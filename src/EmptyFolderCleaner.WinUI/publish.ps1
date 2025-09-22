@@ -1,8 +1,18 @@
-$ErrorActionPreference = "Stop"
-$proj = "src/EmptyFolderCleaner.WinUI/EmptyFolderCleaner.WinUI.csproj"
-dotnet restore $proj
-dotnet publish $proj -c Release -p:PublishProfile=Win-x64-SelfContained
-$pub = Get-ChildItem "src/EmptyFolderCleaner.WinUI/bin/Release/*/win-x64/publish" -Directory | Select-Object -Last 1
-Compress-Archive -Force -Path "$($pub.FullName)\*" -DestinationPath "$($pub.FullName).zip"
-Write-Host "Published to: $($pub.FullName)"
-Write-Host "ZIP: $($pub.FullName).zip"
+[CmdletBinding()]
+param(
+    [ValidateSet('Debug', 'Release')]
+    [string]$Configuration = 'Release',
+
+    [string]$PublishProfile = 'Win-x64-SelfContained',
+
+    [switch]$SkipZip
+)
+
+$ErrorActionPreference = 'Stop'
+
+$repoScript = Join-Path $PSScriptRoot '..' '..' 'publish.ps1'
+if (-not (Test-Path $repoScript)) {
+    throw "Unable to locate publish helper script at '$repoScript'."
+}
+
+& $repoScript -Configuration $Configuration -PublishProfile $PublishProfile -SkipZip:$SkipZip

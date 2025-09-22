@@ -35,10 +35,16 @@ A fast, safe, and modern Windows app to find and delete empty folders. Built wit
    Distribute the entire **publish** folder (zipping it works well). The Windows App SDK runtime loads from the OS when available, which is standard for unpackaged WinUI apps.
 
 ### PowerShell helper script
-Instead of running the commands manually, you can execute the helper script that performs the same steps and zips the output:
+Instead of running the commands manually, you can execute the helper script from the repository root. It restores packages, publishes the app by using the `Win-x64-SelfContained` profile, and creates a ZIP archive next to the publish output:
 
 ```powershell
-pwsh src/EmptyFolderCleaner.WinUI/publish.ps1
+pwsh ./publish.ps1
+```
+
+You can override the build configuration or skip the ZIP step when needed:
+
+```powershell
+pwsh ./publish.ps1 -Configuration Debug -SkipZip
 ```
 
 ### Run the app from source

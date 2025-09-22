@@ -242,9 +242,7 @@ public sealed class MainWindow : Window
     {
         try
         {
-            var hwnd = WindowNative.GetWindowHandle(this);
-            var windowId = global::WinRT.Interop.Win32Interop.GetWindowIdFromWindow(hwnd);
-            return AppWindow.GetFromWindowId(windowId);
+            return this.AppWindow;
         }
         catch
         {
