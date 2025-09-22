@@ -47,6 +47,23 @@ You can override the build configuration or skip the ZIP step when needed:
 pwsh ./publish.ps1 -Configuration Debug -SkipZip
 ```
 
+## Build an MSIX package (recommended installer)
+1. Supply the required visual assets in `src/EmptyFolderCleaner.Packaging/Images` (see the `README.md` inside that folder for the expected file names and pixel sizes).
+2. Restore dependencies (only required once per machine):
+   ```powershell
+   dotnet restore
+   ```
+3. Use **MSBuild** to create a signed-ready bundle from the Windows App Packaging project:
+   ```powershell
+   msbuild .\EmptyFolderCleaner.Packaging\EmptyFolderCleaner.Packaging.wapproj `
+     /p:Configuration=Release `
+     /p:UapAppxPackageBuildMode=StoreUpload `
+     /p:GenerateAppxPackageOnBuild=true
+   ```
+4. The output folder contains an **.msixbundle** plus a temporary certificate (\*.cer). Install the certificate into **Local Machine → Trusted People** (or sign the bundle with your own code-signing certificate), then double-click the MSIX bundle to install.
+
+The MSIX build targets **Windows 10, version 2004 (build 19041)** or later and ships in a single file that installs/uninstalls cleanly. Hosting the bundle alongside an **App Installer** XML enables background updates with no extra tooling.
+
 ### Run the app from source
 If you just want to launch the app (without producing publish artifacts), run the included helper script from the repository root:
 
