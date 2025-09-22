@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -47,13 +48,10 @@ internal static class WindowsAppSdkBootstrapper
         }
     }
 
-    private static (string MajorMinor, string VersionTag, PackageVersion MinVersion) GetReleaseInfo()
+    private static (uint MajorMinor, string VersionTag, PackageVersion MinVersion) GetReleaseInfo()
     {
         Assembly assembly = typeof(Bootstrap).Assembly;
-        Version? assemblyVersion = assembly.GetName().Version;
-        string majorMinor = assemblyVersion is not null
-            ? $"{assemblyVersion.Major}.{assemblyVersion.Minor}"
-            : "";
+        uint majorMinor = 0;
         string versionTag = string.Empty;
         PackageVersion minVersion = default;
 
@@ -62,10 +60,14 @@ internal static class WindowsAppSdkBootstrapper
             Type? releaseType = assembly.GetType("Microsoft.WindowsAppSDK.Release");
             if (releaseType is not null)
             {
-                majorMinor = releaseType
-                                 .GetProperty("MajorMinor", BindingFlags.Public | BindingFlags.Static)?
-                                 .GetValue(null) as string
-                             ?? majorMinor;
+                object? majorMinorValue = releaseType
+                    .GetProperty("MajorMinor", BindingFlags.Public | BindingFlags.Static)?
+                    .GetValue(null);
+                if (TryParseMajorMinor(majorMinorValue, out uint parsedMajorMinor))
+                {
+                    majorMinor = parsedMajorMinor;
+                }
+
                 versionTag = releaseType
                                  .GetProperty("VersionTag", BindingFlags.Public | BindingFlags.Static)?
                                  .GetValue(null) as string
@@ -84,34 +86,96 @@ internal static class WindowsAppSdkBootstrapper
         {
         }
 
-        if (string.IsNullOrWhiteSpace(majorMinor))
+        if (majorMinor == 0)
+        {
+            Version? assemblyVersion = assembly.GetName().Version;
+            if (assemblyVersion is not null)
+            {
+                majorMinor = CombineMajorMinor(assemblyVersion.Major, assemblyVersion.Minor);
+            }
+        }
+
+        if (majorMinor == 0)
         {
             string? informationalVersion = assembly
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
                 .InformationalVersion;
 
-            if (!string.IsNullOrEmpty(informationalVersion))
+            if (TryParseMajorMinorString(informationalVersion, out uint parsedInformationalMajorMinor))
             {
-                int prereleaseSeparator = informationalVersion.IndexOf('-');
-                if (prereleaseSeparator >= 0)
-                {
-                    informationalVersion = informationalVersion.Substring(0, prereleaseSeparator);
-                }
-
-                string[] parts = informationalVersion.Split('.');
-                if (parts.Length >= 2)
-                {
-                    majorMinor = $"{parts[0]}.{parts[1]}";
-                }
-            }
-
-            if (string.IsNullOrWhiteSpace(majorMinor))
-            {
-                majorMinor = "1.6";
+                majorMinor = parsedInformationalMajorMinor;
             }
         }
 
+        if (majorMinor == 0)
+        {
+            majorMinor = CombineMajorMinor(1, 6);
+        }
+
         return (majorMinor, versionTag, minVersion);
+    }
+
+    private static bool TryParseMajorMinor(object? value, out uint result)
+    {
+        switch (value)
+        {
+            case uint majorMinorValue when majorMinorValue != 0:
+                result = majorMinorValue;
+                return true;
+            case int majorMinorInt when majorMinorInt > 0:
+                result = (uint)majorMinorInt;
+                return true;
+            case string majorMinorString:
+                return TryParseMajorMinorString(majorMinorString, out result);
+            default:
+                result = 0;
+                return false;
+        }
+    }
+
+    private static bool TryParseMajorMinorString(string? value, out uint result)
+    {
+        result = 0;
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return false;
+        }
+
+        string sanitized = value.Trim();
+        int dashIndex = sanitized.IndexOf('-');
+        if (dashIndex >= 0)
+        {
+            sanitized = sanitized[..dashIndex];
+        }
+
+        string[] parts = sanitized.Split('.', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length < 2)
+        {
+            return false;
+        }
+
+        if (!ushort.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out ushort major))
+        {
+            return false;
+        }
+
+        if (!ushort.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out ushort minor))
+        {
+            return false;
+        }
+
+        result = ((uint)major << 16) | minor;
+        return true;
+    }
+
+    private static uint CombineMajorMinor(int major, int minor)
+    {
+        if (major < 0 || major > ushort.MaxValue || minor < 0 || minor > ushort.MaxValue)
+        {
+            return 0;
+        }
+
+        return ((uint)major << 16) | (uint)minor;
     }
 
     private static void OnProcessExit(object? sender, EventArgs e)
