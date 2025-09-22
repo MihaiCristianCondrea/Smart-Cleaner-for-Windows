@@ -41,6 +41,13 @@ Instead of running the commands manually, you can execute the helper script that
 pwsh src/EmptyFolderCleaner.WinUI/publish.ps1
 ```
 
+### Run the app from source
+If you just want to launch the app (without producing publish artifacts), run the included helper script from the repository root:
+
+```powershell
+pwsh ./run.ps1 -Configuration Release
+```
+
 ## Usage
 1. Launch **Empty Folder Cleaner**.
 2. Browse to the root directory you want to inspect.

@@ -7,7 +7,13 @@
     Width="840"
     Height="600">
     <muxc:NavigationView IsSettingsVisible="False" PaneDisplayMode="LeftMinimal">
-        <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="12">
+        <Grid Padding="12">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <TextBox x:Name="RootPathBox" Width="520" PlaceholderText="Select a root folder…" />
                 <Button x:Name="BrowseBtn" Content="Browse" Click="OnBrowse" />
