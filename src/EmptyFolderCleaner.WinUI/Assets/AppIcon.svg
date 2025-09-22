@@ -1,32 +1,92 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<!-- Empty Folder Cleaner – Fluent-style folder + smaller broom + extra sparkles -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-labelledby="title desc" role="img">
+  <title>Empty Folder Cleaner</title>
+  <desc>Fluent-style yellow folder with a smaller broom and multiple sparkles</desc>
+
   <defs>
-    <!-- Folder gradient -->
-    <linearGradient id="folderGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#40A9FF"/>
-      <stop offset="100%" stop-color="#0066FF"/>
+    <!-- Folder gradient (Fluent yellow) -->
+    <linearGradient id="g-folder" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#FFD65C"/>
+      <stop offset="100%" stop-color="#FFB900"/>
     </linearGradient>
-    <!-- Broom gradient -->
-    <linearGradient id="broomGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#FFD76E"/>
-      <stop offset="100%" stop-color="#FF9E3D"/>
+
+    <!-- Handle (neutral gray) -->
+    <linearGradient id="g-handle" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#E8E8EA"/>
+      <stop offset="100%" stop-color="#B7B9C0"/>
     </linearGradient>
-    <!-- Sparkle gradient -->
-    <linearGradient id="sparkleGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#7CFF7C"/>
-      <stop offset="100%" stop-color="#00FFD5"/>
+
+    <!-- Broom head (Microsoft-ish accents) -->
+    <linearGradient id="g-warm" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#ff9f00"/>
+      <stop offset="100%" stop-color="#E81123"/>
     </linearGradient>
+    <linearGradient id="g-green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#6BB700"/>
+      <stop offset="100%" stop-color="#00B294"/>
+    </linearGradient>
+    <linearGradient id="g-blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#2e89e1"/>
+      <stop offset="100%" stop-color="#0078D4"/>
+    </linearGradient>
+
+    <!-- Sparkles -->
+    <linearGradient id="g-sparkle-a" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#50E6FF"/>
+      <stop offset="100%" stop-color="#0078D4"/>
+    </linearGradient>
+    <linearGradient id="g-sparkle-b" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#B4A0FF"/>
+      <stop offset="100%" stop-color="#5A32A3"/>
+    </linearGradient>
+
+    <!-- Soft top shine -->
+    <radialGradient id="g-shine" cx="28%" cy="5%" r="75%">
+      <stop offset="0%"  stop-color="#FFFFFF" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
   </defs>
 
-  <!-- Folder -->
-  <path d="M8 20c0-2.2 1.8-4 4-4h12l4 4h28c2.2 0 4 1.8 4 4v24c0 2.2-1.8 4-4 4H12c-2.2 0-4-1.8-4-4V20z"
-        fill="url(#folderGrad)" rx="6" ry="6"/>
+  <!-- ===== Folder (back) ===== -->
+  <!-- tab -->
+  <path d="M12 17a4 4 0 0 1 4-4h8l3 3h8c2.2 0 4 1.8 4 4v2H12v-5Z" fill="url(#g-folder)"/>
+  <!-- body -->
+  <path d="M10 22c0-2.2 1.8-4 4-4h36c2.2 0 4 1.8 4 4v22c0 2.2-1.8 4-4 4H14c-2.2 0-4-1.8-4-4V22Z"
+        fill="url(#g-folder)"/>
+  <!-- subtle top shine -->
+  <rect x="10" y="22" width="44" height="8" fill="url(#g-shine)"/>
 
-  <!-- Sparkle -->
-  <path d="M46 14l2 4 4 2-4 2-2 4-2-4-4-2 4-2z"
-        fill="url(#sparkleGrad)" stroke="white" stroke-width="1"/>
+  <!-- ===== Broom (your geometry, scaled smaller & slightly rotated) ===== -->
+  <!-- scale from ~0.23 -> 0.16 and reposition so it tucks inside the folder -->
+  <g transform="translate(7,4) scale(0.16) rotate(18 140 140)">
+    <!-- handle -->
+    <path d="M82.5,136.1l-68.1-118C11.5,13.3,13.2,7,18.1,4.1l1.1-0.6c4.9-2.8,11.2-1.2,14.1,3.8l68.1,118
+      c1.8,3.1,0.7,7-2.3,8.8l-7.8,4.5C88.2,140.3,84.3,139.2,82.5,136.1z"
+      fill="url(#g-handle)"/>
+    <!-- warm sweep -->
+    <path d="M129.8,81.1c9.3,10.6,18.5,20.8,29.4,29.8c23.7,19.7,54.6,30.4,85.1,32.4c4.6,0.3,13.7-0.6,17,3
+      c1.6,1.8,1.9,4.3,1.7,6.6c-1.1,11.6-29.4,47-39.5,54.5c-0.1,0.1-0.2,0.2-0.3,0.2c-27.4,26.7-64.1,44.2-101.6,51
+      c-2.1,0.3-10,1.7-11.6,1.7c-14,2.1-36.7,2.5-50.9,1.1c-11.6-0.7-48.2-4.2-56.4-12.7c-2.6-2.7-3.2-5.5-1.9-9c1.3-3.6,4-6.8,6-10
+      c2.3-3.7,4.5-7.4,6.6-11.2c12.1-21.8,21-49.8,21.7-74.8c0.6-0.7,0.3-3.8,0.3-4.9c3.3-1.4,7.6-4,10.8-5.8c7-4.1,13.9-8.4,20.7-12.8
+      C75,115.5,83.4,110,91.7,105c3.8-2.3,7.8-5.1,11.6-7.2C112.3,92.4,121.1,86.8,129.8,81.1z"
+      fill="url(#g-warm)"/>
+    <!-- green sweep -->
+    <path d="M149.9,166.9c16.8,17.6,31.6,29.8,55.5,37.4c4.5,1.4,12.1,3.4,16.7,3.5c0.3,0,0.6,0,0.9,0
+      c-27.4,26.7-64.1,44.2-101.6,51c-2.1,0.3-10,1.7-11.6,1.7c1.7-1.2,8.1-2.9,11.2-4.5c0.6-0.6,5.8-3.4,7-4.1
+      c25.4-16.7,32.8-43.4,26.1-71.6c-0.6-2.4-1.3-4.7-2.1-7C151.4,171.5,150,168.6,149.9,166.9z"
+      fill="url(#g-green)"/>
+    <!-- blue sweep -->
+    <path d="M34.9,144.1c-0.7,24.9-9.6,52.9-21.6,74.5c-2.1,3.8-4.3,7.5-6.6,11.2c-2,3.2-4.7,6.4-6,10
+      c-1.3,3.5-0.7,6.3,1.9,9c8.2,8.5,44.8,12,56.4,12.7c9.4-11.7,16.5-25,20.9-39.3c6-19,6-44.4,1.7-63.8c-2.7-12.1-9.2-27.1-14.9-38
+      C75,115.5,83.4,110,91.7,105c3.8-2.3,7.8-5.1,11.6-7.2c8.9-5.4,17.7-11,26.4-16.7c-5.4-5.6-11.9-14.5-19.5-16.7
+      c-8.9-2.6-16,2.3-23.3,6.7c-4.6,2.8-9.5,5.9-14.2,8.5L53,91.5c-9.6,5.8-22.2,10.9-25.2,22.8c-3.1,12.1,7.2,18.5,7.1,29.5"
+      fill="url(#g-blue)"/>
+  </g>
 
-  <!-- Broom handle -->
-  <rect x="36" y="38" width="3" height="12" rx="1.5" fill="#804000" />
-  <!-- Broom brush -->
-  <path d="M34 50h7l-1 6h-5z" fill="url(#broomGrad)" />
+  <!-- ===== Sparkles (more, varied sizes) ===== -->
+  <path d="M48 10 l1.4 2.8 2.8 1.4 -2.8 1.4 -1.4 2.8 -1.4-2.8 -2.8-1.4 2.8-1.4Z" fill="url(#g-sparkle-a)"/>
+  <path d="M55 15 l1.2 2.4 2.4 1.2 -2.4 1.2 -1.2 2.4 -1.2-2.4 -2.4-1.2 2.4-1.2Z" fill="url(#g-sparkle-b)"/>
+  <path d="M43 19 l1.0 2.0 2.0 1.0 -2.0 1.0 -1.0 2.0 -1.0-2.0 -2.0-1.0 2.0-1.0Z" fill="url(#g-sparkle-a)"/>
+  <path d="M52 24 l0.9 1.8 1.8 0.9 -1.8 0.9 -0.9 1.8 -0.9-1.8 -1.8-0.9 1.8-0.9Z" fill="url(#g-sparkle-b)"/>
+
 </svg>
