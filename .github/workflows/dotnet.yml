@@ -29,4 +29,4 @@ jobs:
     - name: Build core library
       run: dotnet build "$Library_Project_Path" --no-restore
     - name: Test
-      run: dotnet test "$Test_Project_Path" --no-build --verbosity normal
+      run: dotnet test "$Test_Project_Path" --no-restore --verbosity normal

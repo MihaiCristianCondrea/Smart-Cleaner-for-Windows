@@ -38,6 +38,6 @@ jobs:
           Configuration: ${{ matrix.configuration }}
 
       - name: Test
-        run: dotnet test $env:Test_Project_Path --configuration $env:Configuration --no-build --verbosity normal
+        run: dotnet test $env:Test_Project_Path --configuration $env:Configuration --no-restore --verbosity normal
         env:
           Configuration: ${{ matrix.configuration }}
