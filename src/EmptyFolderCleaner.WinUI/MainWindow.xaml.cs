@@ -4,35 +4,201 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using EmptyFolderCleaner.Core;
+using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Markup;
 using Windows.Storage.Pickers;
 using WinRT;
 using WinRT.Interop;
+using Windows.Graphics;
 
 namespace EmptyFolderCleaner.WinUI;
 
-public sealed partial class MainWindow : Window
+public sealed class MainWindow : Window
 {
     private CancellationTokenSource? _cts;
     private MicaController? _mica;
     private SystemBackdropConfiguration? _backdropConfig;
     private List<string> _previewCandidates = new();
     private bool _isBusy;
+    private readonly TextBox RootPathBox;
+    private readonly Button BrowseBtn;
+    private readonly Button PreviewBtn;
+    private readonly Button DeleteBtn;
+    private readonly CheckBox RecycleChk;
+    private readonly NumberBox DepthBox;
+    private readonly TextBox ExcludeBox;
+    private readonly ProgressBar Progress;
+    private readonly Button CancelBtn;
+    private readonly InfoBar Info;
+    private readonly ListView Candidates;
 
     public MainWindow()
     {
-        InitializeComponent();
-        TryEnableMica();
-        TryApplyIcon();
+        Title = "Empty Folder Cleaner";
+
+        var navigation = new NavigationView
+        {
+            IsSettingsVisible = false,
+            PaneDisplayMode = NavigationViewPaneDisplayMode.LeftMinimal
+        };
+
+        var grid = new Grid { Padding = new Thickness(12) };
+        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+
+        RootPathBox = new TextBox
+        {
+            Width = 520,
+            PlaceholderText = "Select a root folder…"
+        };
         RootPathBox.TextChanged += RootPathBox_TextChanged;
+
+        BrowseBtn = new Button { Content = "Browse" };
+        BrowseBtn.Click += OnBrowse;
+
+        PreviewBtn = new Button { Content = "Preview" };
+        PreviewBtn.Click += OnPreview;
+
+        DeleteBtn = new Button
+        {
+            Content = "Delete",
+            IsEnabled = false
+        };
+        if (Application.Current.Resources.TryGetValue("AccentButtonStyle", out var accentStyleObj) &&
+            accentStyleObj is Style accentStyle)
+        {
+            DeleteBtn.Style = accentStyle;
+        }
+        DeleteBtn.Click += OnDelete;
+
+        var pathRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 8
+        };
+        pathRow.Children.Add(RootPathBox);
+        pathRow.Children.Add(BrowseBtn);
+        pathRow.Children.Add(PreviewBtn);
+        pathRow.Children.Add(DeleteBtn);
+
+        RecycleChk = new CheckBox
+        {
+            Content = "Send to Recycle Bin",
+            IsChecked = true
+        };
+
+        DepthBox = new NumberBox
+        {
+            Minimum = 0,
+            Maximum = 999,
+            Value = 0,
+            Width = 90
+        };
+
+        var depthRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 6
+        };
+        depthRow.Children.Add(new TextBlock
+        {
+            Text = "Depth limit:",
+            VerticalAlignment = VerticalAlignment.Center
+        });
+        depthRow.Children.Add(DepthBox);
+
+        ExcludeBox = new TextBox
+        {
+            Width = 360,
+            PlaceholderText = ".git; build/*; node_modules"
+        };
+
+        var excludeRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 6
+        };
+        excludeRow.Children.Add(new TextBlock
+        {
+            Text = "Exclusions (semicolon-separated):",
+            VerticalAlignment = VerticalAlignment.Center
+        });
+        excludeRow.Children.Add(ExcludeBox);
+
+        var optionsRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 12,
+            Margin = new Thickness(0, 8, 0, 0)
+        };
+        optionsRow.Children.Add(RecycleChk);
+        optionsRow.Children.Add(depthRow);
+        optionsRow.Children.Add(excludeRow);
+        Grid.SetRow(optionsRow, 1);
+
+        Progress = new ProgressBar
+        {
+            Width = 280,
+            Visibility = Visibility.Collapsed,
+            IsIndeterminate = true
+        };
+
+        CancelBtn = new Button
+        {
+            Content = "Cancel",
+            Visibility = Visibility.Collapsed,
+            IsEnabled = false
+        };
+        CancelBtn.Click += OnCancel;
+
+        Info = new InfoBar { IsOpen = false };
+
+        var statusRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 12,
+            Margin = new Thickness(0, 8, 0, 0)
+        };
+        statusRow.Children.Add(Progress);
+        statusRow.Children.Add(CancelBtn);
+        statusRow.Children.Add(Info);
+        Grid.SetRow(statusRow, 2);
+
+        Candidates = new ListView
+        {
+            Margin = new Thickness(0, 8, 0, 0),
+            SelectionMode = ListViewSelectionMode.None,
+            IsItemClickEnabled = false
+        };
+        Candidates.ItemTemplate = (DataTemplate)XamlReader.Load(
+            "<DataTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'>" +
+            "<TextBlock Text='{Binding}' TextTrimming='CharacterEllipsis' />" +
+            "</DataTemplate>");
+        Grid.SetRow(Candidates, 3);
+
+        grid.Children.Add(pathRow);
+        grid.Children.Add(optionsRow);
+        grid.Children.Add(statusRow);
+        grid.Children.Add(Candidates);
+
+        navigation.Content = grid;
+        Content = navigation;
+
+        TryEnableMica();
+        TryConfigureAppWindow();
+        Activated += OnWindowActivated;
         Closed += OnClosed;
     }
 
     private void OnClosed(object sender, WindowEventArgs args)
     {
+        Activated -= OnWindowActivated;
         _cts?.Cancel();
         _cts?.Dispose();
         _cts = null;
@@ -60,21 +226,53 @@ public sealed partial class MainWindow : Window
         };
 
         _mica = new MicaController { Kind = MicaKind.Base };
-        _mica.AddSystemBackdropTarget(this.As<ICompositionSupportsSystemBackdrop>());
+        _mica.AddSystemBackdropTarget(this.As<global::Microsoft.UI.Composition.ICompositionSupportsSystemBackdrop>());
         _mica.SetSystemBackdropConfiguration(_backdropConfig);
     }
 
-    protected override void OnActivated(WindowActivatedEventArgs args)
+    private void OnWindowActivated(object sender, WindowActivatedEventArgs args)
     {
         if (_backdropConfig is not null)
         {
             _backdropConfig.IsInputActive = args.WindowActivationState != WindowActivationState.Deactivated;
         }
-
-        base.OnActivated(args);
     }
 
-    private void TryApplyIcon()
+    private AppWindow? TryGetAppWindow()
+    {
+        try
+        {
+            var hwnd = WindowNative.GetWindowHandle(this);
+            var windowId = global::WinRT.Interop.Win32Interop.GetWindowIdFromWindow(hwnd);
+            return AppWindow.GetFromWindowId(windowId);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private void TryConfigureAppWindow()
+    {
+        var appWindow = TryGetAppWindow();
+        if (appWindow is null)
+        {
+            return;
+        }
+
+        try
+        {
+            appWindow.Resize(new SizeInt32(840, 600));
+        }
+        catch
+        {
+            // Ignore sizing failures on unsupported systems.
+        }
+
+        TryApplyIcon(appWindow);
+    }
+
+    private void TryApplyIcon(AppWindow? appWindow = null)
     {
         try
         {
@@ -84,10 +282,8 @@ public sealed partial class MainWindow : Window
                 return;
             }
 
-            var hwnd = WindowNative.GetWindowHandle(this);
-            var windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
-            var appWindow = AppWindow.GetFromWindowId(windowId);
-            appWindow.SetIcon(iconPath);
+            appWindow ??= TryGetAppWindow();
+            appWindow?.SetIcon(iconPath);
         }
         catch
         {
