@@ -1,73 +1,53 @@
-# Empty Folder Cleaner
+# Empty Folder Cleaner (Windows, WinUI 3)
 
-This repository contains a .NET 8 solution for scanning and deleting empty directories. The core logic is packaged as a reusable
-library that powers both a cross-platform command line interface and a WinUI 3 desktop application for Windows.
+A fast, safe, and modern Windows app to find and delete empty folders. Built with **.NET 8** and the **Windows App SDK (WinUI 3)** for a Fluent look that respects the system accent, uses Mica, and stays responsive during long scans.
 
-## Project layout
+## Features
+- **Preview first** – scan any folder and review empty directories before you delete them.
+- **Safe by default** – deletions go to the **Recycle Bin** (you can opt out for permanent removal).
+- **Exclusions** – semicolon separated wildcards (e.g., `.git; build/*; node_modules`).
+- **Depth limit** – constrain traversal depth (0 = unlimited).
+- **Symlink aware** – reparse points are skipped by default.
+- **Progress + cancel** – long operations stay cancellable and surface status in an InfoBar.
+- **Fluent UI** – Mica backdrop, accent-aware buttons, and light implicit animations.
 
-```
-EmptyFolderCleaner.sln
-├── src/
-│   ├── EmptyFolderCleaner.Core/       # Directory scanning and deletion logic
-│   ├── EmptyFolderCleaner.Cli/        # System.CommandLine based CLI
-│   └── EmptyFolderCleaner.WinUI/      # WinUI 3 desktop app (Windows App SDK)
-└── tests/
-    └── EmptyFolderCleaner.Core.Tests/ # xUnit tests for the core library
-```
+## Requirements
+- Windows 10 2004 (build 19041) or newer.
+- No additional runtime is required when you use the self-contained publish output.
 
-### Core library (`EmptyFolderCleaner.Core`)
-
-The `DirectoryCleaner` type performs a bottom-up traversal of a directory tree and supports:
-
-* Dry-run previews and destructive runs.
-* Optional deletion to the Windows Recycle Bin (guarded at runtime on non-Windows platforms).
-* Wildcard-based exclude patterns (`*` and `?`) applied to names or relative paths.
-* Explicit exclude path list.
-* Reparse point (symbolic link/junction) skipping by default.
-* Depth limits and optional deletion of the root directory itself.
-* Cancellation support and structured error reporting.
-
-### Command line interface (`EmptyFolderCleaner.Cli`)
-
-The CLI wraps the library with a friendly interface:
-
-```bash
-# Preview (default)
-dotnet run --project src/EmptyFolderCleaner.Cli -- "C:/path/to/root"
-
-# Permanently delete empty directories
-dotnet run --project src/EmptyFolderCleaner.Cli -- "C:/path" --delete --permanent
-
-# Delete using the Recycle Bin on Windows
-dotnet run --project src/EmptyFolderCleaner.Cli -- "C:/path" --delete
-
-# Apply exclusions and limit traversal depth
-dotnet run --project src/EmptyFolderCleaner.Cli -- \
-  "C:/path" --exclude ".git" --exclude "build/*" --depth 2 --json
-```
-
-Run `dotnet run --project src/EmptyFolderCleaner.Cli -- --help` for the full option list.
-
-### WinUI 3 desktop application (`EmptyFolderCleaner.WinUI`)
-
-An unpackaged WinUI 3 experience that ships with Fluent design defaults. It reuses the core library and
-provides preview and delete flows, exclusion patterns, progress and cancellation.
-
-Publishing a portable executable (on Windows with the Windows App SDK workload installed):
-
+## Build (portable publish)
 ```powershell
+dotnet restore
 dotnet publish src/EmptyFolderCleaner.WinUI/EmptyFolderCleaner.WinUI.csproj -c Release -p:PublishProfile=Win-x64-SelfContained
 ```
 
-## Development
+The resulting executable lives in:
 
-1. Install the .NET 8 SDK.
-2. Restore dependencies and run the unit tests:
-
-```bash
-dotnet test tests/EmptyFolderCleaner.Core.Tests/EmptyFolderCleaner.Core.Tests.csproj
+```
+src/EmptyFolderCleaner.WinUI/bin/Release/net8.0-windows10.0.19041.0/win-x64/publish/EmptyFolderCleaner.WinUI.exe
 ```
 
-3. Run the CLI as shown above or open the solution in Visual Studio / Rider to work with the WinUI project.
+Distribute the entire publish folder (a zip works well). The Windows App SDK runtime loads from the OS when available, which is standard for unpackaged WinUI apps.
 
-> **Note:** Building the WinUI project requires Windows with the Windows App SDK workload. The CLI and tests run cross-platform.
+To automate publishing on Windows, run:
+
+```powershell
+pwsh src/EmptyFolderCleaner.WinUI/publish.ps1
+```
+
+The script restores dependencies, publishes, and zips the latest output.
+
+## Usage
+1. Launch **Empty Folder Cleaner**.
+2. Browse to the root directory you want to inspect.
+3. Adjust exclusion patterns or depth if needed.
+4. Click **Preview** to list empty folders.
+5. Review the results, then click **Delete** to remove them (Recycle Bin by default).
+6. Use **Cancel** whenever you want to stop a long-running scan.
+
+## Privacy
+Everything runs locally. The app only reads and deletes directories that you point it to—no telemetry, no uploads.
+
+## Credits
+- Windows App SDK / WinUI 3
+- Windows Community Toolkit (animations)

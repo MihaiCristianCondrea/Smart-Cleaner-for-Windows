@@ -1,21 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
-    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <OutputType>WinExe</OutputType>
+    <UseWinUI>true</UseWinUI>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UseWinUI>true</UseWinUI>
     <WindowsPackageType>None</WindowsPackageType>
     <RootNamespace>EmptyFolderCleaner.WinUI</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>x64</Platforms>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <EnableMsixTooling>false</EnableMsixTooling>
+    <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <PublishTrimmed>false</PublishTrimmed>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishReadyToRun>true</PublishReadyToRun>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.250907003" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4948" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.3" />
+    <PackageReference Include="CommunityToolkit.WinUI" Version="8.2.2" />
+    <PackageReference Include="CommunityToolkit.WinUI.Animations" Version="8.2.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,15 +30,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="app.manifest">
+    <None Include="app.manifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="Assets\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
 </Project>
