@@ -14,15 +14,19 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      Test_Project_Path: tests/EmptyFolderCleaner.Core.Tests/EmptyFolderCleaner.Core.Tests.csproj
+      Library_Project_Path: src/EmptyFolderCleaner.Core/EmptyFolderCleaner.Core.csproj
+
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
+    - name: Restore test dependencies
+      run: dotnet restore "$Test_Project_Path"
+    - name: Build core library
+      run: dotnet build "$Library_Project_Path" --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test "$Test_Project_Path" --no-build --verbosity normal
