@@ -15,27 +15,31 @@ A fast, safe, and modern Windows app to find and delete empty folders. Built wit
 - Windows 10 2004 (build 19041) or newer.
 - No additional runtime is required when you use the self-contained publish output.
 
-## Build (portable publish)
-```powershell
-dotnet restore
-dotnet publish src/EmptyFolderCleaner.WinUI/EmptyFolderCleaner.WinUI.csproj -c Release -p:PublishProfile=Win-x64-SelfContained
-```
+## Build from PowerShell (portable EXE)
+1. Open **Windows Terminal** or **PowerShell** and change into the repository folder, e.g.:
+   ```powershell
+   cd C:\path\to\Empty-Folders-Cleaner
+   ```
+2. Restore NuGet packages:
+   ```powershell
+   dotnet restore
+   ```
+3. Publish a self-contained, portable build (no runtime required on the target PC):
+   ```powershell
+   dotnet publish src/EmptyFolderCleaner.WinUI/EmptyFolderCleaner.WinUI.csproj -c Release -p:PublishProfile=Win-x64-SelfContained
+   ```
+4. After the command finishes, the portable executable and its dependencies are located at:
+   ```
+   src/EmptyFolderCleaner.WinUI/bin/Release/net8.0-windows10.0.19041.0/win-x64/publish/EmptyFolderCleaner.WinUI.exe
+   ```
+   Distribute the entire **publish** folder (zipping it works well). The Windows App SDK runtime loads from the OS when available, which is standard for unpackaged WinUI apps.
 
-The resulting executable lives in:
-
-```
-src/EmptyFolderCleaner.WinUI/bin/Release/net8.0-windows10.0.19041.0/win-x64/publish/EmptyFolderCleaner.WinUI.exe
-```
-
-Distribute the entire publish folder (a zip works well). The Windows App SDK runtime loads from the OS when available, which is standard for unpackaged WinUI apps.
-
-To automate publishing on Windows, run:
+### PowerShell helper script
+Instead of running the commands manually, you can execute the helper script that performs the same steps and zips the output:
 
 ```powershell
 pwsh src/EmptyFolderCleaner.WinUI/publish.ps1
 ```
-
-The script restores dependencies, publishes, and zips the latest output.
 
 ## Usage
 1. Launch **Empty Folder Cleaner**.
