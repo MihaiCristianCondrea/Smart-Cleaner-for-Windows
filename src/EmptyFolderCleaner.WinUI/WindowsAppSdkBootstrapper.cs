@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Microsoft.Windows.ApplicationModel.DynamicDependency;
@@ -27,12 +28,12 @@ internal static class WindowsAppSdkBootstrapper
             // The bootstrapper call below will surface a clearer error message.
         }
 
-        var minVersion = new PackageVersion(Microsoft.WindowsAppSDK.Runtime.Version.UInt64);
+        var releaseInfo = GetReleaseInfo();
 
         if (Bootstrap.TryInitialize(
-                Microsoft.WindowsAppSDK.Release.MajorMinor,
-                Microsoft.WindowsAppSDK.Release.VersionTag,
-                minVersion,
+                releaseInfo.MajorMinor,
+                releaseInfo.VersionTag,
+                releaseInfo.MinVersion,
                 Bootstrap.InitializeOptions.None,
                 out int hresult))
         {
@@ -44,6 +45,73 @@ internal static class WindowsAppSdkBootstrapper
             ShowInitializationError(hresult);
             Environment.Exit(hresult);
         }
+    }
+
+    private static (string MajorMinor, string VersionTag, PackageVersion MinVersion) GetReleaseInfo()
+    {
+        Assembly assembly = typeof(Bootstrap).Assembly;
+        Version? assemblyVersion = assembly.GetName().Version;
+        string majorMinor = assemblyVersion is not null
+            ? $"{assemblyVersion.Major}.{assemblyVersion.Minor}"
+            : "";
+        string versionTag = string.Empty;
+        PackageVersion minVersion = default;
+
+        try
+        {
+            Type? releaseType = assembly.GetType("Microsoft.WindowsAppSDK.Release");
+            if (releaseType is not null)
+            {
+                majorMinor = releaseType
+                                 .GetProperty("MajorMinor", BindingFlags.Public | BindingFlags.Static)?
+                                 .GetValue(null) as string
+                             ?? majorMinor;
+                versionTag = releaseType
+                                 .GetProperty("VersionTag", BindingFlags.Public | BindingFlags.Static)?
+                                 .GetValue(null) as string
+                             ?? versionTag;
+            }
+
+            Type? runtimeVersionType = assembly.GetType("Microsoft.WindowsAppSDK.Runtime+Version");
+            if (runtimeVersionType?
+                    .GetProperty("UInt64", BindingFlags.Public | BindingFlags.Static)?
+                    .GetValue(null) is ulong rawVersion && rawVersion != 0)
+            {
+                minVersion = new PackageVersion(rawVersion);
+            }
+        }
+        catch (Exception)
+        {
+        }
+
+        if (string.IsNullOrWhiteSpace(majorMinor))
+        {
+            string? informationalVersion = assembly
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+                .InformationalVersion;
+
+            if (!string.IsNullOrEmpty(informationalVersion))
+            {
+                int prereleaseSeparator = informationalVersion.IndexOf('-');
+                if (prereleaseSeparator >= 0)
+                {
+                    informationalVersion = informationalVersion.Substring(0, prereleaseSeparator);
+                }
+
+                string[] parts = informationalVersion.Split('.');
+                if (parts.Length >= 2)
+                {
+                    majorMinor = $"{parts[0]}.{parts[1]}";
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(majorMinor))
+            {
+                majorMinor = "1.6";
+            }
+        }
+
+        return (majorMinor, versionTag, minVersion);
     }
 
     private static void OnProcessExit(object? sender, EventArgs e)
