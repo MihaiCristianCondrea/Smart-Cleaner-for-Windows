@@ -18,6 +18,8 @@
     <PublishTrimmed>false</PublishTrimmed>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <PublishReadyToRun>true</PublishReadyToRun>
+    <WindowsAppSdkBootstrapInitialize>false</WindowsAppSdkBootstrapInitialize>
+    <WindowsAppSdkUndockedRegFreeWinRTInitialize>false</WindowsAppSdkUndockedRegFreeWinRTInitialize>
   </PropertyGroup>
 
   <ItemGroup>
