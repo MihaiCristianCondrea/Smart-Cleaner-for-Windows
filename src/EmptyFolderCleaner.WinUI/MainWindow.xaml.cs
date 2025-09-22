@@ -4,14 +4,16 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using EmptyFolderCleaner.Core;
+using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Data;
+using Microsoft.UI.Xaml.Markup;
 using Windows.Storage.Pickers;
 using WinRT;
 using WinRT.Interop;
+using Windows.Graphics;
 
 namespace EmptyFolderCleaner.WinUI;
 
@@ -37,8 +39,6 @@ public sealed class MainWindow : Window
     public MainWindow()
     {
         Title = "Empty Folder Cleaner";
-        Width = 840;
-        Height = 600;
 
         var navigation = new NavigationView
         {
@@ -176,12 +176,10 @@ public sealed class MainWindow : Window
             SelectionMode = ListViewSelectionMode.None,
             IsItemClickEnabled = false
         };
-        Candidates.ItemTemplate = new DataTemplate(() =>
-        {
-            var textBlock = new TextBlock { TextTrimming = TextTrimming.CharacterEllipsis };
-            textBlock.SetBinding(TextBlock.TextProperty, new Binding());
-            return textBlock;
-        });
+        Candidates.ItemTemplate = (DataTemplate)XamlReader.Load(
+            "<DataTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation'>" +
+            "<TextBlock Text='{Binding}' TextTrimming='CharacterEllipsis' />" +
+            "</DataTemplate>");
         Grid.SetRow(Candidates, 3);
 
         grid.Children.Add(pathRow);
@@ -193,7 +191,7 @@ public sealed class MainWindow : Window
         Content = navigation;
 
         TryEnableMica();
-        TryApplyIcon();
+        TryConfigureAppWindow();
         Activated += OnWindowActivated;
         Closed += OnClosed;
     }
@@ -228,7 +226,7 @@ public sealed class MainWindow : Window
         };
 
         _mica = new MicaController { Kind = MicaKind.Base };
-        _mica.AddSystemBackdropTarget(this.As<ICompositionSupportsSystemBackdrop>());
+        _mica.AddSystemBackdropTarget(this.As<global::Microsoft.UI.Composition.ICompositionSupportsSystemBackdrop>());
         _mica.SetSystemBackdropConfiguration(_backdropConfig);
     }
 
@@ -240,7 +238,41 @@ public sealed class MainWindow : Window
         }
     }
 
-    private void TryApplyIcon()
+    private AppWindow? TryGetAppWindow()
+    {
+        try
+        {
+            var hwnd = WindowNative.GetWindowHandle(this);
+            var windowId = global::WinRT.Interop.Win32Interop.GetWindowIdFromWindow(hwnd);
+            return AppWindow.GetFromWindowId(windowId);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private void TryConfigureAppWindow()
+    {
+        var appWindow = TryGetAppWindow();
+        if (appWindow is null)
+        {
+            return;
+        }
+
+        try
+        {
+            appWindow.Resize(new SizeInt32(840, 600));
+        }
+        catch
+        {
+            // Ignore sizing failures on unsupported systems.
+        }
+
+        TryApplyIcon(appWindow);
+    }
+
+    private void TryApplyIcon(AppWindow? appWindow = null)
     {
         try
         {
@@ -250,10 +282,8 @@ public sealed class MainWindow : Window
                 return;
             }
 
-            var hwnd = WindowNative.GetWindowHandle(this);
-            var windowId = Win32Interop.GetWindowIdFromWindow(hwnd);
-            var appWindow = AppWindow.GetFromWindowId(windowId);
-            appWindow.SetIcon(iconPath);
+            appWindow ??= TryGetAppWindow();
+            appWindow?.SetIcon(iconPath);
         }
         catch
         {
