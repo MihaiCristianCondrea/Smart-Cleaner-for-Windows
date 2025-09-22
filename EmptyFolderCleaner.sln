@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyFolderCleaner.Core.Tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyFolderCleaner.WinUI", "src\EmptyFolderCleaner.WinUI\EmptyFolderCleaner.WinUI.csproj", "{BE04035C-D5F8-41D9-90FE-71577886EE0D}"
 EndProject
+Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "EmptyFolderCleaner.Packaging", "src\EmptyFolderCleaner.Packaging\EmptyFolderCleaner.Packaging.wapproj", "{B8FE2F8D-94E8-4110-B214-5AE594305FB8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,10 +36,15 @@ Global
 		{BE04035C-D5F8-41D9-90FE-71577886EE0D}.Debug|Any CPU.Build.0 = Debug|x64
 		{BE04035C-D5F8-41D9-90FE-71577886EE0D}.Release|Any CPU.ActiveCfg = Release|x64
 		{BE04035C-D5F8-41D9-90FE-71577886EE0D}.Release|Any CPU.Build.0 = Release|x64
+		{B8FE2F8D-94E8-4110-B214-5AE594305FB8}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{B8FE2F8D-94E8-4110-B214-5AE594305FB8}.Debug|Any CPU.Build.0 = Debug|x64
+		{B8FE2F8D-94E8-4110-B214-5AE594305FB8}.Release|Any CPU.ActiveCfg = Release|x64
+		{B8FE2F8D-94E8-4110-B214-5AE594305FB8}.Release|Any CPU.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{65858408-D19D-4A53-9B75-4DFA91D1F115} = {D4DF305F-AD53-41FF-9080-5B12409FA1CA}
 		{33B24881-F1F2-4FE7-968D-47652F632D36} = {944F6F6F-D713-4D17-A1B7-200E25F63BBE}
 		{BE04035C-D5F8-41D9-90FE-71577886EE0D} = {D4DF305F-AD53-41FF-9080-5B12409FA1CA}
+		{B8FE2F8D-94E8-4110-B214-5AE594305FB8} = {D4DF305F-AD53-41FF-9080-5B12409FA1CA}
 	EndGlobalSection
 EndGlobal
