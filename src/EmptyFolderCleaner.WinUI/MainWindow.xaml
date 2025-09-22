@@ -1,0 +1,45 @@
+<Window
+    x:Class="EmptyFolderCleaner.WinUI.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    Title="Empty Folder Cleaner"
+    Width="760"
+    Height="540">
+    <muxc:NavigationView IsSettingsVisible="False" PaneDisplayMode="Top" PaneTitle="Empty Folder Cleaner">
+        <Grid RowDefinitions="Auto,*">
+            <StackPanel Orientation="Horizontal" Spacing="8" Margin="12">
+                <TextBox x:Name="RootPathBox" Width="360" PlaceholderText="Choose a root folder..." />
+                <Button Content="Browse" Click="OnBrowse" />
+                <CheckBox x:Name="RecycleCheckBox" Content="Send to Recycle Bin" IsChecked="True" />
+                <CheckBox x:Name="IncludeReparseCheckBox" Content="Include reparse points" />
+                <Button x:Name="PreviewButton" Content="Preview" Click="OnPreview" />
+                <Button x:Name="DeleteButton" Content="Delete" Click="OnDelete" IsEnabled="False" />
+            </StackPanel>
+
+            <Grid Grid.Row="1" Margin="12" RowDefinitions="Auto,Auto,*">
+                <muxc:InfoBar x:Name="StatusInfo" IsOpen="False" />
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center" Margin="0,12,0,12">
+                    <TextBlock Text="Exclude patterns (semicolon separated)" VerticalAlignment="Center" />
+                    <TextBox x:Name="ExcludePatternsBox" Width="260" PlaceholderText=".git;node_modules" />
+                    <CheckBox x:Name="DeleteRootCheckBox" Content="Allow deleting root" />
+                </StackPanel>
+
+                <Grid Grid.Row="2" RowDefinitions="Auto,*">
+                    <muxc:ProgressRing x:Name="Progress" Width="32" Height="32" IsActive="False" Visibility="Collapsed" />
+                    <ListView x:Name="ResultsList" Grid.Row="1">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="🗀" />
+                                    <TextBlock Text="{x:Bind}" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </Grid>
+        </Grid>
+    </muxc:NavigationView>
+</Window>
