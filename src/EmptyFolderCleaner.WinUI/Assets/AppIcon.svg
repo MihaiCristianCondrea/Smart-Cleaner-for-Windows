@@ -1,92 +1,54 @@
-<!-- Empty Folder Cleaner – Fluent-style folder + smaller broom + extra sparkles -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-labelledby="title desc" role="img">
-  <title>Empty Folder Cleaner</title>
-  <desc>Fluent-style yellow folder with a smaller broom and multiple sparkles</desc>
-
-  <defs>
-    <!-- Folder gradient (Fluent yellow) -->
-    <linearGradient id="g-folder" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%"  stop-color="#FFD65C"/>
-      <stop offset="100%" stop-color="#FFB900"/>
-    </linearGradient>
-
-    <!-- Handle (neutral gray) -->
-    <linearGradient id="g-handle" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"  stop-color="#E8E8EA"/>
-      <stop offset="100%" stop-color="#B7B9C0"/>
-    </linearGradient>
-
-    <!-- Broom head (Microsoft-ish accents) -->
-    <linearGradient id="g-warm" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%"  stop-color="#ff9f00"/>
-      <stop offset="100%" stop-color="#E81123"/>
-    </linearGradient>
-    <linearGradient id="g-green" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%"  stop-color="#6BB700"/>
-      <stop offset="100%" stop-color="#00B294"/>
-    </linearGradient>
-    <linearGradient id="g-blue" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%"  stop-color="#2e89e1"/>
-      <stop offset="100%" stop-color="#0078D4"/>
-    </linearGradient>
-
-    <!-- Sparkles -->
-    <linearGradient id="g-sparkle-a" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%"  stop-color="#50E6FF"/>
-      <stop offset="100%" stop-color="#0078D4"/>
-    </linearGradient>
-    <linearGradient id="g-sparkle-b" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%"  stop-color="#B4A0FF"/>
-      <stop offset="100%" stop-color="#5A32A3"/>
-    </linearGradient>
-
-    <!-- Soft top shine -->
-    <radialGradient id="g-shine" cx="28%" cy="5%" r="75%">
-      <stop offset="0%"  stop-color="#FFFFFF" stop-opacity="0.45"/>
-      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
-
-  <!-- ===== Folder (back) ===== -->
-  <!-- tab -->
-  <path d="M12 17a4 4 0 0 1 4-4h8l3 3h8c2.2 0 4 1.8 4 4v2H12v-5Z" fill="url(#g-folder)"/>
-  <!-- body -->
-  <path d="M10 22c0-2.2 1.8-4 4-4h36c2.2 0 4 1.8 4 4v22c0 2.2-1.8 4-4 4H14c-2.2 0-4-1.8-4-4V22Z"
-        fill="url(#g-folder)"/>
-  <!-- subtle top shine -->
-  <rect x="10" y="22" width="44" height="8" fill="url(#g-shine)"/>
-
-  <!-- ===== Broom (your geometry, scaled smaller & slightly rotated) ===== -->
-  <!-- scale from ~0.23 -> 0.16 and reposition so it tucks inside the folder -->
-  <g transform="translate(7,4) scale(0.16) rotate(18 140 140)">
-    <!-- handle -->
-    <path d="M82.5,136.1l-68.1-118C11.5,13.3,13.2,7,18.1,4.1l1.1-0.6c4.9-2.8,11.2-1.2,14.1,3.8l68.1,118
-      c1.8,3.1,0.7,7-2.3,8.8l-7.8,4.5C88.2,140.3,84.3,139.2,82.5,136.1z"
-      fill="url(#g-handle)"/>
-    <!-- warm sweep -->
-    <path d="M129.8,81.1c9.3,10.6,18.5,20.8,29.4,29.8c23.7,19.7,54.6,30.4,85.1,32.4c4.6,0.3,13.7-0.6,17,3
-      c1.6,1.8,1.9,4.3,1.7,6.6c-1.1,11.6-29.4,47-39.5,54.5c-0.1,0.1-0.2,0.2-0.3,0.2c-27.4,26.7-64.1,44.2-101.6,51
-      c-2.1,0.3-10,1.7-11.6,1.7c-14,2.1-36.7,2.5-50.9,1.1c-11.6-0.7-48.2-4.2-56.4-12.7c-2.6-2.7-3.2-5.5-1.9-9c1.3-3.6,4-6.8,6-10
-      c2.3-3.7,4.5-7.4,6.6-11.2c12.1-21.8,21-49.8,21.7-74.8c0.6-0.7,0.3-3.8,0.3-4.9c3.3-1.4,7.6-4,10.8-5.8c7-4.1,13.9-8.4,20.7-12.8
-      C75,115.5,83.4,110,91.7,105c3.8-2.3,7.8-5.1,11.6-7.2C112.3,92.4,121.1,86.8,129.8,81.1z"
-      fill="url(#g-warm)"/>
-    <!-- green sweep -->
-    <path d="M149.9,166.9c16.8,17.6,31.6,29.8,55.5,37.4c4.5,1.4,12.1,3.4,16.7,3.5c0.3,0,0.6,0,0.9,0
-      c-27.4,26.7-64.1,44.2-101.6,51c-2.1,0.3-10,1.7-11.6,1.7c1.7-1.2,8.1-2.9,11.2-4.5c0.6-0.6,5.8-3.4,7-4.1
-      c25.4-16.7,32.8-43.4,26.1-71.6c-0.6-2.4-1.3-4.7-2.1-7C151.4,171.5,150,168.6,149.9,166.9z"
-      fill="url(#g-green)"/>
-    <!-- blue sweep -->
-    <path d="M34.9,144.1c-0.7,24.9-9.6,52.9-21.6,74.5c-2.1,3.8-4.3,7.5-6.6,11.2c-2,3.2-4.7,6.4-6,10
-      c-1.3,3.5-0.7,6.3,1.9,9c8.2,8.5,44.8,12,56.4,12.7c9.4-11.7,16.5-25,20.9-39.3c6-19,6-44.4,1.7-63.8c-2.7-12.1-9.2-27.1-14.9-38
-      C75,115.5,83.4,110,91.7,105c3.8-2.3,7.8-5.1,11.6-7.2c8.9-5.4,17.7-11,26.4-16.7c-5.4-5.6-11.9-14.5-19.5-16.7
-      c-8.9-2.6-16,2.3-23.3,6.7c-4.6,2.8-9.5,5.9-14.2,8.5L53,91.5c-9.6,5.8-22.2,10.9-25.2,22.8c-3.1,12.1,7.2,18.5,7.1,29.5"
-      fill="url(#g-blue)"/>
-  </g>
-
-  <!-- ===== Sparkles (more, varied sizes) ===== -->
-  <path d="M48 10 l1.4 2.8 2.8 1.4 -2.8 1.4 -1.4 2.8 -1.4-2.8 -2.8-1.4 2.8-1.4Z" fill="url(#g-sparkle-a)"/>
-  <path d="M55 15 l1.2 2.4 2.4 1.2 -2.4 1.2 -1.2 2.4 -1.2-2.4 -2.4-1.2 2.4-1.2Z" fill="url(#g-sparkle-b)"/>
-  <path d="M43 19 l1.0 2.0 2.0 1.0 -2.0 1.0 -1.0 2.0 -1.0-2.0 -2.0-1.0 2.0-1.0Z" fill="url(#g-sparkle-a)"/>
-  <path d="M52 24 l0.9 1.8 1.8 0.9 -1.8 0.9 -0.9 1.8 -0.9-1.8 -1.8-0.9 1.8-0.9Z" fill="url(#g-sparkle-b)"/>
-
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 24.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#D2D2D4;}
+	.st1{fill:url(#SVGID_1_);}
+	.st2{fill:url(#SVGID_2_);}
+	.st3{fill:url(#SVGID_3_);}
+	.st4{fill:url(#SVGID_4_);}
+</style>
+<g>
+	<path class="st0" d="M213.9,267.8l-78.5-133.6c-3.4-5.5-1.4-12.6,4.1-15.9l1.2-0.7c5.5-3.3,12.7-1.5,16.1,4.2l78.5,133.5
+		c2.1,3.5,0.8,7.9-2.5,10l-8.8,5.1C220.4,272.5,215.9,271.3,213.9,267.8"/>
+	
+		<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="-48.1678" y1="652.0485" x2="-48.1678" y2="650.9109" gradientTransform="matrix(263.2866 -92.4343 -55.5302 -158.1703 49118.875 98900.1875)">
+		<stop  offset="0" style="stop-color:#FF6B55"/>
+		<stop  offset="1" style="stop-color:#C5221F"/>
+	</linearGradient>
+	<path class="st1" d="M267,204.3c10.7,11.9,21.3,23.5,33.6,33.6c27.1,22.2,62.4,34.2,97.1,36.2c5.3,0.3,15.6-0.8,19.4,3.3
+		c1.8,2,2.2,4.9,2,7.5c-1.2,13.2-33.1,53.7-44.5,62.3c-0.1,0.1-0.3,0.2-0.3,0.2c-31,30.6-72.6,50.8-115.1,58.9
+		c-2.4,0.4-11.3,2.1-13.2,2c-15.9,2.4-41.7,3.2-57.9,1.6c-13.1-0.7-54.8-4.4-64.2-14c-3-3-3.6-6.2-2.2-10.2
+		c1.4-4.1,4.5-7.7,6.7-11.4c2.6-4.3,5.1-8.4,7.4-12.9c13.6-24.9,23.5-56.8,24.1-85.3c0.7-0.8,0.3-4.3,0.3-5.5
+		c3.8-1.7,8.6-4.6,12.2-6.7c8-4.7,15.8-9.6,23.4-14.7c9.2-5.4,18.7-11.7,28.1-17.5c4.3-2.6,8.8-5.9,13.1-8.2
+		C247.2,217.3,257.2,210.8,267,204.3"/>
+	
+		<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="-47.7331" y1="651.9366" x2="-47.7331" y2="650.7991" gradientTransform="matrix(126.3161 -44.3469 -49.6886 -141.5311 38729.6719 90342.9531)">
+		<stop  offset="0" style="stop-color:#FFD966"/>
+		<stop  offset="1" style="stop-color:#F4B400"/>
+	</linearGradient>
+	<path class="st2" d="M267,204.3c10.7,11.9,21.3,23.5,33.6,33.6c27.1,22.2,62.4,34.2,97.1,36.2c5.3,0.3,15.6-0.8,19.4,3.3
+		c1.8,2,2.2,4.9,2,7.5c-1.2,13.2-33.1,53.7-44.5,62.3c-0.1,0.1-0.3,0.2-0.3,0.2l-1.1,0c-5.2-0.1-13.9-2.2-19.1-3.8
+		c-27.2-8.4-44.2-22.2-63.5-42.1c-1-1-1.9-2.2-2.7-3.3c-17.7-19.7-30-42.9-44.2-65c-2.1-3.2-4.3-6.7-6.6-9.9
+		C247.2,217.3,257.2,210.8,267,204.3"/>
+	
+		<linearGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" x1="-47.7298" y1="650.8563" x2="-47.7298" y2="649.7188" gradientTransform="matrix(117.0934 -41.109 -26.5121 -75.5162 23128.5371 47492.1016)">
+		<stop  offset="0" style="stop-color:#7FE29B"/>
+		<stop  offset="1" style="stop-color:#188038"/>
+	</linearGradient>
+	<path class="st3" d="M290.6,301.8c19.3,19.9,36.2,33.6,63.5,42.1c5.1,1.6,13.7,3.7,19.1,3.8l1.1,0c-31,30.6-72.6,50.8-115.1,58.9
+		c-2.4,0.4-11.3,2.1-13.2,2c1.9-1.4,9.2-3.3,12.8-5.2c0.7-0.7,6.6-3.9,8-4.7c28.7-19.2,37-49.6,29.1-81.7c-0.7-2.8-1.5-5.4-2.4-7.9
+		C292.3,307,290.8,303.6,290.6,301.8"/>
+	
+		<linearGradient id="SVGID_4_" gradientUnits="userSpaceOnUse" x1="-48.0127" y1="652.0986" x2="-48.0127" y2="650.961" gradientTransform="matrix(165.5877 -58.1343 -57.3333 -163.3061 45500.3164 103910.7422)">
+		<stop  offset="0" style="stop-color:#7AB4FF"/>
+		<stop  offset="1" style="stop-color:#1A73E8"/>
+	</linearGradient>
+	<path class="st4" d="M159.6,276.8c-0.6,28.3-10.4,60.2-23.9,85c-2.3,4.3-4.8,8.6-7.4,12.9c-2.2,3.7-5.3,7.3-6.7,11.4
+		c-1.5,4-0.8,7.1,2.2,10.2c9.4,9.6,51.1,13.3,64.2,14c10.6-13.4,18.5-28.6,23.4-44.9c6.6-21.6,6.5-50.6,1.4-72.6
+		c-3.1-13.7-10.7-30.7-17.3-43.1c9.4-5.6,18.9-12,28.2-17.8c4.3-2.6,8.8-5.9,13.1-8.2c10.1-6.2,20-12.7,29.9-19.2
+		c-6.2-6.3-13.7-16.4-22.3-18.8c-10.2-2.8-18.2,2.8-26.4,7.8c-5.2,3.3-10.8,6.8-16.1,9.8l-22.3,13.7c-10.9,6.7-25.1,12.6-28.4,26.1
+		c-3.5,13.8,8.3,21,8.3,33.5"/>
+</g>
 </svg>
