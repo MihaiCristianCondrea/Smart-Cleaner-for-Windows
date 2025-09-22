@@ -194,11 +194,13 @@ public sealed class MainWindow : Window
 
         TryEnableMica();
         TryApplyIcon();
+        Activated += OnWindowActivated;
         Closed += OnClosed;
     }
 
     private void OnClosed(object sender, WindowEventArgs args)
     {
+        Activated -= OnWindowActivated;
         _cts?.Cancel();
         _cts?.Dispose();
         _cts = null;
@@ -230,14 +232,12 @@ public sealed class MainWindow : Window
         _mica.SetSystemBackdropConfiguration(_backdropConfig);
     }
 
-    protected override void OnActivated(WindowActivatedEventArgs args)
+    private void OnWindowActivated(object sender, WindowActivatedEventArgs args)
     {
         if (_backdropConfig is not null)
         {
             _backdropConfig.IsInputActive = args.WindowActivationState != WindowActivationState.Deactivated;
         }
-
-        base.OnActivated(args);
     }
 
     private void TryApplyIcon()
