@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250108002" />
-    <PackageReference Include="CommunityToolkit.WinUI.Animations" Version="8.2.250402" />
   </ItemGroup>
 
   <ItemGroup>
