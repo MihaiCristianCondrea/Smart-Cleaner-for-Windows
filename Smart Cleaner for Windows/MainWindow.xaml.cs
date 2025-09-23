@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Globalization;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
@@ -13,6 +17,8 @@ using Windows.Graphics;
 using Windows.Storage.Pickers;
 using WinRT;
 using WinRT.Interop;
+using System.Runtime.CompilerServices;
+using System.Security.Principal;
 
 namespace Smart_Cleaner_for_Windows;
 
@@ -23,6 +29,10 @@ public sealed partial class MainWindow : Window
     private SystemBackdropConfiguration? _backdropConfig;
     private List<string> _previewCandidates = new();
     private bool _isBusy;
+    private readonly ObservableCollection<DiskCleanupItemViewModel> _diskCleanupItems = new();
+    private CancellationTokenSource? _diskCleanupCts;
+    private readonly string _diskCleanupVolume = DiskCleanupManager.GetDefaultVolume();
+    private bool _isDiskCleanupOperation;
 
     public MainWindow()
     {
@@ -37,6 +47,14 @@ public sealed partial class MainWindow : Window
         SetStatus(Symbol.Folder, "Ready when you are", "Select a folder to begin.");
         SetActivity("Waiting for the next action.");
         UpdateResultsSummary(0, "Preview results will appear here once you run a scan.");
+
+        DiskCleanupList.ItemsSource = _diskCleanupItems;
+        DiskCleanupStatusText.Text = $"Ready to analyze disk cleanup handlers for {_diskCleanupVolume}.";
+        if (!IsAdministrator())
+        {
+            DiskCleanupIntro.Text = "Analyze Windows cleanup handlers. Some categories require Administrator privileges.";
+        }
+        UpdateDiskCleanupActionState();
 
         TryEnableMica();
         TryConfigureAppWindow();
@@ -53,6 +71,9 @@ public sealed partial class MainWindow : Window
         _mica?.Dispose();
         _mica = null;
         _backdropConfig = null;
+        _diskCleanupCts?.Cancel();
+        _diskCleanupCts?.Dispose();
+        _diskCleanupCts = null;
     }
 
     private void TryEnableMica()
@@ -373,13 +394,23 @@ public sealed partial class MainWindow : Window
 
     private void CancelActiveOperation()
     {
+        var cancelled = false;
+
         if (_cts is { IsCancellationRequested: false })
         {
             _cts.Cancel();
-            if (_isBusy)
-            {
-                SetActivity("Cancelling current operation…");
-            }
+            cancelled = true;
+        }
+
+        if (_diskCleanupCts is { IsCancellationRequested: false })
+        {
+            _diskCleanupCts.Cancel();
+            cancelled = true;
+        }
+
+        if (cancelled && (_isBusy || _isDiskCleanupOperation))
+        {
+            SetActivity("Cancelling current operation…");
         }
     }
 
@@ -474,6 +505,7 @@ public sealed partial class MainWindow : Window
         DepthBox.IsEnabled = !isBusy;
         ExcludeBox.IsEnabled = !isBusy;
         RecycleChk.IsEnabled = !isBusy;
+        UpdateDiskCleanupActionState();
     }
 
     private void ShowInfo(string message, InfoBarSeverity severity)
@@ -481,5 +513,290 @@ public sealed partial class MainWindow : Window
         Info.Message = message;
         Info.Severity = severity;
         Info.IsOpen = true;
+    }
+
+    private async void OnDiskCleanupAnalyze(object sender, RoutedEventArgs e)
+    {
+        if (_isBusy)
+        {
+            ShowDiskCleanupInfo("Finish the current operation before analyzing disk cleanup.", InfoBarSeverity.Warning);
+            return;
+        }
+
+        _diskCleanupCts?.Cancel();
+        _diskCleanupCts?.Dispose();
+        _diskCleanupCts = new CancellationTokenSource();
+
+        DiskCleanupInfoBar.IsOpen = false;
+        _isDiskCleanupOperation = true;
+        DiskCleanupProgress.Visibility = Visibility.Visible;
+        SetActivity("Analyzing disk cleanup handlers…");
+        SetBusy(true);
+
+        try
+        {
+            var items = await DiskCleanupManager.AnalyzeAsync(_diskCleanupVolume, _diskCleanupCts.Token);
+            ApplyDiskCleanupResults(items);
+            UpdateDiskCleanupStatusSummary();
+            SetActivity("Disk cleanup analysis complete.");
+            ShowDiskCleanupInfo($"Analyzed {items.Count} handler(s).", InfoBarSeverity.Success);
+        }
+        catch (OperationCanceledException)
+        {
+            ShowDiskCleanupInfo("Disk cleanup analysis cancelled.", InfoBarSeverity.Informational);
+            SetActivity("Disk cleanup analysis cancelled.");
+        }
+        catch (Exception ex)
+        {
+            ShowDiskCleanupInfo($"Disk cleanup analysis failed: {ex.Message}", InfoBarSeverity.Error);
+            SetActivity("Disk cleanup analysis failed.");
+        }
+        finally
+        {
+            _isDiskCleanupOperation = false;
+            DiskCleanupProgress.Visibility = Visibility.Collapsed;
+            SetBusy(false);
+            _diskCleanupCts?.Dispose();
+            _diskCleanupCts = null;
+            UpdateDiskCleanupActionState();
+        }
+    }
+
+    private async void OnDiskCleanupClean(object sender, RoutedEventArgs e)
+    {
+        if (_isBusy)
+        {
+            ShowDiskCleanupInfo("Finish the current operation before cleaning disk handlers.", InfoBarSeverity.Warning);
+            return;
+        }
+
+        var targets = _diskCleanupItems
+            .Where(item => item.IsSelected && item.CanSelect)
+            .Select(item => item.Item)
+            .ToList();
+
+        if (targets.Count == 0)
+        {
+            ShowDiskCleanupInfo("Select at least one category to clean.", InfoBarSeverity.Warning);
+            return;
+        }
+
+        _diskCleanupCts?.Cancel();
+        _diskCleanupCts?.Dispose();
+        _diskCleanupCts = new CancellationTokenSource();
+
+        DiskCleanupInfoBar.IsOpen = false;
+        _isDiskCleanupOperation = true;
+        DiskCleanupProgress.Visibility = Visibility.Visible;
+        SetActivity("Running disk cleanup handlers…");
+        SetBusy(true);
+
+        try
+        {
+            var result = await DiskCleanupManager.CleanAsync(_diskCleanupVolume, targets, _diskCleanupCts.Token);
+
+            var severity = result.HasFailures
+                ? InfoBarSeverity.Warning
+                : result.Freed > 0
+                    ? InfoBarSeverity.Success
+                    : InfoBarSeverity.Informational;
+
+            var message = result.SuccessCount > 0
+                ? $"Cleaned {result.SuccessCount} handler(s) and freed {FormatBytes(result.Freed)}."
+                : "No disk cleanup handlers reported any changes.";
+
+            if (result.HasFailures)
+            {
+                var details = string.Join(Environment.NewLine, result.Failures.Select(f => $"• {f.Name}: {f.Message}"));
+                message += Environment.NewLine + details;
+            }
+
+            ShowDiskCleanupInfo(message, severity);
+            SetActivity("Disk cleanup completed.");
+
+            var refreshed = await DiskCleanupManager.AnalyzeAsync(_diskCleanupVolume, _diskCleanupCts.Token);
+            ApplyDiskCleanupResults(refreshed);
+            UpdateDiskCleanupStatusSummary();
+        }
+        catch (OperationCanceledException)
+        {
+            ShowDiskCleanupInfo("Disk cleanup cancelled.", InfoBarSeverity.Informational);
+            SetActivity("Disk cleanup cancelled.");
+        }
+        catch (Exception ex)
+        {
+            ShowDiskCleanupInfo($"Disk cleanup failed: {ex.Message}", InfoBarSeverity.Error);
+            SetActivity("Disk cleanup failed.");
+        }
+        finally
+        {
+            _isDiskCleanupOperation = false;
+            DiskCleanupProgress.Visibility = Visibility.Collapsed;
+            SetBusy(false);
+            _diskCleanupCts?.Dispose();
+            _diskCleanupCts = null;
+            UpdateDiskCleanupActionState();
+        }
+    }
+
+    private void ApplyDiskCleanupResults(IReadOnlyCollection<DiskCleanupManager.DiskCleanupItem> items)
+    {
+        foreach (var item in _diskCleanupItems)
+        {
+            item.PropertyChanged -= OnDiskCleanupItemChanged;
+        }
+
+        _diskCleanupItems.Clear();
+
+        foreach (var item in items)
+        {
+            var viewModel = new DiskCleanupItemViewModel(item);
+            viewModel.PropertyChanged += OnDiskCleanupItemChanged;
+            _diskCleanupItems.Add(viewModel);
+        }
+
+        UpdateDiskCleanupStatusSummary();
+        UpdateDiskCleanupActionState();
+    }
+
+    private void OnDiskCleanupItemChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(DiskCleanupItemViewModel.IsSelected))
+        {
+            UpdateDiskCleanupActionState();
+        }
+    }
+
+    private void UpdateDiskCleanupActionState()
+    {
+        var canInteract = !_isBusy && !_isDiskCleanupOperation;
+        DiskCleanupAnalyzeBtn.IsEnabled = !_isBusy;
+        DiskCleanupList.IsEnabled = canInteract;
+        var hasSelection = canInteract && _diskCleanupItems.Any(item => item.IsSelected && item.CanSelect);
+        DiskCleanupCleanBtn.IsEnabled = hasSelection;
+    }
+
+    private void UpdateDiskCleanupStatusSummary()
+    {
+        if (_diskCleanupItems.Count == 0)
+        {
+            DiskCleanupStatusText.Text = $"No Disk Cleanup handlers reported data for {_diskCleanupVolume}. Try running as Administrator.";
+            return;
+        }
+
+        var selectable = _diskCleanupItems.Where(item => item.CanSelect).ToList();
+        var totalBytes = selectable.Aggregate(0UL, (current, item) => current + item.Item.Size);
+
+        if (selectable.Count == 0)
+        {
+            DiskCleanupStatusText.Text = $"No reclaimable space detected on {_diskCleanupVolume}.";
+        }
+        else
+        {
+            var label = selectable.Count == 1 ? "category" : "categories";
+            DiskCleanupStatusText.Text = $"Potential savings: {FormatBytes(totalBytes)} across {selectable.Count} {label} on {_diskCleanupVolume}.";
+        }
+
+        if (_diskCleanupItems.Any(item => item.Item.RequiresElevation))
+        {
+            DiskCleanupStatusText.Text += " Some handlers require Administrator privileges.";
+        }
+
+        if (_diskCleanupItems.Any(item => !string.IsNullOrWhiteSpace(item.ErrorMessage)))
+        {
+            DiskCleanupStatusText.Text += " Some handlers reported issues.";
+        }
+    }
+
+    private void ShowDiskCleanupInfo(string message, InfoBarSeverity severity)
+    {
+        DiskCleanupInfoBar.Message = message;
+        DiskCleanupInfoBar.Severity = severity;
+        DiskCleanupInfoBar.IsOpen = true;
+    }
+
+    private static string FormatBytes(ulong value)
+    {
+        if (value == 0)
+        {
+            return "0 B";
+        }
+
+        string[] suffixes = new[] { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
+        double size = value;
+        var index = 0;
+
+        while (size >= 1024 && index < suffixes.Length - 1)
+        {
+            size /= 1024;
+            index++;
+        }
+
+        return string.Format(CultureInfo.CurrentCulture, "{0:0.##} {1}", size, suffixes[index]);
+    }
+
+    private static bool IsAdministrator()
+    {
+        if (!OperatingSystem.IsWindows())
+        {
+            return false;
+        }
+
+        try
+        {
+            using var identity = WindowsIdentity.GetCurrent();
+            return identity is not null && new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private sealed class DiskCleanupItemViewModel : INotifyPropertyChanged
+    {
+        private bool _isSelected;
+
+        public DiskCleanupItemViewModel(DiskCleanupManager.DiskCleanupItem item)
+        {
+            Item = item;
+            if (item.CanSelect && (item.Flags.HasFlag(DiskCleanupManager.DiskCleanupFlags.RunByDefault) ||
+                                   item.Flags.HasFlag(DiskCleanupManager.DiskCleanupFlags.EnableByDefault)))
+            {
+                _isSelected = true;
+            }
+        }
+
+        internal DiskCleanupManager.DiskCleanupItem Item { get; }
+
+        public string Name => Item.Name;
+
+        public string? Description => Item.Description;
+
+        public string FormattedSize => FormatBytes(Item.Size);
+
+        public bool CanSelect => Item.CanSelect;
+
+        public string? ErrorMessage => Item.Error;
+
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                if (_isSelected != value)
+                {
+                    _isSelected = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }
