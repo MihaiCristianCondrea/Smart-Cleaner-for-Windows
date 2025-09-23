@@ -12,9 +12,11 @@ using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using Smart_Cleaner_for_Windows.Core;
 using Windows.Graphics;
 using Windows.Storage.Pickers;
+using Windows.UI;
 using WinRT;
 using WinRT.Interop;
 using System.Runtime.CompilerServices;
@@ -34,6 +36,17 @@ public sealed partial class MainWindow : Window
     private CancellationTokenSource? _diskCleanupCts;
     private readonly string _diskCleanupVolume = DiskCleanupManager.GetDefaultVolume();
     private bool _isDiskCleanupOperation;
+    private readonly Dictionary<string, Color> _defaultAccentColors = new();
+    private static readonly string[] AccentResourceKeys = new[]
+    {
+        "SystemAccentColor",
+        "SystemAccentColorLight1",
+        "SystemAccentColorLight2",
+        "SystemAccentColorLight3",
+        "SystemAccentColorDark1",
+        "SystemAccentColorDark2",
+        "SystemAccentColorDark3",
+    };
 
     public MainWindow()
         : this(DirectoryCleaner.Default)
@@ -46,10 +59,13 @@ public sealed partial class MainWindow : Window
 
         InitializeComponent();
 
+        CaptureDefaultAccentColors();
+
         if (Application.Current.Resources.TryGetValue("AccentButtonStyle", out var accentStyleObj) &&
             accentStyleObj is Style accentStyle)
         {
             DeleteBtn.Style = accentStyle;
+            DiskCleanupCleanBtn.Style = accentStyle;
         }
 
         SetStatus(Symbol.Folder, "Ready when you are", "Select a folder to begin.");
@@ -68,6 +84,8 @@ public sealed partial class MainWindow : Window
         TryConfigureAppWindow();
         Activated += OnWindowActivated;
         Closed += OnClosed;
+
+        NavigateTo(DashboardItem);
     }
 
     private void OnClosed(object sender, WindowEventArgs args)
@@ -164,6 +182,50 @@ public sealed partial class MainWindow : Window
         {
             // Ignore icon failures on unsupported systems.
         }
+    }
+
+    private void OnNavigationLoaded(object sender, RoutedEventArgs e)
+    {
+        if (RootNavigation.SelectedItem is NavigationViewItem selectedItem)
+        {
+            ShowPage(selectedItem);
+        }
+        else
+        {
+            NavigateTo(DashboardItem);
+        }
+    }
+
+    private void OnNavigationSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+    {
+        if (args.SelectedItem is NavigationViewItem item)
+        {
+            ShowPage(item);
+        }
+    }
+
+    private void OnNavigateToEmptyFolders(object sender, RoutedEventArgs e) => NavigateTo(EmptyFoldersItem);
+
+    private void OnNavigateToDiskCleanup(object sender, RoutedEventArgs e) => NavigateTo(DiskCleanupItem);
+
+    private void OnNavigateToSettings(object sender, RoutedEventArgs e) => NavigateTo(SettingsItem);
+
+    private void NavigateTo(NavigationViewItem item)
+    {
+        if (!Equals(RootNavigation.SelectedItem, item))
+        {
+            RootNavigation.SelectedItem = item;
+        }
+
+        ShowPage(item);
+    }
+
+    private void ShowPage(NavigationViewItem item)
+    {
+        DashboardView.Visibility = item == DashboardItem ? Visibility.Visible : Visibility.Collapsed;
+        EmptyFoldersView.Visibility = item == EmptyFoldersItem ? Visibility.Visible : Visibility.Collapsed;
+        DiskCleanupView.Visibility = item == DiskCleanupItem ? Visibility.Visible : Visibility.Collapsed;
+        SettingsView.Visibility = item == SettingsItem ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private async void OnBrowse(object sender, RoutedEventArgs e)
@@ -497,6 +559,7 @@ public sealed partial class MainWindow : Window
     private void SetActivity(string message)
     {
         ActivityText.Text = message;
+        DiskCleanupActivityText.Text = message;
     }
 
     private void SetBusy(bool isBusy)
@@ -506,6 +569,9 @@ public sealed partial class MainWindow : Window
         Progress.IsIndeterminate = isBusy;
         CancelBtn.Visibility = isBusy ? Visibility.Visible : Visibility.Collapsed;
         CancelBtn.IsEnabled = isBusy;
+        var showDiskCleanupCancel = isBusy && _isDiskCleanupOperation;
+        DiskCleanupCancelBtn.Visibility = showDiskCleanupCancel ? Visibility.Visible : Visibility.Collapsed;
+        DiskCleanupCancelBtn.IsEnabled = showDiskCleanupCancel;
         PreviewBtn.IsEnabled = !isBusy;
         DeleteBtn.IsEnabled = !isBusy && _previewCandidates.Count > 0;
         BrowseBtn.IsEnabled = !isBusy;
@@ -741,6 +807,128 @@ public sealed partial class MainWindow : Window
         }
 
         return string.Format(CultureInfo.CurrentCulture, "{0:0.##} {1}", size, suffixes[index]);
+    }
+
+    private void CaptureDefaultAccentColors()
+    {
+        foreach (var key in AccentResourceKeys)
+        {
+            if (Application.Current.Resources.TryGetValue(key, out var value) && value is Color color)
+            {
+                _defaultAccentColors[key] = color;
+            }
+        }
+    }
+
+    private void OnAccentColorChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (sender is not ComboBox combo || combo.SelectedItem is not ComboBoxItem item)
+        {
+            return;
+        }
+
+        if (item.Tag is not string tag)
+        {
+            return;
+        }
+
+        if (string.Equals(tag, "default", StringComparison.OrdinalIgnoreCase))
+        {
+            RestoreAccentColors();
+            return;
+        }
+
+        if (TryParseColor(tag, out var color))
+        {
+            ApplyAccentColor(color);
+        }
+    }
+
+    private void RestoreAccentColors()
+    {
+        foreach (var key in AccentResourceKeys)
+        {
+            if (_defaultAccentColors.TryGetValue(key, out var color))
+            {
+                SetAccentResource(key, color);
+            }
+        }
+    }
+
+    private void ApplyAccentColor(Color color)
+    {
+        SetAccentResource("SystemAccentColor", color);
+        SetAccentResource("SystemAccentColorLight1", Lighten(color, 0.3));
+        SetAccentResource("SystemAccentColorLight2", Lighten(color, 0.5));
+        SetAccentResource("SystemAccentColorLight3", Lighten(color, 0.7));
+        SetAccentResource("SystemAccentColorDark1", Darken(color, 0.2));
+        SetAccentResource("SystemAccentColorDark2", Darken(color, 0.35));
+        SetAccentResource("SystemAccentColorDark3", Darken(color, 0.5));
+    }
+
+    private static void SetAccentResource(string key, Color color)
+    {
+        Application.Current.Resources[key] = color;
+        var brushKey = key + "Brush";
+        if (Application.Current.Resources.TryGetValue(brushKey, out var brushObj) && brushObj is SolidColorBrush brush)
+        {
+            brush.Color = color;
+        }
+    }
+
+    private static Color Lighten(Color color, double amount) => Lerp(color, Colors.White, amount);
+
+    private static Color Darken(Color color, double amount) => Lerp(color, Colors.Black, amount);
+
+    private static Color Lerp(Color from, Color to, double amount)
+    {
+        amount = Math.Clamp(amount, 0, 1);
+        return Color.FromArgb(
+            (byte)(from.A + (to.A - from.A) * amount),
+            (byte)(from.R + (to.R - from.R) * amount),
+            (byte)(from.G + (to.G - from.G) * amount),
+            (byte)(from.B + (to.B - from.B) * amount));
+    }
+
+    private static bool TryParseColor(string? value, out Color color)
+    {
+        color = default;
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return false;
+        }
+
+        var span = value.AsSpan();
+        if (span[0] == '#')
+        {
+            span = span[1..];
+        }
+
+        if (span.Length == 6)
+        {
+            if (uint.TryParse(span, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var rgb))
+            {
+                var r = (byte)((rgb >> 16) & 0xFF);
+                var g = (byte)((rgb >> 8) & 0xFF);
+                var b = (byte)(rgb & 0xFF);
+                color = Color.FromArgb(255, r, g, b);
+                return true;
+            }
+        }
+        else if (span.Length == 8)
+        {
+            if (uint.TryParse(span, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var argb))
+            {
+                var a = (byte)((argb >> 24) & 0xFF);
+                var r = (byte)((argb >> 16) & 0xFF);
+                var g = (byte)((argb >> 8) & 0xFF);
+                var b = (byte)(argb & 0xFF);
+                color = Color.FromArgb(a, r, g, b);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static bool IsAdministrator()

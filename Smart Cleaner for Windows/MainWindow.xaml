@@ -13,15 +13,18 @@
     </Window.SystemBackdrop>
 
     <NavigationView
+        x:Name="RootNavigation"
         IsBackButtonVisible="Collapsed"
-        IsSettingsVisible="True"
+        IsSettingsVisible="False"
         PaneDisplayMode="Left"
         CompactPaneLength="56"
         OpenPaneLength="260"
         IsPaneToggleButtonVisible="True"
         SelectionFollowsFocus="Disabled"
         AlwaysShowHeader="False"
-        IsTitleBarAutoPaddingEnabled="False">
+        IsTitleBarAutoPaddingEnabled="False"
+        SelectionChanged="OnNavigationSelectionChanged"
+        Loaded="OnNavigationLoaded">
 
         <NavigationView.Resources>
             <CornerRadius x:Key="CardCornerRadius">20</CornerRadius>
@@ -57,17 +60,22 @@
         </NavigationView.AutoSuggestBox>
 
         <NavigationView.MenuItems>
-            <NavigationViewItem Content="Dashboard">
+            <NavigationViewItem x:Name="DashboardItem" Content="Dashboard" IsSelected="True">
                 <NavigationViewItem.Icon>
                     <SymbolIcon Symbol="Home" />
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
-            <NavigationViewItem Content="Cleaner" IsSelected="True">
+            <NavigationViewItem x:Name="EmptyFoldersItem" Content="Empty folders">
+                <NavigationViewItem.Icon>
+                    <SymbolIcon Symbol="Folder" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem x:Name="DiskCleanupItem" Content="Disk cleanup">
                 <NavigationViewItem.Icon>
                     <SymbolIcon Symbol="Delete" />
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
-            <NavigationViewItem Content="Settings">
+            <NavigationViewItem x:Name="SettingsItem" Content="Settings">
                 <NavigationViewItem.Icon>
                     <SymbolIcon Symbol="Setting" />
                 </NavigationViewItem.Icon>
@@ -87,476 +95,686 @@
         </NavigationView.PaneFooter>
 
         <NavigationView.Content>
-            <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-                <Grid Padding="32" RowSpacing="24">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-
-                    <Border Grid.Row="0" Background="{StaticResource HeroCardBrush}" CornerRadius="28" Padding="28">
-                        <Grid ColumnSpacing="24">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-
-                            <Border
-                                Width="76"
-                                Height="76"
-                                CornerRadius="24"
-                                Background="{StaticResource HeroCardOverlayBrush}"
-                                VerticalAlignment="Center">
-                                <SymbolIcon
-                                    x:Name="StatusGlyph"
-                                    Symbol="Folder"
-                                    Foreground="White"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center" />
-                            </Border>
-
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="8">
-                                <TextBlock
-                                    Text="Cleanup overview"
-                                    Foreground="#B3FFFFFF"
-                                    FontWeight="SemiBold" />
-                                <TextBlock
-                                    x:Name="StatusTitle"
-                                    Text="Ready when you are"
-                                    FontSize="30"
-                                    FontWeight="SemiBold"
-                                    Foreground="White"
-                                    TextWrapping="Wrap" />
-                                <TextBlock
-                                    x:Name="StatusDescription"
-                                    Text="Select a folder to begin."
-                                    Foreground="#E6FFFFFF"
-                                    TextWrapping="WrapWholeWords" />
-                            </StackPanel>
-
-                            <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="4">
-                                <TextBlock Text="Current results" Foreground="#B3FFFFFF" />
-                                <InfoBadge
-                                    x:Name="ResultBadge"
-                                    HorizontalAlignment="Right"
-                                    Visibility="Collapsed" />
-                            </StackPanel>
-                        </Grid>
-                    </Border>
-
-                    <Grid Grid.Row="1" ColumnSpacing="24">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="360" />
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Grid.Column="0" Spacing="16">
-                            <Border Style="{StaticResource CardStyle}">
-                                <Grid RowSpacing="20">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-
-                                    <StackPanel Orientation="Horizontal" Spacing="12">
-                                        <Border
-                                            Width="40"
-                                            Height="40"
-                                            CornerRadius="14"
-                                            Background="{ThemeResource AccentFillColorTertiaryBrush}"
-                                            VerticalAlignment="Center">
-                                            <SymbolIcon
-                                                Symbol="Folder"
-                                                Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center" />
-                                        </Border>
-                                        <StackPanel>
-                                            <TextBlock Text="Root folder" FontSize="22" FontWeight="SemiBold" />
-                                            <TextBlock
-                                                Text="Pick a starting location to scan for empty directories."
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        </StackPanel>
-                                    </StackPanel>
-
-                                    <StackPanel Grid.Row="1" Spacing="16">
-                                        <Grid ColumnSpacing="12">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBox
-                                                x:Name="RootPathBox"
-                                                Grid.Column="0"
-                                                PlaceholderText="Select a root folder…"
-                                                TextChanged="RootPathBox_TextChanged" />
-                                            <Button x:Name="BrowseBtn" Grid.Column="1" Click="OnBrowse">
-                                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                                    <SymbolIcon Symbol="OpenFile" />
-                                                    <TextBlock Text="Browse" />
-                                                </StackPanel>
-                                            </Button>
-                                        </Grid>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-                                            <Button x:Name="PreviewBtn" Click="OnPreview">
-                                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                                    <SymbolIcon Symbol="PreviewLink" />
-                                                    <TextBlock Text="Preview" />
-                                                </StackPanel>
-                                            </Button>
-                                            <Button x:Name="DeleteBtn" Click="OnDelete" IsEnabled="False">
-                                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                                    <SymbolIcon Symbol="Delete" />
-                                                    <TextBlock Text="Clean now" />
-                                                </StackPanel>
-                                            </Button>
-                                        </StackPanel>
-                                    </StackPanel>
-                                </Grid>
-                            </Border>
-
-                            <Border Style="{StaticResource CardStyle}">
-                                <StackPanel Spacing="20">
-                                    <StackPanel Orientation="Horizontal" Spacing="12">
-                                        <Border
-                                            Width="40"
-                                            Height="40"
-                                            CornerRadius="14"
-                                            Background="{ThemeResource AccentFillColorTertiaryBrush}"
-                                            VerticalAlignment="Center">
-                                            <SymbolIcon
-                                                Symbol="Setting"
-                                                Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center" />
-                                        </Border>
-                                        <StackPanel>
-                                            <TextBlock Text="Scan options" FontSize="22" FontWeight="SemiBold" />
-                                            <TextBlock
-                                                Text="Customize how the cleaner behaves before you run a scan."
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        </StackPanel>
-                                    </StackPanel>
-
-                                    <StackPanel Spacing="16">
-                                        <CheckBox x:Name="RecycleChk" IsChecked="True">
-                                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                                <FontIcon Glyph="&#xE107;" FontFamily="Segoe MDL2 Assets" />
-                                                <TextBlock Text="Send deleted folders to Recycle Bin" />
-                                            </StackPanel>
-                                        </CheckBox>
-
-                                        <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                                            <SymbolIcon
-                                                Symbol="Sort"
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                            <TextBlock VerticalAlignment="Center" Text="Depth limit" />
-                                            <NumberBox
-                                                x:Name="DepthBox"
-                                                Width="96"
-                                                Minimum="0"
-                                                Maximum="999"
-                                                Value="0" />
-                                        </StackPanel>
-
-                                        <StackPanel Spacing="4">
-                                            <TextBlock Text="Exclusions" FontWeight="SemiBold" />
-                                            <TextBox
-                                                x:Name="ExcludeBox"
-                                                PlaceholderText=".git; build/*; node_modules"
-                                                AcceptsReturn="False" />
-                                            <TextBlock
-                                                Text="Use semicolons to separate names or wildcard patterns."
-                                                FontSize="12"
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        </StackPanel>
-                                    </StackPanel>
-                                </StackPanel>
-                            </Border>
+            <Grid>
+                <ScrollViewer x:Name="DashboardView" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Padding="32" Spacing="24">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Dashboard" FontSize="32" FontWeight="SemiBold" />
+                            <TextBlock
+                                Text="Choose a tool to continue."
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                         </StackPanel>
 
-                        <StackPanel Grid.Column="1" Spacing="16">
-                            <Border Style="{StaticResource CardStyle}">
-                                <StackPanel Spacing="16">
-                                    <StackPanel Orientation="Horizontal" Spacing="12">
-                                        <Border
-                                            Width="40"
-                                            Height="40"
-                                            CornerRadius="14"
-                                            Background="{ThemeResource AccentFillColorTertiaryBrush}"
-                                            VerticalAlignment="Center">
-                                            <SymbolIcon
-                                                Symbol="Clock"
-                                                Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center" />
-                                        </Border>
-                                        <TextBlock Text="Activity" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                    </StackPanel>
-
-                                    <TextBlock
-                                        x:Name="ActivityText"
-                                        Text="Waiting for the next action."
-                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                        TextWrapping="Wrap" />
-
-                                    <ProgressBar
-                                        x:Name="Progress"
-                                        Height="4"
-                                        Visibility="Collapsed"
-                                        IsIndeterminate="True" />
-
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                        <Button x:Name="CancelBtn" Click="OnCancel" Visibility="Collapsed" IsEnabled="False">
-                                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                                <SymbolIcon Symbol="Cancel" />
-                                                <TextBlock Text="Cancel" />
-                                            </StackPanel>
-                                        </Button>
-                                    </StackPanel>
-
-                                    <InfoBar x:Name="Info" IsOpen="False" />
-                                </StackPanel>
-                            </Border>
-
-                            <Border Style="{StaticResource CardStyle}">
-                                <StackPanel Spacing="16">
-                                    <StackPanel Orientation="Horizontal" Spacing="12">
-                                        <Border
-                                            Width="40"
-                                            Height="40"
-                                            CornerRadius="14"
-                                            Background="{ThemeResource AccentFillColorTertiaryBrush}"
-                                            VerticalAlignment="Center">
-                                            <FontIcon
-                                                Glyph="&#xE74D;"
-                                                FontFamily="Segoe MDL2 Assets"
-                                                Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center" />
-                                        </Border>
-                                        <StackPanel>
-                                            <TextBlock Text="Disk Cleanup" FontSize="22" FontWeight="SemiBold" />
-                                            <TextBlock
-                                                x:Name="DiskCleanupIntro"
-                                                Text="Analyze Windows cleanup handlers to reclaim temporary files."
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                TextWrapping="Wrap" />
-                                        </StackPanel>
-                                    </StackPanel>
-
-                                    <TextBlock
-                                        x:Name="DiskCleanupStatusText"
-                                        Text="Ready to analyze Windows disk cleanup handlers."
-                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                        TextWrapping="Wrap" />
-
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-                                        <Button x:Name="DiskCleanupAnalyzeBtn" Click="OnDiskCleanupAnalyze">
-                                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                                <SymbolIcon Symbol="Refresh" />
-                                                <TextBlock Text="Analyze" />
-                                            </StackPanel>
-                                        </Button>
-                                        <Button x:Name="DiskCleanupCleanBtn" Click="OnDiskCleanupClean" IsEnabled="False">
-                                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                                <SymbolIcon Symbol="Delete" />
-                                                <TextBlock Text="Clean selected" />
-                                            </StackPanel>
-                                        </Button>
-                                    </StackPanel>
-
-                                    <ProgressBar
-                                        x:Name="DiskCleanupProgress"
-                                        Height="4"
-                                        Visibility="Collapsed"
-                                        IsIndeterminate="True" />
-
-                                    <InfoBar x:Name="DiskCleanupInfoBar" IsOpen="False" />
-
-                                    <ListView
-                                        x:Name="DiskCleanupList"
-                                        SelectionMode="None"
-                                        IsItemClickEnabled="False">
-                                        <ListView.ItemTemplate>
-                                            <DataTemplate>
-                                                <CheckBox
-                                                    Padding="0"
-                                                    HorizontalContentAlignment="Stretch"
-                                                    IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                                    IsEnabled="{Binding CanSelect}">
-                                                    <Grid ColumnSpacing="12">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="Auto" />
-                                                            <ColumnDefinition Width="*" />
-                                                            <ColumnDefinition Width="Auto" />
-                                                        </Grid.ColumnDefinitions>
-                                                        <Border
-                                                            Width="32"
-                                                            Height="32"
-                                                            CornerRadius="12"
-                                                            Background="{ThemeResource AccentFillColorTertiaryBrush}"
-                                                            HorizontalAlignment="Center"
-                                                            VerticalAlignment="Center">
-                                                            <FontIcon
-                                                                Glyph="&#xE74D;"
-                                                                FontFamily="Segoe MDL2 Assets"
-                                                                Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
-                                                                HorizontalAlignment="Center"
-                                                                VerticalAlignment="Center" />
-                                                        </Border>
-                                                        <StackPanel Grid.Column="1" Spacing="2">
-                                                            <TextBlock
-                                                                Text="{Binding Name}"
-                                                                FontWeight="SemiBold"
-                                                                TextWrapping="Wrap" />
-                                                            <TextBlock
-                                                                Text="{Binding Description}"
-                                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                                TextWrapping="Wrap" />
-                                                            <TextBlock
-                                                                Text="{Binding ErrorMessage}"
-                                                                Foreground="{ThemeResource SystemFillColorCriticalBrush}"
-                                                                TextWrapping="Wrap" />
-                                                        </StackPanel>
-                                                        <TextBlock
-                                                            Grid.Column="2"
-                                                            Text="{Binding FormattedSize}"
-                                                            HorizontalAlignment="Right"
-                                                            VerticalAlignment="Center"
-                                                            FontWeight="SemiBold" />
-                                                    </Grid>
-                                                </CheckBox>
-                                            </DataTemplate>
-                                        </ListView.ItemTemplate>
-                                    </ListView>
-                                </StackPanel>
-                            </Border>
-
-                            <Border Style="{StaticResource CardStyle}">
-                                <StackPanel Spacing="16">
-                                    <StackPanel Orientation="Horizontal" Spacing="12">
-                                        <Border
-                                            Width="40"
-                                            Height="40"
-                                            CornerRadius="14"
-                                            Background="{ThemeResource AccentFillColorTertiaryBrush}"
-                                            VerticalAlignment="Center">
-                                            <SymbolIcon
-                                                Symbol="Favorite"
-                                                Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center" />
-                                        </Border>
-                                        <TextBlock Text="Cleaner highlights" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                    </StackPanel>
-
-                                    <StackPanel Spacing="12">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <SymbolIcon Symbol="PreviewLink" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                            <TextBlock
-                                                Text="Preview empty directories before committing to a cleanup."
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                TextWrapping="Wrap" />
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <SymbolIcon Symbol="ProtectedDocument" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                            <TextBlock
-                                                Text="Recycle Bin support keeps removals safe."
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                TextWrapping="Wrap" />
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <SymbolIcon Symbol="Filter" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                            <TextBlock
-                                                Text="Exclude directories with custom rules to stay in control."
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                TextWrapping="Wrap" />
-                                        </StackPanel>
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel Spacing="16">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <Border
+                                        Width="48"
+                                        Height="48"
+                                        CornerRadius="16"
+                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                        VerticalAlignment="Center">
+                                        <SymbolIcon
+                                            Symbol="Folder"
+                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel>
+                                        <TextBlock Text="Empty folders cleaner" FontSize="22" FontWeight="SemiBold" />
+                                        <TextBlock
+                                            Text="Scan for empty directories and remove them safely."
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                     </StackPanel>
                                 </StackPanel>
-                            </Border>
-                        </StackPanel>
-                    </Grid>
+                                <Button Click="OnNavigateToEmptyFolders">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <SymbolIcon Symbol="Play" />
+                                        <TextBlock Text="Open empty folders cleaner" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Border>
 
-                    <Border Grid.Row="2" Style="{StaticResource CardStyle}">
-                        <Grid RowSpacing="16">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel Spacing="16">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <Border
+                                        Width="48"
+                                        Height="48"
+                                        CornerRadius="16"
+                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                        VerticalAlignment="Center">
+                                        <FontIcon
+                                            Glyph="&#xE74D;"
+                                            FontFamily="Segoe MDL2 Assets"
+                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel>
+                                        <TextBlock Text="Disk cleanup" FontSize="22" FontWeight="SemiBold" />
+                                        <TextBlock
+                                            Text="Analyze Windows cleanup handlers and free up disk space."
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </StackPanel>
+                                <Button Click="OnNavigateToDiskCleanup">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <SymbolIcon Symbol="Delete" />
+                                        <TextBlock Text="Open disk cleanup" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Border>
 
-                            <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel Spacing="16">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <Border
+                                        Width="48"
+                                        Height="48"
+                                        CornerRadius="16"
+                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                        VerticalAlignment="Center">
+                                        <SymbolIcon
+                                            Symbol="Setting"
+                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel>
+                                        <TextBlock Text="Settings" FontSize="22" FontWeight="SemiBold" />
+                                        <TextBlock
+                                            Text="Configure Smart Cleaner, pick an accent color, and learn more about the app."
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </StackPanel>
+                                <Button Click="OnNavigateToSettings">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <SymbolIcon Symbol="GoToStart" />
+                                        <TextBlock Text="Open settings" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <ScrollViewer
+                    x:Name="EmptyFoldersView"
+                    HorizontalScrollBarVisibility="Disabled"
+                    Visibility="Collapsed">
+                    <Grid Padding="32" RowSpacing="24">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0" Background="{StaticResource HeroCardBrush}" CornerRadius="28" Padding="28">
+                            <Grid ColumnSpacing="24">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
                                 <Border
-                                    Width="40"
-                                    Height="40"
-                                    CornerRadius="14"
-                                    Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                    Width="76"
+                                    Height="76"
+                                    CornerRadius="24"
+                                    Background="{StaticResource HeroCardOverlayBrush}"
                                     VerticalAlignment="Center">
                                     <SymbolIcon
-                                        Symbol="Preview"
-                                        Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                        x:Name="StatusGlyph"
+                                        Symbol="Folder"
+                                        Foreground="White"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center" />
                                 </Border>
-                                <TextBlock Text="Preview results" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" />
-                            </StackPanel>
 
-                            <TextBlock
-                                Grid.Row="1"
-                                x:Name="ResultsCaption"
-                                Text="Preview results will appear here once you run a scan."
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="8">
+                                    <TextBlock
+                                        Text="Cleanup overview"
+                                        Foreground="#B3FFFFFF"
+                                        FontWeight="SemiBold" />
+                                    <TextBlock
+                                        x:Name="StatusTitle"
+                                        Text="Ready when you are"
+                                        FontSize="30"
+                                        FontWeight="SemiBold"
+                                        Foreground="White"
+                                        TextWrapping="Wrap" />
+                                    <TextBlock
+                                        x:Name="StatusDescription"
+                                        Text="Select a folder to begin."
+                                        Foreground="#E6FFFFFF"
+                                        TextWrapping="WrapWholeWords" />
+                                </StackPanel>
 
-                            <ListView
-                                x:Name="Candidates"
-                                Grid.Row="2"
-                                Margin="0"
-                                SelectionMode="None"
-                                IsItemClickEnabled="False">
-                                <ListView.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border
-                                            Background="{ThemeResource LayerFillColorDefaultBrush}"
-                                            CornerRadius="12"
-                                            Padding="12">
+                                <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="4">
+                                    <TextBlock Text="Current results" Foreground="#B3FFFFFF" />
+                                    <InfoBadge
+                                        x:Name="ResultBadge"
+                                        HorizontalAlignment="Right"
+                                        Visibility="Collapsed" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Grid Grid.Row="1" ColumnSpacing="24">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="360" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Spacing="16">
+                                <Border Style="{StaticResource CardStyle}">
+                                    <Grid RowSpacing="20">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                            <Border
+                                                Width="40"
+                                                Height="40"
+                                                CornerRadius="14"
+                                                Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                                VerticalAlignment="Center">
+                                                <SymbolIcon
+                                                    Symbol="Folder"
+                                                    Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center" />
+                                            </Border>
+                                            <StackPanel>
+                                                <TextBlock Text="Root folder" FontSize="22" FontWeight="SemiBold" />
+                                                <TextBlock
+                                                    Text="Pick a starting location to scan for empty directories."
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Row="1" Spacing="16">
                                             <Grid ColumnSpacing="12">
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" />
                                                     <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
-                                                <Border
-                                                    Width="32"
-                                                    Height="32"
-                                                    CornerRadius="12"
-                                                    Background="{ThemeResource AccentFillColorTertiaryBrush}"
-                                                    HorizontalAlignment="Center"
-                                                    VerticalAlignment="Center">
-                                                    <SymbolIcon
-                                                        Symbol="Folder"
-                                                        HorizontalAlignment="Center"
-                                                        VerticalAlignment="Center"
-                                                        Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
-                                                </Border>
-                                                <TextBlock
-                                                    Grid.Column="1"
-                                                    Text="{Binding}"
-                                                    TextTrimming="CharacterEllipsis"
-                                                    VerticalAlignment="Center"
-                                                    ToolTipService.ToolTip="{Binding}"
-                                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                                <TextBox
+                                                    x:Name="RootPathBox"
+                                                    Grid.Column="0"
+                                                    PlaceholderText="Select a root folder…"
+                                                    TextChanged="RootPathBox_TextChanged" />
+                                                <Button x:Name="BrowseBtn" Grid.Column="1" Click="OnBrowse">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                                        <SymbolIcon Symbol="OpenFile" />
+                                                        <TextBlock Text="Browse" />
+                                                    </StackPanel>
+                                                </Button>
                                             </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                                                <Button x:Name="PreviewBtn" Click="OnPreview">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                                        <SymbolIcon Symbol="PreviewLink" />
+                                                        <TextBlock Text="Preview" />
+                                                    </StackPanel>
+                                                </Button>
+                                                <Button x:Name="DeleteBtn" Click="OnDelete" IsEnabled="False">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                                        <SymbolIcon Symbol="Delete" />
+                                                        <TextBlock Text="Clean now" />
+                                                    </StackPanel>
+                                                </Button>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource CardStyle}">
+                                    <StackPanel Spacing="20">
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                            <Border
+                                                Width="40"
+                                                Height="40"
+                                                CornerRadius="14"
+                                                Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                                VerticalAlignment="Center">
+                                                <SymbolIcon
+                                                    Symbol="Setting"
+                                                    Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center" />
+                                            </Border>
+                                            <StackPanel>
+                                                <TextBlock Text="Scan options" FontSize="22" FontWeight="SemiBold" />
+                                                <TextBlock
+                                                    Text="Customize how the cleaner behaves before you run a scan."
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <StackPanel Spacing="16">
+                                            <CheckBox x:Name="RecycleChk" IsChecked="True">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <FontIcon Glyph="&#xE107;" FontFamily="Segoe MDL2 Assets" />
+                                                    <TextBlock Text="Send deleted folders to Recycle Bin" />
+                                                </StackPanel>
+                                            </CheckBox>
+
+                                            <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                                                <SymbolIcon
+                                                    Symbol="Sort"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock VerticalAlignment="Center" Text="Depth limit" />
+                                                <NumberBox
+                                                    x:Name="DepthBox"
+                                                    Width="96"
+                                                    Minimum="0"
+                                                    Maximum="999"
+                                                    Value="0" />
+                                            </StackPanel>
+
+                                            <StackPanel Spacing="4">
+                                                <TextBlock Text="Exclusions" FontWeight="SemiBold" />
+                                                <TextBox
+                                                    x:Name="ExcludeBox"
+                                                    PlaceholderText=".git; build/*; node_modules"
+                                                    AcceptsReturn="False" />
+                                                <TextBlock
+                                                    Text="Use semicolons to separate names or wildcard patterns."
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Spacing="16">
+                                <Border Style="{StaticResource CardStyle}">
+                                    <StackPanel Spacing="16">
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                            <Border
+                                                Width="40"
+                                                Height="40"
+                                                CornerRadius="14"
+                                                Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                                VerticalAlignment="Center">
+                                                <SymbolIcon
+                                                    Symbol="Clock"
+                                                    Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center" />
+                                            </Border>
+                                            <TextBlock Text="Activity" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                        </StackPanel>
+
+                                        <TextBlock
+                                            x:Name="ActivityText"
+                                            Text="Waiting for the next action."
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            TextWrapping="Wrap" />
+
+                                        <ProgressBar
+                                            x:Name="Progress"
+                                            Height="4"
+                                            Visibility="Collapsed"
+                                            IsIndeterminate="True" />
+
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                            <Button x:Name="CancelBtn" Click="OnCancel" Visibility="Collapsed" IsEnabled="False">
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <SymbolIcon Symbol="Cancel" />
+                                                    <TextBlock Text="Cancel" />
+                                                </StackPanel>
+                                            </Button>
+                                        </StackPanel>
+
+                                        <InfoBar x:Name="Info" IsOpen="False" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource CardStyle}">
+                                    <StackPanel Spacing="12">
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                            <Border
+                                                Width="40"
+                                                Height="40"
+                                                CornerRadius="14"
+                                                Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                                VerticalAlignment="Center">
+                                                <SymbolIcon
+                                                    Symbol="Favorite"
+                                                    Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center" />
+                                            </Border>
+                                            <TextBlock Text="Cleaner highlights" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                        </StackPanel>
+
+                                        <StackPanel Spacing="12">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <SymbolIcon Symbol="PreviewLink" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock
+                                                    Text="Preview empty directories before committing to a cleanup."
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    TextWrapping="Wrap" />
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <SymbolIcon Symbol="ProtectedDocument" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock
+                                                    Text="Recycle Bin support keeps removals safe."
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    TextWrapping="Wrap" />
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <SymbolIcon Symbol="Filter" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock
+                                                    Text="Exclude directories with custom rules to stay in control."
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    TextWrapping="Wrap" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
                         </Grid>
-                    </Border>
-                </Grid>
-            </ScrollViewer>
+
+                        <Border Grid.Row="2" Style="{StaticResource CardStyle}">
+                            <Grid RowSpacing="16">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <Border
+                                        Width="40"
+                                        Height="40"
+                                        CornerRadius="14"
+                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                        VerticalAlignment="Center">
+                                        <SymbolIcon
+                                            Symbol="Preview"
+                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
+                                    </Border>
+                                    <TextBlock Text="Preview results" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                </StackPanel>
+
+                                <TextBlock
+                                    Grid.Row="1"
+                                    x:Name="ResultsCaption"
+                                    Text="Preview results will appear here once you run a scan."
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+                                <ListView
+                                    x:Name="Candidates"
+                                    Grid.Row="2"
+                                    Margin="0"
+                                    SelectionMode="None"
+                                    IsItemClickEnabled="False">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border
+                                                Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                                CornerRadius="12"
+                                                Padding="12">
+                                                <Grid ColumnSpacing="12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border
+                                                        Width="32"
+                                                        Height="32"
+                                                        CornerRadius="12"
+                                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center">
+                                                        <SymbolIcon
+                                                            Symbol="Folder"
+                                                            HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center"
+                                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+                                                    </Border>
+                                                    <TextBlock
+                                                        Grid.Column="1"
+                                                        Text="{Binding}"
+                                                        TextTrimming="CharacterEllipsis"
+                                                        VerticalAlignment="Center"
+                                                        ToolTipService.ToolTip="{Binding}"
+                                                        Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </ScrollViewer>
+
+                <ScrollViewer
+                    x:Name="DiskCleanupView"
+                    HorizontalScrollBarVisibility="Disabled"
+                    Visibility="Collapsed">
+                    <Grid Padding="32" RowSpacing="24">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0" Background="{StaticResource HeroCardBrush}" CornerRadius="28" Padding="28">
+                            <Grid ColumnSpacing="24">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Border
+                                    Width="76"
+                                    Height="76"
+                                    CornerRadius="24"
+                                    Background="{StaticResource HeroCardOverlayBrush}"
+                                    VerticalAlignment="Center">
+                                    <FontIcon
+                                        Glyph="&#xE74D;"
+                                        FontFamily="Segoe MDL2 Assets"
+                                        Foreground="White"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center" />
+                                </Border>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="8">
+                                    <TextBlock Text="Disk cleanup" Foreground="#B3FFFFFF" FontWeight="SemiBold" />
+                                    <TextBlock
+                                        x:Name="DiskCleanupIntro"
+                                        Text="Analyze Windows cleanup handlers to reclaim temporary files."
+                                        Foreground="#E6FFFFFF"
+                                        TextWrapping="Wrap" />
+                                    <TextBlock
+                                        x:Name="DiskCleanupStatusText"
+                                        Text="Ready to analyze Windows disk cleanup handlers."
+                                        Foreground="#E6FFFFFF"
+                                        TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="1" Style="{StaticResource CardStyle}">
+                            <StackPanel Spacing="16">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <Border
+                                        Width="40"
+                                        Height="40"
+                                        CornerRadius="14"
+                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                        VerticalAlignment="Center">
+                                        <FontIcon
+                                            Glyph="&#xE74D;"
+                                            FontFamily="Segoe MDL2 Assets"
+                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
+                                    </Border>
+                                    <TextBlock Text="Cleanup categories" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                </StackPanel>
+
+                                <TextBlock
+                                    x:Name="DiskCleanupActivityText"
+                                    Text="Waiting for the next action."
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    TextWrapping="Wrap" />
+
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                                    <Button x:Name="DiskCleanupAnalyzeBtn" Click="OnDiskCleanupAnalyze">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <SymbolIcon Symbol="Refresh" />
+                                            <TextBlock Text="Analyze" />
+                                        </StackPanel>
+                                    </Button>
+                                    <Button x:Name="DiskCleanupCleanBtn" Click="OnDiskCleanupClean" IsEnabled="False">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <SymbolIcon Symbol="Delete" />
+                                            <TextBlock Text="Clean selected" />
+                                        </StackPanel>
+                                    </Button>
+                                    <Button x:Name="DiskCleanupCancelBtn" Click="OnCancel" Visibility="Collapsed" IsEnabled="False">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <SymbolIcon Symbol="Cancel" />
+                                            <TextBlock Text="Cancel" />
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+
+                                <ProgressBar
+                                    x:Name="DiskCleanupProgress"
+                                    Height="4"
+                                    Visibility="Collapsed"
+                                    IsIndeterminate="True" />
+
+                                <InfoBar x:Name="DiskCleanupInfoBar" IsOpen="False" />
+
+                                <ListView
+                                    x:Name="DiskCleanupList"
+                                    SelectionMode="None"
+                                    IsItemClickEnabled="False">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <CheckBox
+                                                Padding="0"
+                                                HorizontalContentAlignment="Stretch"
+                                                IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                IsEnabled="{Binding CanSelect}">
+                                                <Grid ColumnSpacing="12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border
+                                                        Width="32"
+                                                        Height="32"
+                                                        CornerRadius="12"
+                                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center">
+                                                        <FontIcon
+                                                            Glyph="&#xE74D;"
+                                                            FontFamily="Segoe MDL2 Assets"
+                                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                                            HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center" />
+                                                    </Border>
+                                                    <StackPanel Grid.Column="1" Spacing="2">
+                                                        <TextBlock
+                                                            Text="{Binding Name}"
+                                                            FontWeight="SemiBold"
+                                                            TextWrapping="Wrap" />
+                                                        <TextBlock
+                                                            Text="{Binding Description}"
+                                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                            TextWrapping="Wrap" />
+                                                        <TextBlock
+                                                            Text="{Binding ErrorMessage}"
+                                                            Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                                            TextWrapping="Wrap" />
+                                                    </StackPanel>
+                                                    <TextBlock
+                                                        Grid.Column="2"
+                                                        Text="{Binding FormattedSize}"
+                                                        HorizontalAlignment="Right"
+                                                        VerticalAlignment="Center"
+                                                        FontWeight="SemiBold" />
+                                                </Grid>
+                                            </CheckBox>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </ScrollViewer>
+
+                <ScrollViewer
+                    x:Name="SettingsView"
+                    HorizontalScrollBarVisibility="Disabled"
+                    Visibility="Collapsed">
+                    <StackPanel Padding="32" Spacing="24">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Settings" FontSize="32" FontWeight="SemiBold" />
+                            <TextBlock
+                                Text="Adjust Smart Cleaner to match your preferences."
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="About" FontSize="22" FontWeight="SemiBold" />
+                                <TextBlock Text="Smart Cleaner for Windows" FontWeight="SemiBold" />
+                                <TextBlock
+                                    Text="A modern utility for tidying empty folders and reclaiming disk space."
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    TextWrapping="Wrap" />
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon
+                                        Glyph="&#xE946;"
+                                        FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                    <TextBlock Text="Version 1.0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="Appearance" FontSize="22" FontWeight="SemiBold" />
+                                <TextBlock
+                                    Text="Choose an accent color to personalize the interface."
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    TextWrapping="Wrap" />
+                                <ComboBox x:Name="AccentColorComboBox" SelectionChanged="OnAccentColorChanged">
+                                    <ComboBoxItem Content="Use system accent" Tag="default" IsSelected="True" />
+                                    <ComboBoxItem Content="Cobalt" Tag="#FF005FB8" />
+                                    <ComboBoxItem Content="Emerald" Tag="#FF107C10" />
+                                    <ComboBoxItem Content="Rose" Tag="#FFC3006A" />
+                                    <ComboBoxItem Content="Amber" Tag="#FFC19C00" />
+                                    <ComboBoxItem Content="Slate" Tag="#FF525E7B" />
+                                </ComboBox>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
         </NavigationView.Content>
     </NavigationView>
 </Window>
