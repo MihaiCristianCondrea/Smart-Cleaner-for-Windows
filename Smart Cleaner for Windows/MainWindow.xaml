@@ -3,7 +3,6 @@
     x:Class="Smart_Cleaner_for_Windows.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Smart_Cleaner_for_Windows"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -13,7 +12,79 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid>
+    <NavigationView IsSettingsVisible="False" PaneDisplayMode="LeftMinimal">
+        <Grid Padding="16" RowSpacing="12">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-    </Grid>
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBox
+                    x:Name="RootPathBox"
+                    Grid.Column="0"
+                    PlaceholderText="Select a root folder…"
+                    TextChanged="RootPathBox_TextChanged" />
+                <Button
+                    x:Name="BrowseBtn"
+                    Grid.Column="1"
+                    Content="Browse"
+                    Click="OnBrowse"
+                    Margin="0,0,0,0" />
+                <Button
+                    x:Name="PreviewBtn"
+                    Grid.Column="2"
+                    Content="Preview"
+                    Click="OnPreview" />
+                <Button
+                    x:Name="DeleteBtn"
+                    Grid.Column="3"
+                    Content="Delete"
+                    Click="OnDelete"
+                    IsEnabled="False" />
+            </Grid>
+
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="16">
+                <CheckBox x:Name="RecycleChk" Content="Send to Recycle Bin" IsChecked="True" />
+
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock VerticalAlignment="Center" Text="Depth limit:" />
+                    <NumberBox x:Name="DepthBox" Width="90" Minimum="0" Maximum="999" Value="0" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock VerticalAlignment="Center" Text="Exclusions (semicolon-separated):" />
+                    <TextBox x:Name="ExcludeBox" Width="360" PlaceholderText=".git; build/*; node_modules" />
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="12">
+                <ProgressBar x:Name="Progress" Width="280" Visibility="Collapsed" IsIndeterminate="True" />
+                <Button x:Name="CancelBtn" Content="Cancel" Click="OnCancel" Visibility="Collapsed" IsEnabled="False" />
+                <InfoBar x:Name="Info" IsOpen="False" />
+            </StackPanel>
+
+            <ListView
+                x:Name="Candidates"
+                Grid.Row="3"
+                Margin="0,8,0,0"
+                SelectionMode="None"
+                IsItemClickEnabled="False">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+    </NavigationView>
 </Window>
