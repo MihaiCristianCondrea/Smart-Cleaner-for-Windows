@@ -75,22 +75,24 @@
                     <SymbolIcon Symbol="Delete" />
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
-            <NavigationViewItem x:Name="SettingsItem" Content="Settings">
-                <NavigationViewItem.Icon>
-                    <SymbolIcon Symbol="Setting" />
-                </NavigationViewItem.Icon>
-            </NavigationViewItem>
         </NavigationView.MenuItems>
 
         <NavigationView.PaneFooter>
-            <StackPanel Margin="16" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                <FontIcon
-                    Glyph="&#xE946;"
-                    FontFamily="{StaticResource SymbolThemeFontFamily}"
-                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center" />
-                <TextBlock Text="Version 1.0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            <StackPanel Margin="16" Spacing="12">
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <FontIcon
+                        Glyph="&#xE946;"
+                        FontFamily="{StaticResource SymbolThemeFontFamily}"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center" />
+                    <TextBlock Text="Version 1.0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+                <NavigationViewItem x:Name="SettingsItem" Tapped="OnSettingsTapped" Content="Settings">
+                    <NavigationViewItem.Icon>
+                        <SymbolIcon Symbol="Setting" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
             </StackPanel>
         </NavigationView.PaneFooter>
 
@@ -169,37 +171,6 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Style="{StaticResource CardStyle}">
-                            <StackPanel Spacing="16">
-                                <StackPanel Orientation="Horizontal" Spacing="12">
-                                    <Border
-                                        Width="48"
-                                        Height="48"
-                                        CornerRadius="16"
-                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
-                                        VerticalAlignment="Center">
-                                        <SymbolIcon
-                                            Symbol="Setting"
-                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center" />
-                                    </Border>
-                                    <StackPanel>
-                                        <TextBlock Text="Settings" FontSize="22" FontWeight="SemiBold" />
-                                        <TextBlock
-                                            Text="Configure Smart Cleaner, pick an accent color, and learn more about the app."
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                            TextWrapping="Wrap" />
-                                    </StackPanel>
-                                </StackPanel>
-                                <Button Click="OnNavigateToSettings">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <SymbolIcon Symbol="GoToStart" />
-                                        <TextBlock Text="Open settings" />
-                                    </StackPanel>
-                                </Button>
-                            </StackPanel>
-                        </Border>
                     </StackPanel>
                 </ScrollViewer>
 
