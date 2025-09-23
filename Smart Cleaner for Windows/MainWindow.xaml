@@ -116,6 +116,77 @@
                                         CornerRadius="16"
                                         Background="{ThemeResource AccentFillColorTertiaryBrush}"
                                         VerticalAlignment="Center">
+                                        <FontIcon
+                                            Glyph="&#xE8A0;"
+                                            FontFamily="Segoe MDL2 Assets"
+                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel>
+                                        <TextBlock Text="Storage overview" FontSize="22" FontWeight="SemiBold" />
+                                        <TextBlock
+                                            x:Name="StorageSummaryText"
+                                            Text="Collecting drive information…"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            TextWrapping="WrapWholeWords" />
+                                    </StackPanel>
+                                </StackPanel>
+                                <ItemsControl x:Name="DriveUsageList">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Spacing="12" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid ColumnSpacing="12">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="160" />
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Spacing="2">
+                                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                                                    <TextBlock
+                                                        Text="{Binding Details}"
+                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        TextWrapping="Wrap" />
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                                                    <ProgressBar Minimum="0" Maximum="100" Value="{Binding UsedPercentage}" Height="6" />
+                                                    <TextBlock
+                                                        Text="{Binding UsageSummary}"
+                                                        HorizontalAlignment="Right"
+                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon
+                                        Glyph="&#xE946;"
+                                        FontFamily="Segoe MDL2 Assets"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        VerticalAlignment="Center" />
+                                    <TextBlock
+                                        x:Name="StorageTipText"
+                                        Text="Keep an eye on your drives to maintain performance."
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        TextWrapping="WrapWholeWords" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel Spacing="16">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <Border
+                                        Width="48"
+                                        Height="48"
+                                        CornerRadius="16"
+                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                        VerticalAlignment="Center">
                                         <SymbolIcon
                                             Symbol="Folder"
                                             Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"

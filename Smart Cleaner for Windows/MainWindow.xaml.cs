@@ -34,6 +34,7 @@ public sealed partial class MainWindow : Window
     private SystemBackdropConfiguration? _backdropConfig;
     private List<string> _previewCandidates = new();
     private bool _isBusy;
+    private readonly ObservableCollection<DriveUsageViewModel> _driveUsage = new();
     private readonly ObservableCollection<DiskCleanupItemViewModel> _diskCleanupItems = new();
     private CancellationTokenSource? _diskCleanupCts;
     private readonly string _diskCleanupVolume = DiskCleanupManager.GetDefaultVolume();
@@ -62,6 +63,9 @@ public sealed partial class MainWindow : Window
         InitializeComponent();
 
         CaptureDefaultAccentColors();
+
+        DriveUsageList.ItemsSource = _driveUsage;
+        UpdateStorageOverview();
 
         if (Application.Current.Resources.TryGetValue("AccentButtonStyle", out var accentStyleObj) &&
             accentStyleObj is Style accentStyle)
@@ -228,6 +232,163 @@ public sealed partial class MainWindow : Window
         EmptyFoldersView.Visibility = item == EmptyFoldersItem ? Visibility.Visible : Visibility.Collapsed;
         DiskCleanupView.Visibility = item == DiskCleanupItem ? Visibility.Visible : Visibility.Collapsed;
         SettingsView.Visibility = item == SettingsItem ? Visibility.Visible : Visibility.Collapsed;
+
+        if (item == DashboardItem)
+        {
+            UpdateStorageOverview();
+        }
+    }
+
+    private void UpdateStorageOverview()
+    {
+        try
+        {
+            var drives = DriveInfo.GetDrives()
+                .Where(d => d.IsReady && d.TotalSize > 0)
+                .OrderBy(d => d.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            _driveUsage.Clear();
+
+            if (drives.Count == 0)
+            {
+                StorageSummaryText.Text = "No ready drives detected.";
+                StorageTipText.Text = "Connect or unlock a drive to view usage details.";
+                return;
+            }
+
+            ulong totalCapacity = 0;
+            ulong totalFree = 0;
+            DriveUsageViewModel? busiestDrive = null;
+
+            foreach (var drive in drives)
+            {
+                try
+                {
+                    var capacity = drive.TotalSize;
+                    if (capacity <= 0)
+                    {
+                        continue;
+                    }
+
+                    var freeSpace = drive.TotalFreeSpace;
+                    var capacityValue = (ulong)capacity;
+                    var freeValue = freeSpace <= 0 ? 0UL : (ulong)freeSpace;
+                    if (freeValue > capacityValue)
+                    {
+                        freeValue = capacityValue;
+                    }
+
+                    totalCapacity += capacityValue;
+                    totalFree += freeValue;
+
+                    var usedValue = capacityValue - freeValue;
+                    var usedPercentage = capacityValue == 0
+                        ? 0
+                        : (double)usedValue / capacityValue * 100;
+
+                    var displayName = GetDriveDisplayName(drive);
+                    var details = string.Format(
+                        CultureInfo.CurrentCulture,
+                        "{0} free of {1}",
+                        FormatBytes(freeValue),
+                        FormatBytes(capacityValue));
+                    var usageSummary = string.Format(
+                        CultureInfo.CurrentCulture,
+                        "{0:0}% used ({1})",
+                        usedPercentage,
+                        FormatBytes(usedValue));
+
+                    var viewModel = new DriveUsageViewModel(displayName, details, usedPercentage, usageSummary);
+                    _driveUsage.Add(viewModel);
+
+                    if (busiestDrive is null || viewModel.UsedPercentage > busiestDrive.UsedPercentage)
+                    {
+                        busiestDrive = viewModel;
+                    }
+                }
+                catch (IOException)
+                {
+                    continue;
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    continue;
+                }
+            }
+
+            if (_driveUsage.Count == 0)
+            {
+                StorageSummaryText.Text = "No accessible drives detected.";
+                StorageTipText.Text = "We couldn't read your drive information. Try running the app with higher permissions.";
+                return;
+            }
+
+            var driveLabel = _driveUsage.Count == 1 ? "drive" : "drives";
+            StorageSummaryText.Text = string.Format(
+                CultureInfo.CurrentCulture,
+                "Monitoring {0} {1}. {2} free of {3}.",
+                _driveUsage.Count,
+                driveLabel,
+                FormatBytes(totalFree),
+                FormatBytes(totalCapacity));
+
+            if (busiestDrive is not null)
+            {
+                StorageTipText.Text = GetStorageTip(busiestDrive);
+            }
+            else
+            {
+                StorageTipText.Text = "Storage tips will appear once drives are detected.";
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _driveUsage.Clear();
+            StorageSummaryText.Text = "Storage overview is unavailable.";
+            StorageTipText.Text = "We couldn't access drive information. Try again later or adjust your permissions.";
+        }
+    }
+
+    private static string GetDriveDisplayName(DriveInfo drive)
+    {
+        var name = drive.Name.TrimEnd('\', '/');
+        var label = drive.VolumeLabel;
+        if (string.IsNullOrWhiteSpace(label))
+        {
+            return name;
+        }
+
+        return string.Format(CultureInfo.CurrentCulture, "{0} ({1})", name, label);
+    }
+
+    private static string GetStorageTip(DriveUsageViewModel drive)
+    {
+        var usageDetail = drive.UsageSummary;
+
+        if (drive.UsedPercentage >= 90)
+        {
+            return string.Format(
+                CultureInfo.CurrentCulture,
+                "{0} is running low on space ({1}). Remove large files or move content to free up storage.",
+                drive.Name,
+                usageDetail);
+        }
+
+        if (drive.UsedPercentage >= 75)
+        {
+            return string.Format(
+                CultureInfo.CurrentCulture,
+                "{0} is getting crowded ({1}). Consider cleaning temporary files or uninstalling unused apps.",
+                drive.Name,
+                usageDetail);
+        }
+
+        return string.Format(
+            CultureInfo.CurrentCulture,
+            "{0} has plenty of room ({1}). Keep performing periodic cleanups to stay optimized.",
+            drive.Name,
+            usageDetail);
     }
 
     private async void OnBrowse(object sender, RoutedEventArgs e)
@@ -949,6 +1110,25 @@ public sealed partial class MainWindow : Window
         {
             return false;
         }
+    }
+
+    private sealed class DriveUsageViewModel
+    {
+        public DriveUsageViewModel(string name, string details, double usedPercentage, string usageSummary)
+        {
+            Name = name;
+            Details = details;
+            UsedPercentage = usedPercentage;
+            UsageSummary = usageSummary;
+        }
+
+        public string Name { get; }
+
+        public string Details { get; }
+
+        public double UsedPercentage { get; }
+
+        public string UsageSummary { get; }
     }
 
     private sealed class DiskCleanupItemViewModel : INotifyPropertyChanged
