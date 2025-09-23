@@ -229,7 +229,7 @@ public sealed partial class MainWindow : Window
                 : hasResults
                     ? Symbol.View
                     : Symbol.Accept;
-            var badgeValue = hasResults ? result.EmptyFound : (int?)null;
+            int? badgeValue = hasResults ? result.EmptyFound : null;
 
             SetStatus(statusSymbol, statusTitle, statusDescription, badgeValue);
             SetActivity("Scan complete.");
@@ -275,7 +275,7 @@ public sealed partial class MainWindow : Window
         SetBusy(true);
         SetActivity("Cleaning empty folders…");
         var pendingCount = _previewCandidates.Count;
-        var pendingBadge = pendingCount > 0 ? pendingCount : (int?)null;
+        int? pendingBadge = pendingCount > 0 ? pendingCount : null;
         SetStatus(
             Symbol.Delete,
             "Cleaning in progress…",
@@ -311,7 +311,7 @@ public sealed partial class MainWindow : Window
                 severity = InfoBarSeverity.Warning;
             }
 
-            var badgeValue = result.DeletedCount > 0 ? result.DeletedCount : (int?)null;
+            int? badgeValue = result.DeletedCount > 0 ? result.DeletedCount : null;
             var statusSymbol = result.HasFailures || result.EmptyFound > result.DeletedCount
                 ? Symbol.Important
                 : result.DeletedCount > 0
@@ -437,7 +437,7 @@ public sealed partial class MainWindow : Window
         }
         else
         {
-            ResultBadge.Value = null;
+            ResultBadge.ClearValue(InfoBadge.ValueProperty);
             ResultBadge.Visibility = Visibility.Collapsed;
         }
     }
