@@ -5,6 +5,7 @@
     <UseWinUI>true</UseWinUI>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <WindowsPackageType>None</WindowsPackageType>
     <RootNamespace>EmptyFolderCleaner.WinUI</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
