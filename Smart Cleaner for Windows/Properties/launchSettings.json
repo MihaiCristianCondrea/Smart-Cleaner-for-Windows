@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Smart Cleaner for Windows (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Smart Cleaner for Windows (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
