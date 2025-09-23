@@ -2,19 +2,37 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Enumeration;
-using System.Runtime.Versioning;
 using System.Threading;
-using Microsoft.VisualBasic.FileIO;
 
 namespace Smart_Cleaner_for_Windows.Core;
 
 /// <summary>
 /// Provides helpers to identify and remove empty directories.
 /// </summary>
-public static class DirectoryCleaner
+public sealed class DirectoryCleaner : IDirectoryCleaner
 {
     private static readonly bool IgnoreCase = OperatingSystem.IsWindows();
     private static readonly StringComparer PathComparer = IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+    private readonly IDirectorySystem _directorySystem;
+    private readonly IDirectoryDeleter _directoryDeleter;
+
+    public static IDirectoryCleaner Default { get; } = new DirectoryCleaner();
+
+    public static DirectoryCleanResult Clean(string root, DirectoryCleanOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        return Default.Clean(root, options, cancellationToken);
+    }
+
+    public DirectoryCleaner()
+        : this(new FileSystemDirectorySystem(), new FileSystemDirectoryDeleter())
+    {
+    }
+
+    public DirectoryCleaner(IDirectorySystem directorySystem, IDirectoryDeleter directoryDeleter)
+    {
+        _directorySystem = directorySystem ?? throw new ArgumentNullException(nameof(directorySystem));
+        _directoryDeleter = directoryDeleter ?? throw new ArgumentNullException(nameof(directoryDeleter));
+    }
 
     /// <summary>
     /// Scans the directory tree rooted at <paramref name="root"/> and optionally deletes empty directories.
@@ -25,7 +43,7 @@ public static class DirectoryCleaner
     /// <returns>The result of the cleaning operation.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="root"/> is null or empty.</exception>
     /// <exception cref="DirectoryNotFoundException">Thrown when the root directory does not exist.</exception>
-    public static DirectoryCleanResult Clean(string root, DirectoryCleanOptions? options = null, CancellationToken cancellationToken = default)
+    public DirectoryCleanResult Clean(string root, DirectoryCleanOptions? options = null, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(root))
         {
@@ -34,7 +52,7 @@ public static class DirectoryCleaner
 
         options ??= DirectoryCleanOptions.Default;
 
-        if (!Directory.Exists(root))
+        if (!_directorySystem.Exists(root))
         {
             throw new DirectoryNotFoundException($"The directory '{root}' does not exist.");
         }
@@ -50,7 +68,7 @@ public static class DirectoryCleaner
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (!Directory.Exists(directory))
+            if (!_directorySystem.Exists(directory))
             {
                 continue;
             }
@@ -74,7 +92,10 @@ public static class DirectoryCleaner
 
             try
             {
-                DeleteDirectory(directory, options.SendToRecycleBin);
+                var mode = options.SendToRecycleBin
+                    ? DirectoryDeletionMode.RecycleBin
+                    : DirectoryDeletionMode.Permanent;
+                _directoryDeleter.Delete(directory, mode);
                 deleted.Add(directory);
             }
             catch (OperationCanceledException)
@@ -94,7 +115,7 @@ public static class DirectoryCleaner
         return new DirectoryCleanResult(empty, deleted, failures);
     }
 
-    private static IEnumerable<string> EnumerateBottomUp(
+    private IEnumerable<string> EnumerateBottomUp(
         string root,
         DirectoryCleanOptions options,
         DirectoryExclusionFilter exclusions,
@@ -120,7 +141,7 @@ public static class DirectoryCleaner
             IEnumerable<string> children;
             try
             {
-                children = Directory.EnumerateDirectories(current);
+                children = _directorySystem.EnumerateDirectories(current);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
@@ -154,11 +175,11 @@ public static class DirectoryCleaner
         }
     }
 
-    private static bool IsDirectoryEmpty(string directory, ICollection<DirectoryCleanFailure> failures)
+    private bool IsDirectoryEmpty(string directory, ICollection<DirectoryCleanFailure> failures)
     {
         try
         {
-            using var enumerator = Directory.EnumerateFileSystemEntries(directory).GetEnumerator();
+            using var enumerator = _directorySystem.EnumerateFileSystemEntries(directory).GetEnumerator();
             return !enumerator.MoveNext();
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -168,11 +189,11 @@ public static class DirectoryCleaner
         }
     }
 
-    private static bool IsReparsePoint(string path, ICollection<DirectoryCleanFailure> failures)
+    private bool IsReparsePoint(string path, ICollection<DirectoryCleanFailure> failures)
     {
         try
         {
-            var attributes = File.GetAttributes(path);
+            var attributes = _directorySystem.GetAttributes(path);
             return (attributes & FileAttributes.ReparsePoint) != 0;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -180,28 +201,6 @@ public static class DirectoryCleaner
             failures.Add(new DirectoryCleanFailure(path, ex));
             return true;
         }
-    }
-
-    private static void DeleteDirectory(string path, bool sendToRecycleBin)
-    {
-        if (sendToRecycleBin)
-        {
-            if (!OperatingSystem.IsWindows())
-            {
-                throw new PlatformNotSupportedException("Deleting to the Recycle Bin is only supported on Windows.");
-            }
-
-            DeleteToRecycleBin(path);
-            return;
-        }
-
-        Directory.Delete(path, recursive: false);
-    }
-
-    [SupportedOSPlatform("windows")]
-    private static void DeleteToRecycleBin(string path)
-    {
-        FileSystem.DeleteDirectory(path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
     }
 
     private static string NormalizePath(string path)

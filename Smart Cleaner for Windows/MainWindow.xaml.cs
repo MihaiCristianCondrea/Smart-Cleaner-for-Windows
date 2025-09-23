@@ -24,6 +24,7 @@ namespace Smart_Cleaner_for_Windows;
 
 public sealed partial class MainWindow : Window
 {
+    private readonly IDirectoryCleaner _directoryCleaner;
     private CancellationTokenSource? _cts;
     private MicaController? _mica;
     private SystemBackdropConfiguration? _backdropConfig;
@@ -35,7 +36,14 @@ public sealed partial class MainWindow : Window
     private bool _isDiskCleanupOperation;
 
     public MainWindow()
+        : this(DirectoryCleaner.Default)
     {
+    }
+
+    public MainWindow(IDirectoryCleaner directoryCleaner)
+    {
+        _directoryCleaner = directoryCleaner ?? throw new ArgumentNullException(nameof(directoryCleaner));
+
         InitializeComponent();
 
         if (Application.Current.Resources.TryGetValue("AccentButtonStyle", out var accentStyleObj) &&
@@ -213,7 +221,7 @@ public sealed partial class MainWindow : Window
         try
         {
             var options = CreateOptions(dryRun: true);
-            var result = await Task.Run(() => DirectoryCleaner.Clean(root, options, _cts.Token));
+            var result = await Task.Run(() => _directoryCleaner.Clean(root, options, _cts.Token));
 
             _previewCandidates = new List<string>(result.EmptyDirectories);
             Candidates.ItemsSource = _previewCandidates;
@@ -309,7 +317,7 @@ public sealed partial class MainWindow : Window
         try
         {
             var options = CreateOptions(dryRun: false);
-            var result = await Task.Run(() => DirectoryCleaner.Clean(root, options, _cts.Token));
+            var result = await Task.Run(() => _directoryCleaner.Clean(root, options, _cts.Token));
 
             _previewCandidates.Clear();
             Candidates.ItemsSource = null;
