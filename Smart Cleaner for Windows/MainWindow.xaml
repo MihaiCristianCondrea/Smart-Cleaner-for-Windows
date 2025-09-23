@@ -330,6 +330,120 @@
                                             CornerRadius="14"
                                             Background="{ThemeResource AccentFillColorTertiaryBrush}"
                                             VerticalAlignment="Center">
+                                            <FontIcon
+                                                Glyph="&#xE74D;"
+                                                FontFamily="Segoe MDL2 Assets"
+                                                Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center" />
+                                        </Border>
+                                        <StackPanel>
+                                            <TextBlock Text="Disk Cleanup" FontSize="22" FontWeight="SemiBold" />
+                                            <TextBlock
+                                                x:Name="DiskCleanupIntro"
+                                                Text="Analyze Windows cleanup handlers to reclaim temporary files."
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <TextBlock
+                                        x:Name="DiskCleanupStatusText"
+                                        Text="Ready to analyze Windows disk cleanup handlers."
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        TextWrapping="Wrap" />
+
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                                        <Button x:Name="DiskCleanupAnalyzeBtn" Click="OnDiskCleanupAnalyze">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <SymbolIcon Symbol="Refresh" />
+                                                <TextBlock Text="Analyze" />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button x:Name="DiskCleanupCleanBtn" Click="OnDiskCleanupClean" IsEnabled="False">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <SymbolIcon Symbol="Delete" />
+                                                <TextBlock Text="Clean selected" />
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+
+                                    <ProgressBar
+                                        x:Name="DiskCleanupProgress"
+                                        Height="4"
+                                        Visibility="Collapsed"
+                                        IsIndeterminate="True" />
+
+                                    <InfoBar x:Name="DiskCleanupInfoBar" IsOpen="False" />
+
+                                    <ListView
+                                        x:Name="DiskCleanupList"
+                                        SelectionMode="None"
+                                        IsItemClickEnabled="False">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate>
+                                                <CheckBox
+                                                    Padding="0"
+                                                    HorizontalContentAlignment="Stretch"
+                                                    IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                    IsEnabled="{Binding CanSelect}">
+                                                    <Grid ColumnSpacing="12">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Border
+                                                            Width="32"
+                                                            Height="32"
+                                                            CornerRadius="12"
+                                                            Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                                            HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center">
+                                                            <FontIcon
+                                                                Glyph="&#xE74D;"
+                                                                FontFamily="Segoe MDL2 Assets"
+                                                                Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                                                HorizontalAlignment="Center"
+                                                                VerticalAlignment="Center" />
+                                                        </Border>
+                                                        <StackPanel Grid.Column="1" Spacing="2">
+                                                            <TextBlock
+                                                                Text="{Binding Name}"
+                                                                FontWeight="SemiBold"
+                                                                TextWrapping="Wrap" />
+                                                            <TextBlock
+                                                                Text="{Binding Description}"
+                                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                TextWrapping="Wrap" />
+                                                            <TextBlock
+                                                                Text="{Binding ErrorMessage}"
+                                                                Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                                                TextWrapping="Wrap" />
+                                                        </StackPanel>
+                                                        <TextBlock
+                                                            Grid.Column="2"
+                                                            Text="{Binding FormattedSize}"
+                                                            HorizontalAlignment="Right"
+                                                            VerticalAlignment="Center"
+                                                            FontWeight="SemiBold" />
+                                                    </Grid>
+                                                </CheckBox>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource CardStyle}">
+                                <StackPanel Spacing="16">
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <Border
+                                            Width="40"
+                                            Height="40"
+                                            CornerRadius="14"
+                                            Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                            VerticalAlignment="Center">
                                             <SymbolIcon
                                                 Symbol="Favorite"
                                                 Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
