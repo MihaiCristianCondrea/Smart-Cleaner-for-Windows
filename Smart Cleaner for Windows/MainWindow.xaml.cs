@@ -225,7 +225,7 @@ public sealed partial class MainWindow : Window
                     ? "Review the folders list below before cleaning."
                     : "Everything looks tidy. Try adjusting filters if you expected more.";
             var statusSymbol = result.HasFailures
-                ? Symbol.Warning
+                ? Symbol.Important
                 : hasResults
                     ? Symbol.View
                     : Symbol.Accept;
@@ -275,7 +275,12 @@ public sealed partial class MainWindow : Window
         SetBusy(true);
         SetActivity("Cleaning empty folders…");
         var pendingCount = _previewCandidates.Count;
-        SetStatus(Symbol.Delete, "Cleaning in progress…", "Removing empty folders safely. You can cancel the operation if needed.", pendingCount > 0 ? pendingCount : null);
+        var pendingBadge = pendingCount > 0 ? pendingCount : (int?)null;
+        SetStatus(
+            Symbol.Delete,
+            "Cleaning in progress…",
+            "Removing empty folders safely. You can cancel the operation if needed.",
+            pendingBadge);
         UpdateResultsSummary(pendingCount, pendingCount > 0
             ? "Cleaning in progress. We'll refresh the preview afterwards."
             : "Cleaning in progress…");
@@ -308,10 +313,10 @@ public sealed partial class MainWindow : Window
 
             var badgeValue = result.DeletedCount > 0 ? result.DeletedCount : (int?)null;
             var statusSymbol = result.HasFailures || result.EmptyFound > result.DeletedCount
-                ? Symbol.Warning
+                ? Symbol.Important
                 : result.DeletedCount > 0
                     ? Symbol.Accept
-                    : Symbol.Info;
+                    : Symbol.Message;
             var statusTitle = result.HasFailures
                 ? "Clean completed with warnings"
                 : result.EmptyFound == 0
