@@ -13,6 +13,7 @@ using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Smart_Cleaner_for_Windows.Core;
 using Windows.Graphics;
@@ -209,7 +210,7 @@ public sealed partial class MainWindow : Window
 
     private void OnNavigateToDiskCleanup(object sender, RoutedEventArgs e) => NavigateTo(DiskCleanupItem);
 
-    private void OnNavigateToSettings(object sender, RoutedEventArgs e) => NavigateTo(SettingsItem);
+    private void OnSettingsTapped(object sender, TappedRoutedEventArgs e) => NavigateTo(SettingsItem);
 
     private void NavigateTo(NavigationViewItem item)
     {
