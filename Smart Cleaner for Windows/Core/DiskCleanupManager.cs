@@ -394,7 +394,7 @@ public static class DiskCleanupManager
             }
 
             var result = RunHandler(handlerKey, item, drive, cancellationToken);
-            if (result.Success)
+            if (result.IsSuccess)
             {
                 successCount++;
                 freedTotal += result.FreedSpace;
@@ -484,7 +484,7 @@ public static class DiskCleanupManager
 
             var freed = beforeStatus >= 0 && afterStatus >= 0 && before >= after ? before - after : 0;
             cache.Deactivate(out _);
-            return HandlerExecutionResult.Success(freed);
+            return HandlerExecutionResult.CreateSuccess(freed);
         }
         catch (COMException ex)
         {
@@ -574,9 +574,9 @@ public static class DiskCleanupManager
         return $"HRESULT 0x{hresult:X8}";
     }
 
-    private sealed record HandlerExecutionResult(bool Success, ulong FreedSpace, string? ErrorMessage)
+    private sealed record HandlerExecutionResult(bool IsSuccess, ulong FreedSpace, string? ErrorMessage)
     {
-        public static HandlerExecutionResult Success(ulong freed) => new(true, freed, null);
+        public static HandlerExecutionResult CreateSuccess(ulong freed) => new(true, freed, null);
 
         public static HandlerExecutionResult Failed(string? message) => new(false, 0, message);
     }
