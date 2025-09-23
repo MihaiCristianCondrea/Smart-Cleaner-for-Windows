@@ -121,6 +121,26 @@ public sealed class DirectoryCleanerTests
         Assert.Contains(temp.FullPath, rootResult.DeletedDirectories);
         Assert.False(Directory.Exists(temp.FullPath));
     }
+
+    [Fact]
+    public void Invalid_exclusion_paths_are_reported()
+    {
+        using var temp = TemporaryDirectory.Create();
+        var target = Directory.CreateDirectory(Path.Combine(temp.FullPath, "target")).FullName;
+
+        var options = DirectoryCleanOptions.Default with
+        {
+            ExcludedFullPaths = new[] { "\0" }
+        };
+
+        var result = DirectoryCleaner.Clean(temp.FullPath, options);
+
+        Assert.Contains(target, result.EmptyDirectories);
+
+        var failure = Assert.Single(result.Failures);
+        Assert.Equal("\0", failure.Path);
+        Assert.IsType<ArgumentException>(failure.Exception);
+    }
 }
 
 file sealed class TemporaryDirectory : IDisposable

@@ -40,7 +40,7 @@ public static class DirectoryCleaner
         var empty = new List<string>();
         var deleted = new List<string>();
         var failures = new List<DirectoryCleanFailure>();
-        var exclusions = new DirectoryExclusionFilter(root, options);
+        var exclusions = new DirectoryExclusionFilter(root, options, failures);
 
         foreach (var directory in EnumerateBottomUp(root, options, exclusions, failures, cancellationToken))
         {
@@ -211,10 +211,12 @@ public static class DirectoryCleaner
         private readonly HashSet<string> _fullPathExclusions;
         private readonly string[] _patterns;
         private readonly string _root;
+        private readonly ICollection<DirectoryCleanFailure> _failures;
 
-        public DirectoryExclusionFilter(string root, DirectoryCleanOptions options)
+        public DirectoryExclusionFilter(string root, DirectoryCleanOptions options, ICollection<DirectoryCleanFailure> failures)
         {
             _root = root;
+            _failures = failures;
             _fullPathExclusions = new HashSet<string>(PathComparer);
 
             if (options.ExcludedFullPaths is { Count: > 0 })
@@ -226,19 +228,49 @@ public static class DirectoryCleaner
                         continue;
                     }
 
-                    var resolved = Path.IsPathRooted(path)
-                        ? NormalizePath(path)
-                        : NormalizePath(Path.Combine(root, path));
-                    _fullPathExclusions.Add(resolved);
+                    try
+                    {
+                        var resolved = Path.IsPathRooted(path)
+                            ? NormalizePath(path)
+                            : NormalizePath(Path.Combine(root, path));
+                        _fullPathExclusions.Add(resolved);
+                    }
+                    catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException or System.Security.SecurityException)
+                    {
+                        _failures.Add(new DirectoryCleanFailure(path, ex));
+                    }
                 }
             }
 
-            _patterns = options.ExcludedNamePatterns is { Count: > 0 }
-                ? options.ExcludedNamePatterns
-                    .Where(static pattern => !string.IsNullOrWhiteSpace(pattern))
-                    .Select(static pattern => pattern.Replace('\\', '/'))
-                    .ToArray()
-                : Array.Empty<string>();
+            if (options.ExcludedNamePatterns is { Count: > 0 })
+            {
+                var validPatterns = new List<string>();
+
+                foreach (var pattern in options.ExcludedNamePatterns)
+                {
+                    if (string.IsNullOrWhiteSpace(pattern))
+                    {
+                        continue;
+                    }
+
+                    if (TryNormalizePattern(pattern, out var normalized, out var error))
+                    {
+                        validPatterns.Add(normalized);
+                    }
+                    else if (error is not null)
+                    {
+                        _failures.Add(new DirectoryCleanFailure(pattern, error));
+                    }
+                }
+
+                _patterns = validPatterns.Count > 0
+                    ? validPatterns.ToArray()
+                    : Array.Empty<string>();
+            }
+            else
+            {
+                _patterns = Array.Empty<string>();
+            }
         }
 
         public bool ShouldExclude(string path)
@@ -270,6 +302,24 @@ public static class DirectoryCleaner
             }
 
             return false;
+        }
+
+        private static bool TryNormalizePattern(string pattern, out string normalized, out Exception? error)
+        {
+            normalized = pattern.Replace('\\', '/');
+
+            try
+            {
+                _ = FileSystemName.MatchesSimpleExpression(normalized, string.Empty, IgnoreCase);
+                error = null;
+                return true;
+            }
+            catch (ArgumentException ex)
+            {
+                error = new ArgumentException($"Invalid exclusion pattern '{pattern}'.", ex);
+                normalized = string.Empty;
+                return false;
+            }
         }
 
         private static bool MatchesAny(string[] patterns, string candidate)
