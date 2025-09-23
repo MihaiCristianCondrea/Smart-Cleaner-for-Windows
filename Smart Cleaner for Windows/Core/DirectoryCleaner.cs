@@ -34,6 +34,11 @@ public sealed class DirectoryCleaner : IDirectoryCleaner
         _directoryDeleter = directoryDeleter ?? throw new ArgumentNullException(nameof(directoryDeleter));
     }
 
+    DirectoryCleanResult IDirectoryCleaner.Clean(string root, DirectoryCleanOptions? options, CancellationToken cancellationToken)
+    {
+        return CleanInternal(root, options, cancellationToken);
+    }
+
     /// <summary>
     /// Scans the directory tree rooted at <paramref name="root"/> and optionally deletes empty directories.
     /// </summary>
@@ -43,7 +48,7 @@ public sealed class DirectoryCleaner : IDirectoryCleaner
     /// <returns>The result of the cleaning operation.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="root"/> is null or empty.</exception>
     /// <exception cref="DirectoryNotFoundException">Thrown when the root directory does not exist.</exception>
-    public DirectoryCleanResult Clean(string root, DirectoryCleanOptions? options = null, CancellationToken cancellationToken = default)
+    private DirectoryCleanResult CleanInternal(string root, DirectoryCleanOptions? options, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(root))
         {
