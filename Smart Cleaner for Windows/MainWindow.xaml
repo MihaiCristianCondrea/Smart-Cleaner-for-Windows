@@ -8,83 +8,289 @@
     mc:Ignorable="d"
     Title="Smart Cleaner for Windows">
 
+    <Window.Resources>
+        <CornerRadius x:Key="CardCornerRadius">14</CornerRadius>
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}" />
+            <Setter Property="Padding" Value="20" />
+        </Style>
+    </Window.Resources>
+
     <Window.SystemBackdrop>
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <NavigationView IsSettingsVisible="False" PaneDisplayMode="LeftMinimal">
-        <Grid Padding="16" RowSpacing="12">
+    <NavigationView
+        IsBackButtonVisible="Collapsed"
+        IsSettingsVisible="True"
+        PaneDisplayMode="Left"
+        CompactPaneLength="56"
+        IsPaneToggleButtonVisible="True"
+        AlwaysShowHeader="False">
+        <NavigationView.MenuItems>
+            <NavigationViewItem Content="Dashboard">
+                <NavigationViewItem.Icon>
+                    <SymbolIcon Symbol="Home" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem Content="Cleaner" IsSelected="True">
+                <NavigationViewItem.Icon>
+                    <SymbolIcon Symbol="Delete" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem Content="Settings">
+                <NavigationViewItem.Icon>
+                    <SymbolIcon Symbol="Setting" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+        </NavigationView.MenuItems>
+
+        <Grid Padding="28" RowSpacing="24">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <Grid ColumnSpacing="8">
+            <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                <Border
+                    Width="52"
+                    Height="52"
+                    CornerRadius="18"
+                    Background="{ThemeResource AccentFillColorDefaultBrush}"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left">
+                    <SymbolIcon
+                        Symbol="Delete"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="26"
+                        Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+                </Border>
+                <StackPanel>
+                    <TextBlock Text="Smart Cleaner" FontSize="28" FontWeight="SemiBold" />
+                    <TextBlock
+                        Text="Keep your workspace tidy by removing empty folders in a single sweep."
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+            </StackPanel>
+
+            <Grid Grid.Row="1" ColumnSpacing="24">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="320" />
                 </Grid.ColumnDefinitions>
 
-                <TextBox
-                    x:Name="RootPathBox"
-                    Grid.Column="0"
-                    PlaceholderText="Select a root folder…"
-                    TextChanged="RootPathBox_TextChanged" />
-                <Button
-                    x:Name="BrowseBtn"
-                    Grid.Column="1"
-                    Content="Browse"
-                    Click="OnBrowse"
-                    Margin="0,0,0,0" />
-                <Button
-                    x:Name="PreviewBtn"
-                    Grid.Column="2"
-                    Content="Preview"
-                    Click="OnPreview" />
-                <Button
-                    x:Name="DeleteBtn"
-                    Grid.Column="3"
-                    Content="Delete"
-                    Click="OnDelete"
-                    IsEnabled="False" />
+                <StackPanel Spacing="16">
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel Spacing="16">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Root folder" FontSize="20" FontWeight="SemiBold" />
+                                <TextBlock
+                                    Text="Pick a starting location to scan for empty directories."
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                            <Grid RowSpacing="12">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid ColumnSpacing="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox
+                                        x:Name="RootPathBox"
+                                        Grid.Column="0"
+                                        PlaceholderText="Select a root folder…"
+                                        TextChanged="RootPathBox_TextChanged" />
+                                    <Button
+                                        x:Name="BrowseBtn"
+                                        Grid.Column="1"
+                                        Content="Browse"
+                                        Click="OnBrowse" />
+                                </Grid>
+                                <StackPanel
+                                    Grid.Row="1"
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Right"
+                                    Spacing="8">
+                                    <Button x:Name="PreviewBtn" Content="Preview" Click="OnPreview" />
+                                    <Button x:Name="DeleteBtn" Content="Clean Now" Click="OnDelete" IsEnabled="False" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel Spacing="16">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Scan options" FontSize="20" FontWeight="SemiBold" />
+                                <TextBlock
+                                    Text="Customize how the cleaner behaves before you run a scan."
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                            <StackPanel Spacing="12">
+                                <CheckBox x:Name="RecycleChk" Content="Send deleted folders to Recycle Bin" IsChecked="True" />
+                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <TextBlock VerticalAlignment="Center" Text="Depth limit" />
+                                    <NumberBox x:Name="DepthBox" Width="96" Minimum="0" Maximum="999" Value="0" />
+                                </StackPanel>
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Exclusions" />
+                                    <TextBox
+                                        x:Name="ExcludeBox"
+                                        PlaceholderText=".git; build/*; node_modules"
+                                        AcceptsReturn="False" />
+                                    <TextBlock
+                                        Text="Use semicolons to separate names or wildcard patterns."
+                                        FontSize="12"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="Activity" FontSize="20" FontWeight="SemiBold" />
+                            <TextBlock
+                                x:Name="ActivityText"
+                                Text="Waiting for the next action."
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <ProgressBar
+                                x:Name="Progress"
+                                Height="4"
+                                Visibility="Collapsed"
+                                IsIndeterminate="True" />
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button x:Name="CancelBtn" Content="Cancel" Click="OnCancel" Visibility="Collapsed" IsEnabled="False" />
+                            </StackPanel>
+                            <InfoBar x:Name="Info" IsOpen="False" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <Border Grid.Column="1" Style="{StaticResource CardStyle}" Padding="24" VerticalAlignment="Stretch">
+                    <StackPanel Spacing="16">
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Border
+                                Grid.Column="0"
+                                Width="44"
+                                Height="44"
+                                CornerRadius="16"
+                                Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center">
+                                <SymbolIcon
+                                    x:Name="StatusGlyph"
+                                    Symbol="Folder"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontSize="20"
+                                    Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="Current status" FontWeight="SemiBold" />
+                                <TextBlock
+                                    x:Name="StatusDescription"
+                                    Text="Select a folder to begin."
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                            <InfoBadge
+                                x:Name="ResultBadge"
+                                Grid.Column="2"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Visibility="Collapsed" />
+                        </Grid>
+                        <TextBlock
+                            x:Name="StatusTitle"
+                            Text="Ready when you are"
+                            FontSize="26"
+                            FontWeight="SemiBold" />
+                        <StackPanel Spacing="8">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <SymbolIcon Symbol="PreviewLink" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <TextBlock Text="Preview empty directories before cleaning." Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <SymbolIcon Symbol="Protect" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <TextBlock Text="Recycle Bin support keeps removals safe." Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <SymbolIcon Symbol="Filter" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <TextBlock Text="Exclude directories with custom rules." Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
             </Grid>
 
-            <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="16">
-                <CheckBox x:Name="RecycleChk" Content="Send to Recycle Bin" IsChecked="True" />
-
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                    <TextBlock VerticalAlignment="Center" Text="Depth limit:" />
-                    <NumberBox x:Name="DepthBox" Width="90" Minimum="0" Maximum="999" Value="0" />
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                    <TextBlock VerticalAlignment="Center" Text="Exclusions (semicolon-separated):" />
-                    <TextBox x:Name="ExcludeBox" Width="360" PlaceholderText=".git; build/*; node_modules" />
-                </StackPanel>
-            </StackPanel>
-
-            <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="12">
-                <ProgressBar x:Name="Progress" Width="280" Visibility="Collapsed" IsIndeterminate="True" />
-                <Button x:Name="CancelBtn" Content="Cancel" Click="OnCancel" Visibility="Collapsed" IsEnabled="False" />
-                <InfoBar x:Name="Info" IsOpen="False" />
-            </StackPanel>
-
-            <ListView
-                x:Name="Candidates"
-                Grid.Row="3"
-                Margin="0,8,0,0"
-                SelectionMode="None"
-                IsItemClickEnabled="False">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis" />
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+            <Border Grid.Row="2" Style="{StaticResource CardStyle}">
+                <Grid RowSpacing="12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                        <TextBlock Text="Preview results" FontSize="20" FontWeight="SemiBold" />
+                    </StackPanel>
+                    <TextBlock
+                        Grid.Row="1"
+                        x:Name="ResultsCaption"
+                        Margin="0,0,0,4"
+                        Text="Preview results will appear here once you run a scan."
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <ListView
+                        x:Name="Candidates"
+                        Grid.Row="2"
+                        Margin="0,4,0,0"
+                        SelectionMode="None"
+                        IsItemClickEnabled="False">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnSpacing="12" Padding="8,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border
+                                        Width="32"
+                                        Height="32"
+                                        CornerRadius="12"
+                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center">
+                                        <SymbolIcon
+                                            Symbol="Folder"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontSize="16"
+                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+                                    </Border>
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Text="{Binding}"
+                                        TextTrimming="CharacterEllipsis"
+                                        VerticalAlignment="Center"
+                                        ToolTipService.ToolTip="{Binding}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </Border>
         </Grid>
     </NavigationView>
 </Window>

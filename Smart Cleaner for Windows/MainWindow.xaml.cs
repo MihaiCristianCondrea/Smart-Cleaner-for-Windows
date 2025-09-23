@@ -34,6 +34,10 @@ public sealed partial class MainWindow : Window
             DeleteBtn.Style = accentStyle;
         }
 
+        SetStatus(Symbol.Folder, "Ready when you are", "Select a folder to begin.");
+        SetActivity("Waiting for the next action.");
+        UpdateResultsSummary(0, "Preview results will appear here once you run a scan.");
+
         TryEnableMica();
         TryConfigureAppWindow();
         Activated += OnWindowActivated;
@@ -143,6 +147,9 @@ public sealed partial class MainWindow : Window
         {
             RootPathBox.Text = folder.Path;
             DeleteBtn.IsEnabled = !_isBusy && _previewCandidates.Count > 0;
+            SetStatus(Symbol.Folder, "Folder selected", "Run Preview to identify empty directories.");
+            SetActivity("Ready to scan the selected folder.");
+            UpdateResultsSummary(0, "Preview results will appear here once you run a scan.");
         }
     }
 
@@ -156,6 +163,7 @@ public sealed partial class MainWindow : Window
         _previewCandidates.Clear();
         Candidates.ItemsSource = null;
         DeleteBtn.IsEnabled = false;
+        UpdateResultsSummary(0, "Preview results will appear here once you run a scan.");
     }
 
     private async void OnPreview(object sender, RoutedEventArgs e)
@@ -164,6 +172,9 @@ public sealed partial class MainWindow : Window
         if (!TryGetRootPath(out var root))
         {
             ShowInfo("Select a valid folder.", InfoBarSeverity.Warning);
+            SetStatus(Symbol.Important, "Select a valid folder", "Choose a folder before scanning.");
+            UpdateResultsSummary(0, "Select a valid folder to run a scan.");
+            SetActivity("Waiting for a valid folder.");
             return;
         }
 
@@ -174,6 +185,9 @@ public sealed partial class MainWindow : Window
         DeleteBtn.IsEnabled = false;
 
         SetBusy(true);
+        SetActivity("Scanning for empty folders…");
+        SetStatus(Symbol.Sync, "Scanning in progress…", "Looking for empty folders. You can cancel the scan if needed.");
+        UpdateResultsSummary(0, "Scanning for empty folders…");
 
         try
         {
@@ -184,6 +198,14 @@ public sealed partial class MainWindow : Window
             Candidates.ItemsSource = _previewCandidates;
             DeleteBtn.IsEnabled = !_isBusy && _previewCandidates.Count > 0;
 
+            var hasResults = result.EmptyFound > 0;
+            var resultsMessage = result.HasFailures
+                ? "Some folders might be missing from the preview due to access issues."
+                : hasResults
+                    ? "Review the folders below before cleaning."
+                    : "No empty folders were detected for this location.";
+            UpdateResultsSummary(result.EmptyFound, resultsMessage);
+
             var message = $"Found {result.EmptyFound} empty folder(s).";
             var severity = InfoBarSeverity.Informational;
             if (result.HasFailures)
@@ -192,14 +214,40 @@ public sealed partial class MainWindow : Window
                 severity = InfoBarSeverity.Warning;
             }
 
+            var statusTitle = result.HasFailures
+                ? "Scan completed with warnings"
+                : hasResults
+                    ? $"Found {result.EmptyFound} empty folder(s)"
+                    : "No empty folders detected";
+            var statusDescription = result.HasFailures
+                ? "Some items could not be analyzed. Review the message below."
+                : hasResults
+                    ? "Review the folders list below before cleaning."
+                    : "Everything looks tidy. Try adjusting filters if you expected more.";
+            var statusSymbol = result.HasFailures
+                ? Symbol.Warning
+                : hasResults
+                    ? Symbol.View
+                    : Symbol.Accept;
+            var badgeValue = hasResults ? result.EmptyFound : (int?)null;
+
+            SetStatus(statusSymbol, statusTitle, statusDescription, badgeValue);
+            SetActivity("Scan complete.");
+
             ShowInfo(message, severity);
         }
         catch (OperationCanceledException)
         {
+            SetActivity("Scan cancelled.");
+            SetStatus(Symbol.Cancel, "Scan cancelled", "Preview was cancelled. Adjust settings or try again.");
+            UpdateResultsSummary(0, "Preview was cancelled. Run Preview to refresh the list.");
             ShowInfo("Preview cancelled.", InfoBarSeverity.Informational);
         }
         catch (Exception ex)
         {
+            SetActivity("Something went wrong.");
+            SetStatus(Symbol.Important, "Scan failed", "An unexpected error occurred. Review the message below.");
+            UpdateResultsSummary(0, "The scan failed. Review the message above and try again.");
             ShowInfo($"Error: {ex.Message}", InfoBarSeverity.Error);
         }
         finally
@@ -216,12 +264,21 @@ public sealed partial class MainWindow : Window
         if (!TryGetRootPath(out var root))
         {
             ShowInfo("Select a valid folder.", InfoBarSeverity.Warning);
+            SetStatus(Symbol.Important, "Select a valid folder", "Choose a folder before cleaning.");
+            UpdateResultsSummary(0, "Select a valid folder before cleaning.");
+            SetActivity("Waiting for a valid folder.");
             return;
         }
 
         CancelActiveOperation();
         _cts = new CancellationTokenSource();
         SetBusy(true);
+        SetActivity("Cleaning empty folders…");
+        var pendingCount = _previewCandidates.Count;
+        SetStatus(Symbol.Delete, "Cleaning in progress…", "Removing empty folders safely. You can cancel the operation if needed.", pendingCount > 0 ? pendingCount : null);
+        UpdateResultsSummary(pendingCount, pendingCount > 0
+            ? "Cleaning in progress. We'll refresh the preview afterwards."
+            : "Cleaning in progress…");
 
         try
         {
@@ -249,18 +306,54 @@ public sealed partial class MainWindow : Window
                 severity = InfoBarSeverity.Warning;
             }
 
+            var badgeValue = result.DeletedCount > 0 ? result.DeletedCount : (int?)null;
+            var statusSymbol = result.HasFailures || result.EmptyFound > result.DeletedCount
+                ? Symbol.Warning
+                : result.DeletedCount > 0
+                    ? Symbol.Accept
+                    : Symbol.Info;
+            var statusTitle = result.HasFailures
+                ? "Clean completed with warnings"
+                : result.EmptyFound == 0
+                    ? "No empty folders detected"
+                    : result.EmptyFound > result.DeletedCount
+                        ? "Some folders could not be removed"
+                        : $"Removed {result.DeletedCount} folder(s)";
+            var statusDescription = result.HasFailures
+                ? "Some folders could not be removed. Review the message below."
+                : result.EmptyFound == 0
+                    ? "Run Preview to check another location."
+                    : result.EmptyFound > result.DeletedCount
+                        ? "Some items remain because they could not be deleted."
+                        : "Your workspace is tidier. Run Preview again to double-check.";
+
+            SetStatus(statusSymbol, statusTitle, statusDescription, badgeValue);
+            SetActivity("Clean complete.");
+            UpdateResultsSummary(0, result.DeletedCount > 0
+                ? "Clean completed. Run Preview again to scan another location."
+                : "No empty folders were removed. Run Preview to check again.");
+
             ShowInfo(message, severity);
         }
         catch (OperationCanceledException)
         {
+            SetActivity("Clean cancelled.");
+            SetStatus(Symbol.Cancel, "Clean cancelled", "Deletion was cancelled. Preview again when you're ready.");
+            UpdateResultsSummary(0, "Clean cancelled. Run Preview to refresh the list.");
             ShowInfo("Deletion cancelled.", InfoBarSeverity.Informational);
         }
         catch (UnauthorizedAccessException)
         {
+            SetActivity("Permission required.");
+            SetStatus(Symbol.Important, "Access denied", "Run the app as Administrator to remove protected folders.");
+            UpdateResultsSummary(0, "Some folders could not be removed due to permissions.");
             ShowInfo("Access denied. Try running as Administrator.", InfoBarSeverity.Warning);
         }
         catch (Exception ex)
         {
+            SetActivity("Something went wrong.");
+            SetStatus(Symbol.Important, "Clean failed", "An unexpected error occurred. Review the message below.");
+            UpdateResultsSummary(0, "Cleaning failed. Review the details and try again.");
             ShowInfo($"Error: {ex.Message}", InfoBarSeverity.Error);
         }
         finally
@@ -278,6 +371,10 @@ public sealed partial class MainWindow : Window
         if (_cts is { IsCancellationRequested: false })
         {
             _cts.Cancel();
+            if (_isBusy)
+            {
+                SetActivity("Cancelling current operation…");
+            }
         }
     }
 
@@ -320,6 +417,42 @@ public sealed partial class MainWindow : Window
 
         return text
             .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    }
+
+    private void SetStatus(Symbol symbol, string title, string description, int? badgeValue = null)
+    {
+        StatusGlyph.Symbol = symbol;
+        StatusTitle.Text = title;
+        StatusDescription.Text = description;
+
+        if (badgeValue.HasValue && badgeValue.Value > 0)
+        {
+            ResultBadge.Value = badgeValue.Value;
+            ResultBadge.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            ResultBadge.Value = null;
+            ResultBadge.Visibility = Visibility.Collapsed;
+        }
+    }
+
+    private void UpdateResultsSummary(int count, string? customMessage = null)
+    {
+        if (!string.IsNullOrWhiteSpace(customMessage))
+        {
+            ResultsCaption.Text = customMessage;
+            return;
+        }
+
+        ResultsCaption.Text = count > 0
+            ? "Review the folders below before cleaning."
+            : "Preview results will appear here once you run a scan.";
+    }
+
+    private void SetActivity(string message)
+    {
+        ActivityText.Text = message;
     }
 
     private void SetBusy(bool isBusy)
