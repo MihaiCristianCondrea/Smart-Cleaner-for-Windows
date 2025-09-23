@@ -8,17 +8,6 @@
     mc:Ignorable="d"
     Title="Smart Cleaner for Windows">
 
-    <Window.Resources>
-        <CornerRadius x:Key="CardCornerRadius">14</CornerRadius>
-        <Style x:Key="CardStyle" TargetType="Border">
-            <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}" />
-            <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}" />
-            <Setter Property="Padding" Value="20" />
-        </Style>
-    </Window.Resources>
-
     <Window.SystemBackdrop>
         <MicaBackdrop />
     </Window.SystemBackdrop>
@@ -30,6 +19,16 @@
         CompactPaneLength="56"
         IsPaneToggleButtonVisible="True"
         AlwaysShowHeader="False">
+        <NavigationView.Resources>
+            <CornerRadius x:Key="CardCornerRadius">14</CornerRadius>
+            <Style x:Key="CardStyle" TargetType="Border">
+                <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}" />
+                <Setter Property="Padding" Value="20" />
+            </Style>
+        </NavigationView.Resources>
         <NavigationView.MenuItems>
             <NavigationViewItem Content="Dashboard">
                 <NavigationViewItem.Icon>
@@ -67,7 +66,6 @@
                         Symbol="Delete"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        FontSize="26"
                         Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
                 </Border>
                 <StackPanel>
@@ -196,7 +194,6 @@
                                     Symbol="Folder"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
-                                    FontSize="20"
                                     Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
                             </Border>
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
@@ -224,7 +221,7 @@
                                 <TextBlock Text="Preview empty directories before cleaning." Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <SymbolIcon Symbol="Protect" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <SymbolIcon Symbol="ProtectedDocument" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                 <TextBlock Text="Recycle Bin support keeps removals safe." Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8">
@@ -276,7 +273,6 @@
                                             Symbol="Folder"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
-                                            FontSize="16"
                                             Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
                                     </Border>
                                     <TextBlock

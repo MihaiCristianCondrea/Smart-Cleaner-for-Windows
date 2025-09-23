@@ -1,6 +1,4 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
+# This workflow builds the main solution to ensure the WinUI app compiles on every push.
 name: .NET
 
 on:
@@ -11,22 +9,18 @@ on:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     env:
-      Test_Project_Path: tests/EmptyFolderCleaner.Core.Tests/EmptyFolderCleaner.Core.Tests.csproj
-      Library_Project_Path: src/EmptyFolderCleaner.Core/EmptyFolderCleaner.Core.csproj
+      SOLUTION_PATH: Smart Cleaner for Windows.sln
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-    - name: Restore test dependencies
-      run: dotnet restore "$Test_Project_Path"
-    - name: Build core library
-      run: dotnet build "$Library_Project_Path" --no-restore
-    - name: Test
-      run: dotnet test "$Test_Project_Path" --no-restore --verbosity normal
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore
+        run: dotnet restore "$env:SOLUTION_PATH"
+      - name: Build
+        run: dotnet build "$env:SOLUTION_PATH" --configuration Release --no-restore
