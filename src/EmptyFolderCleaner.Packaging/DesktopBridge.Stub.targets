@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="_DesktopBridgeUnavailableMessage">
+    <Message Text="Desktop Bridge targets not found. Skipping packaging build." Importance="high" />
+  </Target>
+
+  <Target Name="Build" DependsOnTargets="_DesktopBridgeUnavailableMessage" />
+  <Target Name="Clean" DependsOnTargets="_DesktopBridgeUnavailableMessage" />
+  <Target Name="Rebuild" DependsOnTargets="_DesktopBridgeUnavailableMessage" />
+  <Target Name="Publish" DependsOnTargets="_DesktopBridgeUnavailableMessage" />
+</Project>
