@@ -76,7 +76,11 @@
 
         <NavigationView.PaneFooter>
             <StackPanel Margin="16" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                <SymbolIcon Symbol="Info" />
+                <SymbolIcon
+                    Symbol="Info"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center" />
                 <TextBlock Text="Version 1.0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
             </StackPanel>
         </NavigationView.PaneFooter>
@@ -107,7 +111,6 @@
                                 <SymbolIcon
                                     x:Name="StatusGlyph"
                                     Symbol="Folder"
-                                    FontSize="30"
                                     Foreground="White"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center" />
@@ -327,7 +330,7 @@
                                             Background="{ThemeResource AccentFillColorTertiaryBrush}"
                                             VerticalAlignment="Center">
                                             <SymbolIcon
-                                                Symbol="FavoriteStar"
+                                                Symbol="Favorite"
                                                 Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
                                                 HorizontalAlignment="Center"
                                                 VerticalAlignment="Center" />
