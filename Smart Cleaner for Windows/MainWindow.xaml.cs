@@ -437,7 +437,7 @@ public sealed partial class MainWindow : Window
         }
         else
         {
-            ResultBadge.Value = null;
+            ResultBadge.ClearValue(InfoBadge.ValueProperty);
             ResultBadge.Visibility = Visibility.Collapsed;
         }
     }
