@@ -89,7 +89,6 @@ public sealed partial class MainWindow : Window
         TryConfigureAppWindow();
         Activated += OnWindowActivated;
         Closed += OnClosed;
-        RootNavigation.SettingsInvoked += OnSettingsInvoked;
 
         NavigateTo(DashboardItem);
     }
@@ -97,7 +96,6 @@ public sealed partial class MainWindow : Window
     private void OnClosed(object sender, WindowEventArgs args)
     {
         Activated -= OnWindowActivated;
-        RootNavigation.SettingsInvoked -= OnSettingsInvoked;
         _cts?.Cancel();
         _cts?.Dispose();
         _cts = null;
@@ -204,12 +202,8 @@ public sealed partial class MainWindow : Window
 
     private void OnNavigationSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
-        ShowPage(args.SelectedItem);
-    }
-
-    private void OnSettingsInvoked(NavigationView sender, object args)
-    {
-        NavigateTo(sender.SettingsItem);
+        var target = args.IsSettingsSelected ? sender.SettingsItem : args.SelectedItem;
+        ShowPage(target);
     }
 
     private void OnNavigateToEmptyFolders(object sender, RoutedEventArgs e) => NavigateTo(EmptyFoldersItem);
