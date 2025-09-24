@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Enumeration;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Smart_Cleaner_for_Windows.Core;
 
@@ -37,6 +38,16 @@ public sealed class DirectoryCleaner : IDirectoryCleaner
     DirectoryCleanResult IDirectoryCleaner.Clean(string root, DirectoryCleanOptions? options, CancellationToken cancellationToken)
     {
         return CleanInternal(root, options, cancellationToken);
+    }
+
+    public Task<DirectoryCleanResult> CleanAsync(string root, DirectoryCleanOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        return Task.Run(() => CleanInternal(root, options, cancellationToken), cancellationToken);
+    }
+
+    Task<DirectoryCleanResult> IDirectoryCleaner.CleanAsync(string root, DirectoryCleanOptions? options, CancellationToken cancellationToken)
+    {
+        return CleanAsync(root, options, cancellationToken);
     }
 
     /// <summary>

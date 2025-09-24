@@ -554,7 +554,7 @@ public sealed partial class MainWindow
         try
         {
             var options = CreateOptions(dryRun: true);
-            var result = await Task.Run(() => _directoryCleaner.Clean(root, options, _cts.Token));
+            var result = await _directoryCleaner.CleanAsync(root, options, _cts.Token);
 
             _previewCandidates = new List<string>(result.EmptyDirectories);
             Candidates.ItemsSource = _previewCandidates;
@@ -673,7 +673,7 @@ public sealed partial class MainWindow
         try
         {
             var options = CreateOptions(dryRun: false);
-            var result = await Task.Run(() => _directoryCleaner.Clean(root, options, _cts.Token));
+            var result = await _directoryCleaner.CleanAsync(root, options, _cts.Token);
 
             _previewCandidates.Clear();
             Candidates.ItemsSource = null;
