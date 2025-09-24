@@ -207,7 +207,7 @@ public sealed partial class MainWindow : Window
         ShowPage(args.SelectedItem);
     }
 
-    private void OnSettingsInvoked(NavigationView sender, NavigationViewSettingsInvokedEventArgs args)
+    private void OnSettingsInvoked(NavigationView sender, object args)
     {
         NavigateTo(sender.SettingsItem);
     }
