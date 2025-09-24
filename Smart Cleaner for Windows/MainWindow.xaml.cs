@@ -27,7 +27,7 @@ using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 using GdiImageType = Windows.Win32.UI.WindowsAndMessaging.GDI_IMAGE_TYPE;
-using LoadImageFlags = Windows.Win32.UI.WindowsAndMessaging.LOAD_IMAGE_FLAGS;
+using LoadImageFlags = Windows.Win32.UI.WindowsAndMessaging.IMAGE_FLAGS;
 using WinRT;
 using WinRT.Interop;
 using System.Runtime.CompilerServices;
