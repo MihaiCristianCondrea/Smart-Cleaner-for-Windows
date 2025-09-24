@@ -41,6 +41,7 @@ public sealed partial class MainWindow
     private readonly ObservableCollection<DriveUsageViewModel> _driveUsage = new();
     private readonly ObservableCollection<DiskCleanupItemViewModel> _diskCleanupItems = new();
     private CancellationTokenSource? _diskCleanupCts;
+    private readonly bool _diskCleanupSupported;
     private readonly string _diskCleanupVolume;
     private bool _isDiskCleanupOperation;
     private readonly Dictionary<string, Color> _defaultAccentColors = new();
@@ -82,6 +83,7 @@ public sealed partial class MainWindow
     {
         _directoryCleaner = directoryCleaner ?? throw new ArgumentNullException(nameof(directoryCleaner));
         _diskCleanupService = diskCleanupService ?? throw new ArgumentNullException(nameof(diskCleanupService));
+        _diskCleanupSupported = _diskCleanupService.IsSupported;
         _diskCleanupVolume = _diskCleanupService.GetDefaultVolume();
 
         InitializeComponent();
@@ -107,15 +109,34 @@ public sealed partial class MainWindow
         UpdateResultsSummary(0, Localize("ResultsPlaceholder", "Preview results will appear here once you run a scan."));
 
         DiskCleanupList.ItemsSource = _diskCleanupItems;
-        DiskCleanupStatusText.Text = LocalizeFormat(
-            "DiskCleanupStatusReady",
-            "Ready to analyze disk cleanup handlers for {0}.",
-            _diskCleanupVolume);
-        if (!IsAdministrator())
+        if (_diskCleanupSupported)
+        {
+            DiskCleanupStatusText.Text = LocalizeFormat(
+                "DiskCleanupStatusReady",
+                "Ready to analyze disk cleanup handlers for {0}.",
+                _diskCleanupVolume);
+
+            if (!IsAdministrator())
+            {
+                DiskCleanupIntro.Text = Localize(
+                    "DiskCleanupIntro",
+                    "Analyze Windows cleanup handlers. Some categories require Administrator privileges.");
+            }
+        }
+        else
         {
             DiskCleanupIntro.Text = Localize(
-                "DiskCleanupIntro",
-                "Analyze Windows cleanup handlers. Some categories require Administrator privileges.");
+                "DiskCleanupNotSupportedIntro",
+                "Disk cleanup integration isn't available on this system.");
+            DiskCleanupStatusText.Text = Localize(
+                "DiskCleanupNotSupportedStatus",
+                "This feature requires Windows Disk Cleanup handlers and is disabled.");
+            DiskCleanupActivityText.Text = Localize(
+                "ActivityDiskCleanupUnavailable",
+                "Disk cleanup integration isn't available on this system.");
+            ShowDiskCleanupInfo(
+                Localize("InfoDiskCleanupUnsupported", "Disk cleanup isn't supported on this system."),
+                InfoBarSeverity.Informational);
         }
         UpdateDiskCleanupActionState();
 
@@ -909,7 +930,10 @@ public sealed partial class MainWindow
     private void SetActivity(string message)
     {
         ActivityText.Text = message;
-        DiskCleanupActivityText.Text = message;
+        if (_diskCleanupSupported)
+        {
+            DiskCleanupActivityText.Text = message;
+        }
     }
 
     private void SetBusy(bool isBusy)
@@ -941,6 +965,14 @@ public sealed partial class MainWindow
 
     private async void OnDiskCleanupAnalyze(object sender, RoutedEventArgs e)
     {
+        if (!_diskCleanupSupported)
+        {
+            ShowDiskCleanupInfo(
+                Localize("InfoDiskCleanupUnsupported", "Disk cleanup isn't supported on this system."),
+                InfoBarSeverity.Informational);
+            return;
+        }
+
         if (_isBusy)
         {
             ShowDiskCleanupInfo(
@@ -999,6 +1031,14 @@ public sealed partial class MainWindow
 
     private async void OnDiskCleanupClean(object sender, RoutedEventArgs e)
     {
+        if (!_diskCleanupSupported)
+        {
+            ShowDiskCleanupInfo(
+                Localize("InfoDiskCleanupUnsupported", "Disk cleanup isn't supported on this system."),
+                InfoBarSeverity.Informational);
+            return;
+        }
+
         if (_isBusy)
         {
             ShowDiskCleanupInfo(
@@ -1119,6 +1159,14 @@ public sealed partial class MainWindow
 
     private void UpdateDiskCleanupActionState()
     {
+        if (!_diskCleanupSupported)
+        {
+            DiskCleanupAnalyzeBtn.IsEnabled = false;
+            DiskCleanupList.IsEnabled = false;
+            DiskCleanupCleanBtn.IsEnabled = false;
+            return;
+        }
+
         var canInteract = !_isBusy && !_isDiskCleanupOperation;
         DiskCleanupAnalyzeBtn.IsEnabled = !_isBusy;
         DiskCleanupList.IsEnabled = canInteract;
@@ -1128,6 +1176,14 @@ public sealed partial class MainWindow
 
     private void UpdateDiskCleanupStatusSummary()
     {
+        if (!_diskCleanupSupported)
+        {
+            DiskCleanupStatusText.Text = Localize(
+                "DiskCleanupNotSupportedStatus",
+                "This feature requires Windows Disk Cleanup handlers and is disabled.");
+            return;
+        }
+
         if (_diskCleanupItems.Count == 0)
         {
             DiskCleanupStatusText.Text = LocalizeFormat(

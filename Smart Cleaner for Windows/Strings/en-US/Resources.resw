@@ -33,6 +33,18 @@
   <data name="DiskCleanupIntro" xml:space="preserve">
     <value>Analyze Windows cleanup handlers. Some categories require Administrator privileges.</value>
   </data>
+  <data name="DiskCleanupNotSupportedIntro" xml:space="preserve">
+    <value>Disk cleanup integration isn't available on this system.</value>
+  </data>
+  <data name="DiskCleanupNotSupportedStatus" xml:space="preserve">
+    <value>This feature requires Windows Disk Cleanup handlers and is disabled.</value>
+  </data>
+  <data name="ActivityDiskCleanupUnavailable" xml:space="preserve">
+    <value>Disk cleanup integration isn't available on this system.</value>
+  </data>
+  <data name="InfoDiskCleanupUnsupported" xml:space="preserve">
+    <value>Disk cleanup isn't supported on this system.</value>
+  </data>
   <data name="StatusFolderSelectedTitle" xml:space="preserve">
     <value>Folder selected</value>
   </data>

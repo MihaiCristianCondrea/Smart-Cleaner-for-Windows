@@ -1,3 +1,5 @@
+using System;
+
 namespace Smart_Cleaner_for_Windows.Core;
 
 /// <summary>
@@ -11,8 +13,15 @@ public static class DiskCleanupServiceFactory
     /// <returns>The service configured with the default platform implementations.</returns>
     public static IDiskCleanupService CreateDefault()
     {
+        var volumeService = new DiskCleanupVolumeService();
+
+        if (!OperatingSystem.IsWindows())
+        {
+            return new NullDiskCleanupService(volumeService);
+        }
+
         return new DiskCleanupService(
-            new DiskCleanupVolumeService(),
+            volumeService,
             new StaTaskScheduler(),
             new RegistryDiskCleanupAnalyzer(),
             new RegistryDiskCleanupExecutor());

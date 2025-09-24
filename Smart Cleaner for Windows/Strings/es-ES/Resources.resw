@@ -33,6 +33,18 @@
   <data name="DiskCleanupIntro" xml:space="preserve">
     <value>Analiza los controladores de limpieza de Windows. Algunas categorías requieren privilegios de administrador.</value>
   </data>
+  <data name="DiskCleanupNotSupportedIntro" xml:space="preserve">
+    <value>La integración con los controladores de limpieza de disco de Windows no está disponible en este sistema.</value>
+  </data>
+  <data name="DiskCleanupNotSupportedStatus" xml:space="preserve">
+    <value>Esta característica requiere los controladores de limpieza de disco de Windows y está deshabilitada.</value>
+  </data>
+  <data name="ActivityDiskCleanupUnavailable" xml:space="preserve">
+    <value>La integración con la limpieza de disco no está disponible en este sistema.</value>
+  </data>
+  <data name="InfoDiskCleanupUnsupported" xml:space="preserve">
+    <value>La limpieza de disco no está disponible en este sistema.</value>
+  </data>
   <data name="StatusFolderSelectedTitle" xml:space="preserve">
     <value>Carpeta seleccionada</value>
   </data>

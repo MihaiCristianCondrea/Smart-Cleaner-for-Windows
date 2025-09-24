@@ -24,11 +24,13 @@ public sealed class DiskCleanupService : IDiskCleanupService
         _executor = executor ?? throw new ArgumentNullException(nameof(executor));
     }
 
+    public bool IsSupported => OperatingSystem.IsWindows();
+
     public string GetDefaultVolume() => _volumeService.GetDefaultVolume();
 
     public Task<IReadOnlyList<DiskCleanupItem>> AnalyzeAsync(string? volume, CancellationToken cancellationToken = default)
     {
-        EnsureWindows();
+        EnsureSupported();
 
         var drive = _volumeService.NormalizeVolume(volume);
         return _staTaskScheduler.RunAsync(ct => _analyzer.Analyze(drive, ct), cancellationToken);
@@ -39,7 +41,7 @@ public sealed class DiskCleanupService : IDiskCleanupService
         IEnumerable<DiskCleanupItem> items,
         CancellationToken cancellationToken = default)
     {
-        EnsureWindows();
+        EnsureSupported();
 
         if (items is null)
         {
@@ -50,9 +52,9 @@ public sealed class DiskCleanupService : IDiskCleanupService
         return _staTaskScheduler.RunAsync(ct => _executor.Clean(drive, items, ct), cancellationToken);
     }
 
-    private static void EnsureWindows()
+    private void EnsureSupported()
     {
-        if (!OperatingSystem.IsWindows())
+        if (!IsSupported)
         {
             throw new PlatformNotSupportedException("Disk Cleanup integration is only available on Windows.");
         }
