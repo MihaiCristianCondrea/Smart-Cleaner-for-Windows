@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:Smart_Cleaner_for_Windows"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Title="Smart Cleaner for Windows">
@@ -86,6 +87,11 @@
             <NavigationViewItem x:Name="EmptyFoldersItem" Content="Empty folders">
                 <NavigationViewItem.Icon>
                     <SymbolIcon Symbol="Folder" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem x:Name="LargeFilesItem" Content="Large files">
+                <NavigationViewItem.Icon>
+                    <SymbolIcon Symbol="SaveLocal" />
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
             <NavigationViewItem x:Name="DiskCleanupItem" Content="Disk cleanup">
@@ -224,6 +230,38 @@
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <SymbolIcon Symbol="Play" />
                                         <TextBlock Text="Open empty folders cleaner" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel Spacing="16">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <Border
+                                        Width="48"
+                                        Height="48"
+                                        CornerRadius="16"
+                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                        VerticalAlignment="Center">
+                                        <SymbolIcon
+                                            Symbol="SaveLocal"
+                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel>
+                                        <TextBlock Text="Large files explorer" FontSize="22" FontWeight="SemiBold" />
+                                        <TextBlock
+                                            Text="Find the biggest files by type and reclaim space quickly."
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </StackPanel>
+                                <Button Click="OnNavigateToLargeFiles">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <SymbolIcon Symbol="SaveLocal" />
+                                        <TextBlock Text="Open large files explorer" />
                                     </StackPanel>
                                 </Button>
                             </StackPanel>
@@ -671,6 +709,459 @@
                                 </ListView>
                             </Grid>
                         </Border>
+                    </Grid>
+                </ScrollViewer>
+
+                <ScrollViewer
+                    x:Name="LargeFilesView"
+                    HorizontalScrollBarVisibility="Disabled"
+                    Visibility="Collapsed">
+                    <ScrollViewer.Resources>
+                        <CollectionViewSource
+                            x:Key="LargeFilesCollectionView"
+                            x:Name="LargeFilesCollectionView"
+                            IsSourceGrouped="True"
+                            ItemsPath="Items" />
+                    </ScrollViewer.Resources>
+                    <Grid Padding="{StaticResource Padding.Page}" RowSpacing="{StaticResource Spacing.Size240}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Border
+                            x:Name="LargeFilesStatusHero"
+                            Grid.Row="0"
+                            Background="{StaticResource Brush.Hero.Neutral}"
+                            CornerRadius="28"
+                            Padding="{StaticResource Padding.Hero}">
+                            <Grid ColumnSpacing="{StaticResource Spacing.Size240}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <Border
+                                    Width="76"
+                                    Height="76"
+                                    CornerRadius="24"
+                                    Background="{StaticResource HeroCardOverlayBrush}"
+                                    VerticalAlignment="Center">
+                                    <SymbolIcon
+                                        x:Name="LargeFilesStatusGlyph"
+                                        Symbol="SaveLocal"
+                                        Foreground="White"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center" />
+                                </Border>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="{StaticResource Spacing.Size80}">
+                                    <TextBlock Text="Largest files" Foreground="#B3FFFFFF" FontWeight="SemiBold" />
+                                    <TextBlock
+                                        x:Name="LargeFilesStatusTitle"
+                                        Text="Ready to explore large files"
+                                        FontSize="30"
+                                        FontWeight="SemiBold"
+                                        Foreground="White"
+                                        TextWrapping="Wrap" />
+                                    <TextBlock
+                                        x:Name="LargeFilesStatusDescription"
+                                        Text="Choose a location to find the biggest files grouped by type."
+                                        Foreground="#E6FFFFFF"
+                                        TextWrapping="WrapWholeWords" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="{StaticResource Spacing.Size40}">
+                                    <TextBlock Text="Current results" Foreground="#B3FFFFFF" />
+                                    <InfoBadge
+                                        x:Name="LargeFilesResultBadge"
+                                        HorizontalAlignment="Right"
+                                        Visibility="Collapsed" />
+                                    <TextBlock
+                                        x:Name="LargeFilesSummaryText"
+                                        Text="No scan results yet."
+                                        Foreground="#E6FFFFFF"
+                                        TextWrapping="Wrap"
+                                        TextAlignment="Right" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Grid
+                            x:Name="LargeFilesLayout"
+                            Grid.Row="1"
+                            ColumnSpacing="{StaticResource Spacing.Size240}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition x:Name="LargeFilesResultsColumn" Width="*" />
+                                <ColumnDefinition x:Name="LargeFilesOptionsColumn" Width="360" />
+                            </Grid.ColumnDefinitions>
+
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup>
+                                    <VisualState x:Name="LargeFilesCompactState">
+                                        <VisualState.StateTriggers>
+                                            <AdaptiveTrigger MinWindowWidth="0" />
+                                        </VisualState.StateTriggers>
+                                        <VisualState.Setters>
+                                            <Setter Target="LargeFilesOptionsColumn.Width" Value="0" />
+                                            <Setter Target="LargeFilesLayout.ColumnSpacing" Value="{StaticResource Spacing.Size160}" />
+                                            <Setter Target="LargeFilesResultsPanel.(Grid.ColumnSpan)" Value="2" />
+                                            <Setter Target="LargeFilesOptionsPanel.(Grid.Row)" Value="1" />
+                                            <Setter Target="LargeFilesOptionsPanel.(Grid.Column)" Value="0" />
+                                            <Setter Target="LargeFilesOptionsPanel.(Grid.ColumnSpan)" Value="2" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="LargeFilesWideState">
+                                        <VisualState.StateTriggers>
+                                            <AdaptiveTrigger MinWindowWidth="960" />
+                                        </VisualState.StateTriggers>
+                                        <VisualState.Setters>
+                                            <Setter Target="LargeFilesOptionsColumn.Width" Value="360" />
+                                            <Setter Target="LargeFilesLayout.ColumnSpacing" Value="{StaticResource Spacing.Size240}" />
+                                            <Setter Target="LargeFilesResultsPanel.(Grid.ColumnSpan)" Value="1" />
+                                            <Setter Target="LargeFilesOptionsPanel.(Grid.Row)" Value="0" />
+                                            <Setter Target="LargeFilesOptionsPanel.(Grid.Column)" Value="1" />
+                                            <Setter Target="LargeFilesOptionsPanel.(Grid.ColumnSpan)" Value="1" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+
+                            <StackPanel x:Name="LargeFilesResultsPanel" Grid.Column="0" Spacing="{StaticResource Spacing.Size160}">
+                                <Border Style="{StaticResource CardStyle}">
+                                    <StackPanel Spacing="{StaticResource Spacing.Size160}">
+                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                            <Border
+                                                Width="40"
+                                                Height="40"
+                                                CornerRadius="14"
+                                                Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                                VerticalAlignment="Center">
+                                                <SymbolIcon
+                                                    Symbol="SaveLocal"
+                                                    Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center" />
+                                            </Border>
+                                            <StackPanel>
+                                                <TextBlock Text="Largest files" FontSize="22" FontWeight="SemiBold" />
+                                                <TextBlock
+                                                    x:Name="LargeFilesResultsCaption"
+                                                    Text="Scan results will appear here after you run a scan."
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    TextWrapping="Wrap" />
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <ListView
+                                            x:Name="LargeFilesList"
+                                            ItemsSource="{Binding Source={StaticResource LargeFilesCollectionView}}"
+                                            IsSourceGrouped="True"
+                                            SelectionMode="None"
+                                            IsItemClickEnabled="False">
+                                            <ListView.GroupStyle>
+                                                <GroupStyle>
+                                                    <GroupStyle.HeaderTemplate>
+                                                        <DataTemplate x:DataType="local:LargeFileGroupViewModel">
+                                                            <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*" />
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                </Grid.ColumnDefinitions>
+                                                                <TextBlock Text="{x:Bind DisplayName}" FontSize="18" FontWeight="SemiBold" />
+                                                                <TextBlock
+                                                                    Grid.Column="1"
+                                                                    Text="{x:Bind Summary}"
+                                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                    HorizontalAlignment="Right" />
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </GroupStyle.HeaderTemplate>
+                                                </GroupStyle>
+                                            </ListView.GroupStyle>
+                                            <ListView.ItemTemplate>
+                                                <DataTemplate x:DataType="local:LargeFileItemViewModel">
+                                                    <Border Padding="16" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="12">
+                                                        <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*" />
+                                                                <ColumnDefinition Width="Auto" />
+                                                            </Grid.ColumnDefinitions>
+                                                            <StackPanel Spacing="{StaticResource Spacing.Size80}">
+                                                                <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="*" />
+                                                                        <ColumnDefinition Width="Auto" />
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                                                    <TextBlock
+                                                                        Grid.Column="1"
+                                                                        Text="{x:Bind SizeDisplay}"
+                                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                                </Grid>
+                                                                <TextBlock
+                                                                    Text="{x:Bind Directory}"
+                                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                    TextTrimming="CharacterEllipsis"
+                                                                    ToolTipService.ToolTip="{x:Bind Directory}" />
+                                                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
+                                                                    <Border
+                                                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                                                        CornerRadius="8"
+                                                                        Padding="8,2"
+                                                                        VerticalAlignment="Center">
+                                                                        <TextBlock
+                                                                            Text="{x:Bind ExtensionDisplay}"
+                                                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+                                                                    </Border>
+                                                                    <TextBlock
+                                                                        Text="{x:Bind TypeName}"
+                                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                        TextTrimming="CharacterEllipsis" />
+                                                                </StackPanel>
+                                                            </StackPanel>
+                                                            <StackPanel
+                                                                Grid.Column="1"
+                                                                Orientation="Horizontal"
+                                                                HorizontalAlignment="Right"
+                                                                VerticalAlignment="Center"
+                                                                Spacing="{StaticResource Spacing.Size60}">
+                                                                <Button Tag="{Binding}" Click="OnLargeFileOpen">
+                                                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                                        <SymbolIcon Symbol="OpenFile" />
+                                                                        <TextBlock Text="Open" />
+                                                                    </StackPanel>
+                                                                </Button>
+                                                                <Button Tag="{Binding}" Click="OnLargeFileDelete">
+                                                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                                        <SymbolIcon Symbol="Delete" />
+                                                                        <TextBlock Text="Delete" />
+                                                                    </StackPanel>
+                                                                </Button>
+                                                                <Button Tag="{Binding}" Click="OnLargeFileExclude">
+                                                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                                        <SymbolIcon Symbol="BlockContact" />
+                                                                        <TextBlock Text="Exclude" />
+                                                                    </StackPanel>
+                                                                </Button>
+                                                            </StackPanel>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ListView.ItemTemplate>
+                                        </ListView>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+                            <StackPanel x:Name="LargeFilesOptionsPanel" Grid.Column="1" Spacing="{StaticResource Spacing.Size160}">
+                                <Border Style="{StaticResource CardStyle}">
+                                    <StackPanel Spacing="{StaticResource Spacing.Size200}">
+                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                            <Border
+                                                Width="40"
+                                                Height="40"
+                                                CornerRadius="14"
+                                                Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                                VerticalAlignment="Center">
+                                                <SymbolIcon
+                                                    Symbol="Folder"
+                                                    Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center" />
+                                            </Border>
+                                            <StackPanel>
+                                                <TextBlock Text="Scan setup" FontSize="22" FontWeight="SemiBold" />
+                                                <TextBlock
+                                                    Text="Choose a location and customize the large file scan."
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    TextWrapping="Wrap" />
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <StackPanel Spacing="{StaticResource Spacing.Size160}">
+                                            <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBox
+                                                    x:Name="LargeFilesRootPathBox"
+                                                    Grid.Column="0"
+                                                    PlaceholderText="Select a root folder…"
+                                                    TextChanged="OnLargeFilesRootPathChanged" />
+                                                <Button x:Name="LargeFilesBrowseBtn" Grid.Column="1" Click="OnLargeFilesBrowse">
+                                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                        <SymbolIcon Symbol="OpenFile" />
+                                                        <TextBlock Text="Browse" />
+                                                    </StackPanel>
+                                                </Button>
+                                            </Grid>
+
+                                            <Button x:Name="LargeFilesScanBtn" Click="OnLargeFilesScan">
+                                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                    <SymbolIcon Symbol="Find" />
+                                                    <TextBlock Text="Scan for large files" />
+                                                </StackPanel>
+                                            </Button>
+
+                                            <CheckBox x:Name="LargeFilesIncludeSubfoldersCheck" IsChecked="True">
+                                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
+                                                    <SymbolIcon Symbol="AllApps" />
+                                                    <TextBlock Text="Include subfolders" />
+                                                </StackPanel>
+                                            </CheckBox>
+
+                                            <CheckBox x:Name="LargeFilesRecycleChk" IsChecked="True">
+                                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
+                                                    <SymbolIcon Symbol="Delete" />
+                                                    <TextBlock Text="Send deleted files to Recycle Bin" />
+                                                </StackPanel>
+                                            </CheckBox>
+
+                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}" VerticalAlignment="Center">
+                                                <SymbolIcon
+                                                    Symbol="Sort"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock VerticalAlignment="Center" Text="Max results" />
+                                                <NumberBox
+                                                    x:Name="LargeFilesMaxItemsBox"
+                                                    Width="96"
+                                                    Minimum="1"
+                                                    Maximum="1000"
+                                                    Value="100" />
+                                            </StackPanel>
+
+                                            <StackPanel Spacing="{StaticResource Spacing.Size40}">
+                                                <TextBlock Text="Exclude patterns" FontWeight="SemiBold" />
+                                                <TextBox
+                                                    x:Name="LargeFilesExclusionsBox"
+                                                    PlaceholderText="*.bak; temp/*"
+                                                    AcceptsReturn="False" />
+                                                <TextBlock
+                                                    Text="Use semicolons to exclude names or relative paths."
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource CardStyle}">
+                                    <StackPanel Spacing="{StaticResource Spacing.Size200}">
+                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                            <Border
+                                                Width="40"
+                                                Height="40"
+                                                CornerRadius="14"
+                                                Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                                VerticalAlignment="Center">
+                                                <SymbolIcon
+                                                    Symbol="Clock"
+                                                    Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center" />
+                                            </Border>
+                                            <TextBlock Text="Activity" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                        </StackPanel>
+
+                                        <TextBlock
+                                            x:Name="LargeFilesActivityText"
+                                            Text="Waiting for the next action."
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            TextWrapping="Wrap" />
+
+                                        <ProgressBar
+                                            x:Name="LargeFilesProgress"
+                                            Height="4"
+                                            Visibility="Collapsed"
+                                            IsIndeterminate="True" />
+
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                            <Button x:Name="LargeFilesCancelBtn" Click="OnLargeFilesCancel" Visibility="Collapsed" IsEnabled="False">
+                                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                    <SymbolIcon Symbol="Cancel" />
+                                                    <TextBlock Text="Cancel" />
+                                                </StackPanel>
+                                            </Button>
+                                        </StackPanel>
+
+                                        <InfoBar x:Name="LargeFilesInfoBar" IsOpen="False" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource CardStyle}">
+                                    <StackPanel Spacing="{StaticResource Spacing.Size200}">
+                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                            <Border
+                                                Width="40"
+                                                Height="40"
+                                                CornerRadius="14"
+                                                Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                                VerticalAlignment="Center">
+                                                <SymbolIcon
+                                                    Symbol="BlockContact"
+                                                    Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center" />
+                                            </Border>
+                                            <StackPanel>
+                                                <TextBlock Text="Excluded paths" FontSize="22" FontWeight="SemiBold" />
+                                                <TextBlock
+                                                    Text="Files excluded from future scans appear here."
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    TextWrapping="Wrap" />
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <ListView
+                                            x:Name="LargeFilesExclusionsList"
+                                            MaxHeight="240"
+                                            SelectionMode="None">
+                                            <ListView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock
+                                                            Text="{Binding}"
+                                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                            TextWrapping="Wrap"
+                                                            ToolTipService.ToolTip="{Binding}" />
+                                                        <Button Grid.Column="1" Tag="{Binding}" Click="OnLargeFilesRemoveExclusion">
+                                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                                <SymbolIcon Symbol="Delete" />
+                                                                <TextBlock Text="Remove" />
+                                                            </StackPanel>
+                                                        </Button>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ListView.ItemTemplate>
+                                        </ListView>
+
+                                        <TextBlock
+                                            x:Name="LargeFilesNoExclusionsText"
+                                            Text="No exclusions yet."
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                            <Button x:Name="LargeFilesClearExclusionsBtn" Click="OnLargeFilesClearExclusions" IsEnabled="False">
+                                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                    <SymbolIcon Symbol="Clear" />
+                                                    <TextBlock Text="Clear all" />
+                                                </StackPanel>
+                                            </Button>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
                     </Grid>
                 </ScrollViewer>
 
