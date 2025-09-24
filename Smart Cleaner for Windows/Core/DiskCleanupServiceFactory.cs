@@ -1,3 +1,5 @@
+using Smart_Cleaner_for_Windows.Core.DiskCleanup;
+
 namespace Smart_Cleaner_for_Windows.Core;
 
 /// <summary>

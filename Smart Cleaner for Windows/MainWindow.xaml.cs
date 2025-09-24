@@ -18,6 +18,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.Windows.ApplicationModel.Resources;
 using Smart_Cleaner_for_Windows.Core;
+using Smart_Cleaner_for_Windows.Core.DiskCleanup;
 using Windows.Graphics;
 using Windows.Storage;
 using Windows.Storage.Pickers;

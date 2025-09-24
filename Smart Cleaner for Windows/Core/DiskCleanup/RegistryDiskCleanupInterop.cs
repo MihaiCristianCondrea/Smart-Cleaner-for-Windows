@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading;
 using Microsoft.Win32;
 
-namespace Smart_Cleaner_for_Windows.Core; // FIXME: Namespace does not correspond to file location, must be: 'Smart_Cleaner_for_Windows.Core.DiskCleanup'
+namespace Smart_Cleaner_for_Windows.Core.DiskCleanup;
 
 internal static class RegistryDiskCleanupInterop
 {
@@ -54,7 +54,7 @@ internal static class RegistryDiskCleanupInterop
         return ExpandResourceString(value);
     }
 
-    public static string? ExpandResourceString(string value) // FIXME: Method 'ExpandResourceString' can be made private
+    private static string? ExpandResourceString(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
@@ -102,18 +102,12 @@ internal static class RegistryDiskCleanupInterop
         return $"HRESULT 0x{hresult:X8}";
     }
 
-    internal sealed class DiskCleanupHandler : IDisposable
+    internal sealed class DiskCleanupHandler(IEmptyVolumeCache cache, object comObject) : IDisposable
     {
-        private readonly object _comObject;
+        private readonly object _comObject = comObject ?? throw new ArgumentNullException(nameof(comObject));
         private bool _disposed;
 
-        public DiskCleanupHandler(IEmptyVolumeCache cache, object comObject) // FIXME: Convert into primary constructor
-        {
-            Cache = cache;
-            _comObject = comObject;
-        }
-
-        public IEmptyVolumeCache Cache { get; }
+        public IEmptyVolumeCache Cache { get; } = cache ?? throw new ArgumentNullException(nameof(cache));
 
         public void Dispose()
         {
@@ -135,25 +129,25 @@ internal static class RegistryDiskCleanupInterop
 
         public int ScanProgress(ulong dwlSpaceUsed, ulong dwlSpaceTotal)
         {
-            return _token.IsCancellationRequested ? HResults.E_ABORT : HResults.S_OK;
+            return _token.IsCancellationRequested ? HResults.OperationAborted : HResults.Success;
         }
 
         public int PurgeProgress(ulong dwlSpaceFreed, ulong dwlSpaceToFree)
         {
-            return _token.IsCancellationRequested ? HResults.E_ABORT : HResults.S_OK;
+            return _token.IsCancellationRequested ? HResults.OperationAborted : HResults.Success;
         }
 
         public int ScanCompleted()
         {
-            return _token.IsCancellationRequested ? HResults.E_ABORT : HResults.S_OK;
+            return _token.IsCancellationRequested ? HResults.OperationAborted : HResults.Success;
         }
     }
 
     internal static class HResults
     {
-        public const int S_OK = 0; // FIXME: Name 'S_OK' does not match rule 'Constant fields (not private)'. Suggested name is 'SOk'.
-        public const int E_ABORT = unchecked((int)0x80004004); // FIXME: Name 'E_ABORT' does not match rule 'Constant fields (not private)'. Suggested name is 'EAbort'.
-        public const int E_ACCESSDENIED = unchecked((int)0x80070005); // FIXME: Name 'E_ACCESSDENIED' does not match rule 'Constant fields (not private)'. Suggested name is 'EAccessdenied'.
+        internal const int Success = 0;
+        internal const int OperationAborted = unchecked((int)0x80004004);
+        internal const int AccessDenied = unchecked((int)0x80070005);
     }
 
     private static class NativeMethods
