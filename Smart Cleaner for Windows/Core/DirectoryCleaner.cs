@@ -10,29 +10,23 @@ namespace Smart_Cleaner_for_Windows.Core;
 /// <summary>
 /// Provides helpers to identify and remove empty directories.
 /// </summary>
-public sealed class DirectoryCleaner : IDirectoryCleaner
+public sealed class DirectoryCleaner(IDirectorySystem directorySystem, IDirectoryDeleter directoryDeleter) : IDirectoryCleaner
 {
     private static readonly bool IgnoreCase = OperatingSystem.IsWindows();
     private static readonly StringComparer PathComparer = IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
-    private readonly IDirectorySystem _directorySystem;
-    private readonly IDirectoryDeleter _directoryDeleter;
+    private readonly IDirectorySystem _directorySystem = directorySystem ?? throw new ArgumentNullException(nameof(directorySystem));
+    private readonly IDirectoryDeleter _directoryDeleter = directoryDeleter ?? throw new ArgumentNullException(nameof(directoryDeleter));
 
     public static IDirectoryCleaner Default { get; } = new DirectoryCleaner();
 
-    public static DirectoryCleanResult Clean(string root, DirectoryCleanOptions? options = null, CancellationToken cancellationToken = default)
-    {
-        return Default.Clean(root, options, cancellationToken);
-    }
-
-    public DirectoryCleaner() // FIXME: Constructor 'DirectoryCleaner' can be made private
+    private DirectoryCleaner()
         : this(new FileSystemDirectorySystem(), new FileSystemDirectoryDeleter())
     {
     }
 
-    public DirectoryCleaner(IDirectorySystem directorySystem, IDirectoryDeleter directoryDeleter) // FIXME: Convert into primary constructor
+    public static DirectoryCleanResult Clean(string root, DirectoryCleanOptions? options = null, CancellationToken cancellationToken = default)
     {
-        _directorySystem = directorySystem ?? throw new ArgumentNullException(nameof(directorySystem));
-        _directoryDeleter = directoryDeleter ?? throw new ArgumentNullException(nameof(directoryDeleter));
+        return Default.Clean(root, options, cancellationToken);
     }
 
     DirectoryCleanResult IDirectoryCleaner.Clean(string root, DirectoryCleanOptions? options, CancellationToken cancellationToken)
@@ -40,7 +34,7 @@ public sealed class DirectoryCleaner : IDirectoryCleaner
         return CleanInternal(root, options, cancellationToken);
     }
 
-    public Task<DirectoryCleanResult> CleanAsync(string root, DirectoryCleanOptions? options = null, CancellationToken cancellationToken = default) // FIXME: Constructor 'DirectoryCleaner' can be made private
+    public Task<DirectoryCleanResult> CleanAsync(string root, DirectoryCleanOptions? options = null, CancellationToken cancellationToken = default)
     {
         return Task.Run(() => CleanInternal(root, options, cancellationToken), cancellationToken);
     }
@@ -282,11 +276,11 @@ public sealed class DirectoryCleaner : IDirectoryCleaner
 
                 _patterns = validPatterns.Count > 0
                     ? validPatterns.ToArray()
-                    : Array.Empty<string>(); // FIXME: Use collection expression
+                    : [];
             }
             else
             {
-                _patterns = Array.Empty<string>(); // FIXME: Use collection expression
+                _patterns = [];
             }
         }
 

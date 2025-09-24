@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.Win32;
 
-namespace Smart_Cleaner_for_Windows.Core; // FIXME: Namespace does not correspond to file location, must be: 'Smart_Cleaner_for_Windows.Core.DiskCleanup'
+namespace Smart_Cleaner_for_Windows.Core.DiskCleanup;
 
 public sealed class RegistryDiskCleanupAnalyzer : IDiskCleanupAnalyzer
 {
@@ -132,7 +132,7 @@ public sealed class RegistryDiskCleanupAnalyzer : IDiskCleanupAnalyzer
                 var callback = new RegistryDiskCleanupInterop.DiskCleanupCallback(cancellationToken);
                 var spaceStatus = cache.GetSpaceUsed(out size, callback);
 
-                if (spaceStatus == RegistryDiskCleanupInterop.HResults.E_ABORT && cancellationToken.IsCancellationRequested)
+                if (spaceStatus == RegistryDiskCleanupInterop.HResults.OperationAborted && cancellationToken.IsCancellationRequested)
                 {
                     throw new OperationCanceledException(cancellationToken);
                 }
@@ -140,14 +140,14 @@ public sealed class RegistryDiskCleanupAnalyzer : IDiskCleanupAnalyzer
                 if (spaceStatus < 0)
                 {
                     error = RegistryDiskCleanupInterop.CreateErrorMessage(spaceStatus);
-                    requiresElevation = spaceStatus == RegistryDiskCleanupInterop.HResults.E_ACCESSDENIED;
+                    requiresElevation = spaceStatus == RegistryDiskCleanupInterop.HResults.AccessDenied;
                     size = 0;
                 }
             }
             else
             {
                 error = RegistryDiskCleanupInterop.CreateErrorMessage(status);
-                requiresElevation = status == RegistryDiskCleanupInterop.HResults.E_ACCESSDENIED;
+                requiresElevation = status == RegistryDiskCleanupInterop.HResults.AccessDenied;
             }
 
             var name = string.IsNullOrWhiteSpace(display) ? subKeyName : display;

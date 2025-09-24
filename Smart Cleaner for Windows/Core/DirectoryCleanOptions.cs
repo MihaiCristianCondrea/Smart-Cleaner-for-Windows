@@ -62,11 +62,11 @@ public sealed record DirectoryCleanOptions
     /// Gets or sets the collection of simple wildcard patterns used to exclude directories by
     /// name or by relative path (using forward slashes). Examples: <c>.git</c>, <c>build/*</c>.
     /// </summary>
-    public IReadOnlyCollection<string> ExcludedNamePatterns { get; init; } = Array.Empty<string>(); // FIXME: Use collection expression
+    public IReadOnlyCollection<string> ExcludedNamePatterns { get; init; } = [];
 
     /// <summary>
     /// Gets or sets the collection of explicit directory paths that should be skipped. Relative
     /// entries are resolved against the root directory that is cleaned.
     /// </summary>
-    public IReadOnlyCollection<string> ExcludedFullPaths { get; init; } = Array.Empty<string>(); // FIXME: Use collection expression
+    public IReadOnlyCollection<string> ExcludedFullPaths { get; init; } = [];
 }

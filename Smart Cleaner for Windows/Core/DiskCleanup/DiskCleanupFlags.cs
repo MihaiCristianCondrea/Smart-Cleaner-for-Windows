@@ -1,6 +1,6 @@
 using System;
 
-namespace Smart_Cleaner_for_Windows.Core; // FIXME: Namespace does not correspond to file location, must be: 'Smart_Cleaner_for_Windows.Core.DiskCleanup'
+namespace Smart_Cleaner_for_Windows.Core.DiskCleanup;
 
 [Flags]
 public enum DiskCleanupFlags : uint

@@ -33,6 +33,46 @@ public sealed record DirectoryCleanResult(
 /// <summary>
 /// Describes a failure that happened when interacting with a directory.
 /// </summary>
-/// <param name="Path">The path that triggered the error.</param>
-/// <param name="Exception">The captured exception.</param>
-public sealed record DirectoryCleanFailure(string Path, Exception Exception); // FIXME: Positional property 'Smart_Cleaner_for_Windows.Core.DirectoryCleanFailure.Path' is never accessed (except in implicit Equals/ToString implementations) && Positional property 'Smart_Cleaner_for_Windows.Core.DirectoryCleanFailure.Exception' is never accessed (except in implicit Equals/ToString implementations)
+public sealed record class DirectoryCleanFailure
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DirectoryCleanFailure"/> class.
+    /// </summary>
+    /// <param name="path">The path that triggered the error.</param>
+    /// <param name="exception">The captured exception.</param>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="path"/> is <see langword="null"/>, empty or whitespace.
+    /// </exception>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="exception"/> is <see langword="null"/>.</exception>
+    public DirectoryCleanFailure(string path, Exception exception)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            throw new ArgumentException("The path associated with the failure must be provided.", nameof(path));
+        }
+
+        ArgumentNullException.ThrowIfNull(exception);
+
+        Path = path;
+        Exception = exception;
+    }
+
+    /// <summary>
+    /// Gets the path that triggered the error.
+    /// </summary>
+    public string Path { get; }
+
+    /// <summary>
+    /// Gets the captured exception.
+    /// </summary>
+    public Exception Exception { get; }
+
+    /// <summary>
+    /// Returns a string representation of the failure.
+    /// </summary>
+    /// <returns>A human-readable description that includes the failing path.</returns>
+    public override string ToString()
+    {
+        return $"{Path}: {Exception.Message}";
+    }
+}

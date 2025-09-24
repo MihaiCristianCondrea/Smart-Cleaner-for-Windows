@@ -3,26 +3,18 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Smart_Cleaner_for_Windows.Core; //FIXME: Namespace does not correspond to file location, must be: 'Smart_Cleaner_for_Windows.Core.DiskCleanup'
+namespace Smart_Cleaner_for_Windows.Core.DiskCleanup;
 
-public sealed class DiskCleanupService : IDiskCleanupService
+public sealed class DiskCleanupService(
+    IDiskCleanupVolumeService volumeService,
+    IStaTaskScheduler staTaskScheduler,
+    IDiskCleanupAnalyzer analyzer,
+    IDiskCleanupExecutor executor) : IDiskCleanupService
 {
-    private readonly IDiskCleanupVolumeService _volumeService;
-    private readonly IStaTaskScheduler _staTaskScheduler;
-    private readonly IDiskCleanupAnalyzer _analyzer;
-    private readonly IDiskCleanupExecutor _executor;
-
-    public DiskCleanupService( // FIXME: Convert into primary constructor
-        IDiskCleanupVolumeService volumeService,
-        IStaTaskScheduler staTaskScheduler,
-        IDiskCleanupAnalyzer analyzer,
-        IDiskCleanupExecutor executor)
-    {
-        _volumeService = volumeService ?? throw new ArgumentNullException(nameof(volumeService));
-        _staTaskScheduler = staTaskScheduler ?? throw new ArgumentNullException(nameof(staTaskScheduler));
-        _analyzer = analyzer ?? throw new ArgumentNullException(nameof(analyzer));
-        _executor = executor ?? throw new ArgumentNullException(nameof(executor));
-    }
+    private readonly IDiskCleanupVolumeService _volumeService = volumeService ?? throw new ArgumentNullException(nameof(volumeService));
+    private readonly IStaTaskScheduler _staTaskScheduler = staTaskScheduler ?? throw new ArgumentNullException(nameof(staTaskScheduler));
+    private readonly IDiskCleanupAnalyzer _analyzer = analyzer ?? throw new ArgumentNullException(nameof(analyzer));
+    private readonly IDiskCleanupExecutor _executor = executor ?? throw new ArgumentNullException(nameof(executor));
 
     public string GetDefaultVolume() => _volumeService.GetDefaultVolume();
 
