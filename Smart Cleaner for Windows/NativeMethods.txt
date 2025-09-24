@@ -1,0 +1,9 @@
+Windows.Win32.UI.WindowsAndMessaging.LoadImage
+Windows.Win32.UI.WindowsAndMessaging.SendMessage
+Windows.Win32.UI.WindowsAndMessaging.SetWindowText
+Windows.Win32.UI.WindowsAndMessaging.WM_SETICON
+Windows.Win32.UI.WindowsAndMessaging.ICON_BIG
+Windows.Win32.UI.WindowsAndMessaging.ICON_SMALL
+Windows.Win32.UI.WindowsAndMessaging.DestroyIcon
+Windows.Win32.UI.WindowsAndMessaging.IMAGE_FLAGS
+Windows.Win32.UI.WindowsAndMessaging.GDI_IMAGE_TYPE

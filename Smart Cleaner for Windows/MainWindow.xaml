@@ -12,41 +12,70 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <NavigationView
-        x:Name="RootNavigation"
-        IsBackButtonVisible="Collapsed"
-        IsSettingsVisible="True"
-        PaneDisplayMode="Left"
-        CompactPaneLength="56"
-        OpenPaneLength="260"
-        IsPaneToggleButtonVisible="True"
-        SelectionFollowsFocus="Disabled"
-        AlwaysShowHeader="False"
-        IsTitleBarAutoPaddingEnabled="False"
-        SelectionChanged="OnNavigationSelectionChanged"
-        Loaded="OnNavigationLoaded">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-        <NavigationView.Resources>
-            <CornerRadius x:Key="CardCornerRadius">20</CornerRadius>
-            <LinearGradientBrush x:Key="HeroCardBrush" StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="{StaticResource Color.BrandPrimary}" Offset="0" />
-                <GradientStop Color="{StaticResource Color.BrandSecondary}" Offset="1" />
-            </LinearGradientBrush>
-            <SolidColorBrush x:Key="HeroCardOverlayBrush" Color="{StaticResource Color.BrandOverlay}" />
-            <Style x:Key="CardStyle" TargetType="Border">
-                <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}" />
-                <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
-                <Setter Property="BorderThickness" Value="1" />
-                <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}" />
-                <Setter Property="Padding" Value="{StaticResource Padding.Card}" />
-            </Style>
-            <Style TargetType="ListViewItem">
-                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                <Setter Property="Padding" Value="0" />
-                <Setter Property="Margin" Value="0,0,0,12" />
-                <Setter Property="Background" Value="Transparent" />
-            </Style>
-        </NavigationView.Resources>
+        <StackPanel
+            x:Name="customTitleBarPanel"
+            Grid.Row="0"
+            Orientation="Horizontal"
+            VerticalAlignment="Center"
+            Visibility="Collapsed"
+            Background="{ThemeResource WindowCaptionBackground}"
+            Padding="12,0"
+            Spacing="{StaticResource Spacing.Size80}">
+            <FontIcon
+                Glyph="&#xE15E;"
+                FontFamily="Segoe MDL2 Assets"
+                Foreground="{ThemeResource WindowCaptionForeground}"
+                VerticalAlignment="Center" />
+            <TextBlock
+                Text="Smart Cleaner for Windows"
+                FontSize="20"
+                FontWeight="SemiBold"
+                VerticalAlignment="Center"
+                Foreground="{ThemeResource WindowCaptionForeground}" />
+        </StackPanel>
+
+        <NavigationView
+            x:Name="RootNavigation"
+            Grid.Row="1"
+            IsBackButtonVisible="Collapsed"
+            IsSettingsVisible="True"
+            PaneDisplayMode="Left"
+            CompactPaneLength="56"
+            OpenPaneLength="260"
+            IsPaneToggleButtonVisible="True"
+            SelectionFollowsFocus="Disabled"
+            AlwaysShowHeader="False"
+            IsTitleBarAutoPaddingEnabled="False"
+            SelectionChanged="OnNavigationSelectionChanged"
+            Loaded="OnNavigationLoaded">
+
+            <NavigationView.Resources>
+                <CornerRadius x:Key="CardCornerRadius">20</CornerRadius>
+                <LinearGradientBrush x:Key="HeroCardBrush" StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="{StaticResource Color.BrandPrimary}" Offset="0" />
+                    <GradientStop Color="{StaticResource Color.BrandSecondary}" Offset="1" />
+                </LinearGradientBrush>
+                <SolidColorBrush x:Key="HeroCardOverlayBrush" Color="{StaticResource Color.BrandOverlay}" />
+                <Style x:Key="CardStyle" TargetType="Border">
+                    <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}" />
+                    <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}" />
+                    <Setter Property="Padding" Value="{StaticResource Padding.Card}" />
+                </Style>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Margin" Value="0,0,0,12" />
+                    <Setter Property="Background" Value="Transparent" />
+                </Style>
+            </NavigationView.Resources>
 
         <NavigationView.MenuItems>
             <NavigationViewItem x:Name="DashboardItem" Content="Dashboard" IsSelected="True">
@@ -66,11 +95,11 @@
             </NavigationViewItem>
         </NavigationView.MenuItems>
 
-        <NavigationView.Content>
-            <Grid>
-                <ScrollViewer x:Name="DashboardView" HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel Padding="{StaticResource Padding.Page}" Spacing="{StaticResource Spacing.Size240}">
-                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size160}" VerticalAlignment="Center">
+            <NavigationView.Content>
+                <Grid>
+                    <ScrollViewer x:Name="DashboardView" HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel Padding="{StaticResource Padding.Page}" Spacing="{StaticResource Spacing.Size240}">
+                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size160}" VerticalAlignment="Center">
                             <Border
                                 Width="56"
                                 Height="56"
@@ -91,10 +120,15 @@
                                     Text="Choose a tool to continue."
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                             </StackPanel>
-                        </StackPanel>
+                            </StackPanel>
 
-                        <Border Style="{StaticResource CardStyle}">
-                            <StackPanel Spacing="{StaticResource Spacing.Size160}">
+                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
+                                <Button x:Name="basicButton" Content="Use system title bar" Click="basicButton_Click" />
+                                <Button x:Name="customButton" Content="Use custom title bar" Click="customButton_Click" />
+                            </StackPanel>
+
+                            <Border Style="{StaticResource CardStyle}">
+                                <StackPanel Spacing="{StaticResource Spacing.Size160}">
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
                                     <Border
                                         Width="48"
@@ -907,4 +941,5 @@
             </Grid>
         </NavigationView.Content>
     </NavigationView>
+    </Grid>
 </Window>
