@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace Smart_Cleaner_for_Windows.Core;
+namespace Smart_Cleaner_for_Windows.Core; // FIXME: Namespace does not correspond to file location, must be: 'Smart_Cleaner_for_Windows.Core.DiskCleanup'
 
 public sealed class DiskCleanupVolumeService : IDiskCleanupVolumeService
 {
@@ -41,7 +41,7 @@ public sealed class DiskCleanupVolumeService : IDiskCleanupVolumeService
     {
         var drive = string.IsNullOrWhiteSpace(volume) ? GetDefaultVolume() : volume.Trim();
 
-        if (drive.Length == 2 && drive[1] == ':')
+        if (drive.Length == 2 && drive[1] == ':') // FIXME: Merge into pattern
         {
             drive += '\\';
         }

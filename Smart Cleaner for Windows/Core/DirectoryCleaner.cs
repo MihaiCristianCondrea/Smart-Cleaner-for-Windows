@@ -24,12 +24,12 @@ public sealed class DirectoryCleaner : IDirectoryCleaner
         return Default.Clean(root, options, cancellationToken);
     }
 
-    public DirectoryCleaner()
+    public DirectoryCleaner() // FIXME: Constructor 'DirectoryCleaner' can be made private
         : this(new FileSystemDirectorySystem(), new FileSystemDirectoryDeleter())
     {
     }
 
-    public DirectoryCleaner(IDirectorySystem directorySystem, IDirectoryDeleter directoryDeleter)
+    public DirectoryCleaner(IDirectorySystem directorySystem, IDirectoryDeleter directoryDeleter) // FIXME: Convert into primary constructor
     {
         _directorySystem = directorySystem ?? throw new ArgumentNullException(nameof(directorySystem));
         _directoryDeleter = directoryDeleter ?? throw new ArgumentNullException(nameof(directoryDeleter));
@@ -40,7 +40,7 @@ public sealed class DirectoryCleaner : IDirectoryCleaner
         return CleanInternal(root, options, cancellationToken);
     }
 
-    public Task<DirectoryCleanResult> CleanAsync(string root, DirectoryCleanOptions? options = null, CancellationToken cancellationToken = default)
+    public Task<DirectoryCleanResult> CleanAsync(string root, DirectoryCleanOptions? options = null, CancellationToken cancellationToken = default) // FIXME: Constructor 'DirectoryCleaner' can be made private
     {
         return Task.Run(() => CleanInternal(root, options, cancellationToken), cancellationToken);
     }
@@ -282,11 +282,11 @@ public sealed class DirectoryCleaner : IDirectoryCleaner
 
                 _patterns = validPatterns.Count > 0
                     ? validPatterns.ToArray()
-                    : Array.Empty<string>();
+                    : Array.Empty<string>(); // FIXME: Use collection expression
             }
             else
             {
-                _patterns = Array.Empty<string>();
+                _patterns = Array.Empty<string>(); // FIXME: Use collection expression
             }
         }
 

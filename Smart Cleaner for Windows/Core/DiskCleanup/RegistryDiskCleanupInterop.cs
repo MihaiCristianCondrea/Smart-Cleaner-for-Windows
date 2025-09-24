@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading;
 using Microsoft.Win32;
 
-namespace Smart_Cleaner_for_Windows.Core;
+namespace Smart_Cleaner_for_Windows.Core; // FIXME: Namespace does not correspond to file location, must be: 'Smart_Cleaner_for_Windows.Core.DiskCleanup'
 
 internal static class RegistryDiskCleanupInterop
 {
@@ -54,7 +54,7 @@ internal static class RegistryDiskCleanupInterop
         return ExpandResourceString(value);
     }
 
-    public static string? ExpandResourceString(string value)
+    public static string? ExpandResourceString(string value) // FIXME: Method 'ExpandResourceString' can be made private
     {
         if (string.IsNullOrWhiteSpace(value))
         {
@@ -107,7 +107,7 @@ internal static class RegistryDiskCleanupInterop
         private readonly object _comObject;
         private bool _disposed;
 
-        public DiskCleanupHandler(IEmptyVolumeCache cache, object comObject)
+        public DiskCleanupHandler(IEmptyVolumeCache cache, object comObject) // FIXME: Convert into primary constructor
         {
             Cache = cache;
             _comObject = comObject;
@@ -151,9 +151,9 @@ internal static class RegistryDiskCleanupInterop
 
     internal static class HResults
     {
-        public const int S_OK = 0;
-        public const int E_ABORT = unchecked((int)0x80004004);
-        public const int E_ACCESSDENIED = unchecked((int)0x80070005);
+        public const int S_OK = 0; // FIXME: Name 'S_OK' does not match rule 'Constant fields (not private)'. Suggested name is 'SOk'.
+        public const int E_ABORT = unchecked((int)0x80004004); // FIXME: Name 'E_ABORT' does not match rule 'Constant fields (not private)'. Suggested name is 'EAbort'.
+        public const int E_ACCESSDENIED = unchecked((int)0x80070005); // FIXME: Name 'E_ACCESSDENIED' does not match rule 'Constant fields (not private)'. Suggested name is 'EAccessdenied'.
     }
 
     private static class NativeMethods
