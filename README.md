@@ -10,6 +10,8 @@ A fast, safe, and modern Windows app to find and delete empty folders. Built wit
 - **Symlink aware** – reparse points are skipped by default.
 - **Progress + cancel** – long operations stay cancellable and surface status in an InfoBar.
 - **Fluent UI** – Mica backdrop, accent-aware buttons, and light implicit animations.
+- **Responsive layout** – adaptive Fluent spacing keeps the UI comfortable from compact panes to wide desktops.
+- **Localized strings** – ships with English (United States) and Spanish (Spain) resources.
 
 ## Requirements
 - Windows 10 2004 (build 19041) or newer.
@@ -64,6 +66,17 @@ pwsh ./publish.ps1 -Configuration Debug -SkipZip
 
 The MSIX build targets **Windows 10, version 2004 (build 19041)** or later and ships in a single file that installs/uninstalls cleanly. Hosting the bundle alongside an **App Installer** XML enables background updates with no extra tooling.
 
+### Choose a Windows App SDK channel
+
+The project supports the Windows App SDK **stable**, **preview**, and **experimental** channels. Pass the `WindowsAppSdkChannel` MSBuild property when building or publishing to switch channels:
+
+```powershell
+dotnet build "Smart Cleaner for Windows/Smart Cleaner for Windows.csproj" -p:WindowsAppSdkChannel=preview
+dotnet publish "Smart Cleaner for Windows/Smart Cleaner for Windows.csproj" -p:WindowsAppSdkChannel=experimental
+```
+
+When omitted the build uses the stable channel (`1.8.250916003`). Preview resolves to `1.8.250814004-preview` and experimental resolves to `1.8.250610002-experimental3`, matching the NuGet packages configured in the project file.
+
 ### Run the app from source
 If you just want to launch the app (without producing publish artifacts), run the included helper script from the repository root:
 
@@ -85,3 +98,4 @@ Everything runs locally. The app only reads and deletes directories that you poi
 ## Credits
 - Windows App SDK / WinUI 3
 - Windows Community Toolkit (animations)
+- Fluent design system guidance
