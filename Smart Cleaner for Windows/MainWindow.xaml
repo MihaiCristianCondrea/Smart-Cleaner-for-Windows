@@ -833,20 +833,73 @@
                         </Border>
 
                         <Border Style="{StaticResource CardStyle}">
-                            <StackPanel Spacing="12">
-                                <TextBlock Text="Appearance" FontSize="22" FontWeight="SemiBold" />
-                                <TextBlock
-                                    Text="Choose an accent color to personalize the interface."
-                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                    TextWrapping="Wrap" />
-                                <ComboBox x:Name="AccentColorComboBox" SelectionChanged="OnAccentColorChanged">
-                                    <ComboBoxItem Content="Use system accent" Tag="default" IsSelected="True" />
-                                    <ComboBoxItem Content="Cobalt" Tag="#FF005FB8" />
-                                    <ComboBoxItem Content="Emerald" Tag="#FF107C10" />
-                                    <ComboBoxItem Content="Rose" Tag="#FFC3006A" />
-                                    <ComboBoxItem Content="Amber" Tag="#FFC19C00" />
-                                    <ComboBoxItem Content="Slate" Tag="#FF525E7B" />
-                                </ComboBox>
+                            <StackPanel Spacing="{StaticResource Spacing.Size200}">
+                                <TextBlock Text="Personalization" FontSize="22" FontWeight="SemiBold" />
+
+                                <StackPanel Spacing="{StaticResource Spacing.Size80}">
+                                    <Grid ColumnSpacing="{StaticResource Spacing.Size160}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Spacing="{StaticResource Spacing.Size40}">
+                                            <TextBlock Text="App theme" FontSize="18" FontWeight="SemiBold" />
+                                            <TextBlock
+                                                Text="Choose how Smart Cleaner looks."
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                TextWrapping="Wrap" />
+                                        </StackPanel>
+
+                                        <TextBlock
+                                            x:Name="ThemeSummaryText"
+                                            Grid.Column="1"
+                                            Text="Use system setting"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            VerticalAlignment="Center" />
+                                    </Grid>
+
+                                    <RadioButtons
+                                        x:Name="ThemeRadioButtons"
+                                        MaxColumns="1"
+                                        SelectionChanged="OnThemeSelectionChanged">
+                                        <RadioButton Content="Light" Tag="light" />
+                                        <RadioButton Content="Dark" Tag="dark" />
+                                        <RadioButton Content="Use system setting" Tag="default" />
+                                    </RadioButtons>
+                                </StackPanel>
+
+                                <StackPanel Spacing="{StaticResource Spacing.Size80}">
+                                    <Grid ColumnSpacing="{StaticResource Spacing.Size160}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Spacing="{StaticResource Spacing.Size40}">
+                                            <TextBlock Text="Accent color" FontSize="18" FontWeight="SemiBold" />
+                                            <TextBlock
+                                                Text="Personalize buttons and highlights with a custom accent."
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                TextWrapping="Wrap" />
+                                        </StackPanel>
+
+                                        <TextBlock
+                                            x:Name="AccentSummaryText"
+                                            Grid.Column="1"
+                                            Text="Use system setting"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            VerticalAlignment="Center" />
+                                    </Grid>
+
+                                    <RadioButtons
+                                        x:Name="AccentColorRadioButtons"
+                                        MaxColumns="1"
+                                        SelectionChanged="OnAccentPreferenceChanged">
+                                        <RadioButton Content="Zest (default color scheme)" Tag="zest" />
+                                        <RadioButton Content="Use system setting" Tag="default" />
+                                    </RadioButtons>
+                                </StackPanel>
                             </StackPanel>
                         </Border>
                     </StackPanel>
