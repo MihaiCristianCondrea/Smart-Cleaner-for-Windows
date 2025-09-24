@@ -851,102 +851,106 @@
                                             </StackPanel>
                                         </StackPanel>
 
-                                        <ListView
-                                            x:Name="LargeFilesList"
-                                            IsSourceGrouped="True"
-                                            SelectionMode="None"
-                                            IsItemClickEnabled="False">
-                                            <ListView.GroupStyle>
-                                                <GroupStyle>
-                                                    <GroupStyle.HeaderTemplate>
-                                                        <DataTemplate>
-                                                            <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition Width="*" />
-                                                                    <ColumnDefinition Width="Auto" />
-                                                                </Grid.ColumnDefinitions>
-                                                                <TextBlock Text="{Binding DisplayName}" FontSize="18" FontWeight="SemiBold" />
-                                                                <TextBlock
-                                                                    Grid.Column="1"
-                                                                    Text="{Binding Summary}"
-                                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                                    HorizontalAlignment="Right" />
-                                                            </Grid>
-                                                        </DataTemplate>
-                                                    </GroupStyle.HeaderTemplate>
-                                                </GroupStyle>
-                                            </ListView.GroupStyle>
-                                            <ListView.ItemTemplate>
+                                        <ItemsControl x:Name="LargeFilesGroupList">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Spacing="{StaticResource Spacing.Size160}" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
-                                                    <Border Padding="16" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="12">
+                                                    <StackPanel Spacing="{StaticResource Spacing.Size120}">
                                                         <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
                                                             <Grid.ColumnDefinitions>
                                                                 <ColumnDefinition Width="*" />
                                                                 <ColumnDefinition Width="Auto" />
                                                             </Grid.ColumnDefinitions>
-                                                            <StackPanel Spacing="{StaticResource Spacing.Size80}">
-                                                                <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
-                                                                    <Grid.ColumnDefinitions>
-                                                                        <ColumnDefinition Width="*" />
-                                                                        <ColumnDefinition Width="Auto" />
-                                                                    </Grid.ColumnDefinitions>
-                                                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-                                                                    <TextBlock
-                                                                        Grid.Column="1"
-                                                                        Text="{Binding SizeDisplay}"
-                                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                                                </Grid>
-                                                                <TextBlock
-                                                                    Text="{Binding Directory}"
-                                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                                    TextTrimming="CharacterEllipsis"
-                                                                    ToolTipService.ToolTip="{Binding Directory}" />
-                                                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
-                                                                    <Border
-                                                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
-                                                                        CornerRadius="8"
-                                                                        Padding="8,2"
-                                                                        VerticalAlignment="Center">
-                                                                        <TextBlock
-                                                                            Text="{Binding ExtensionDisplay}"
-                                                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
-                                                                    </Border>
-                                                                    <TextBlock
-                                                                        Text="{Binding TypeName}"
-                                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                                        TextTrimming="CharacterEllipsis" />
-                                                                </StackPanel>
-                                                            </StackPanel>
-                                                            <StackPanel
+                                                            <TextBlock Text="{Binding DisplayName}" FontSize="18" FontWeight="SemiBold" />
+                                                            <TextBlock
                                                                 Grid.Column="1"
-                                                                Orientation="Horizontal"
-                                                                HorizontalAlignment="Right"
-                                                                VerticalAlignment="Center"
-                                                                Spacing="{StaticResource Spacing.Size60}">
-                                                                <Button Tag="{Binding}" Click="OnLargeFileOpen">
-                                                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
-                                                                        <SymbolIcon Symbol="OpenFile" />
-                                                                        <TextBlock Text="Open" />
-                                                                    </StackPanel>
-                                                                </Button>
-                                                                <Button Tag="{Binding}" Click="OnLargeFileDelete">
-                                                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
-                                                                        <SymbolIcon Symbol="Delete" />
-                                                                        <TextBlock Text="Delete" />
-                                                                    </StackPanel>
-                                                                </Button>
-                                                                <Button Tag="{Binding}" Click="OnLargeFileExclude">
-                                                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
-                                                                        <SymbolIcon Symbol="BlockContact" />
-                                                                        <TextBlock Text="Exclude" />
-                                                                    </StackPanel>
-                                                                </Button>
-                                                            </StackPanel>
+                                                                Text="{Binding Summary}"
+                                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                HorizontalAlignment="Right" />
                                                         </Grid>
-                                                    </Border>
+                                                        <ItemsControl ItemsSource="{Binding Items}">
+                                                            <ItemsControl.ItemsPanel>
+                                                                <ItemsPanelTemplate>
+                                                                    <StackPanel Spacing="{StaticResource Spacing.Size120}" />
+                                                                </ItemsPanelTemplate>
+                                                            </ItemsControl.ItemsPanel>
+                                                            <ItemsControl.ItemTemplate>
+                                                                <DataTemplate>
+                                                                    <Border Padding="16" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="12">
+                                                                        <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
+                                                                            <Grid.ColumnDefinitions>
+                                                                                <ColumnDefinition Width="*" />
+                                                                                <ColumnDefinition Width="Auto" />
+                                                                            </Grid.ColumnDefinitions>
+                                                                            <StackPanel Spacing="{StaticResource Spacing.Size80}">
+                                                                                <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
+                                                                                    <Grid.ColumnDefinitions>
+                                                                                        <ColumnDefinition Width="*" />
+                                                                                        <ColumnDefinition Width="Auto" />
+                                                                                    </Grid.ColumnDefinitions>
+                                                                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                                                                    <TextBlock
+                                                                                        Grid.Column="1"
+                                                                                        Text="{Binding SizeDisplay}"
+                                                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                                                </Grid>
+                                                                                <TextBlock
+                                                                                    Text="{Binding Directory}"
+                                                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                                    TextWrapping="Wrap"
+                                                                                    TextTrimming="CharacterEllipsis"
+                                                                                    ToolTipService.ToolTip="{Binding Directory}" />
+                                                                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                                                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                                                        <Border
+                                                                                            Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                                                                            CornerRadius="8"
+                                                                                            Padding="8,2"
+                                                                                            VerticalAlignment="Center">
+                                                                                            <TextBlock
+                                                                                                Text="{Binding ExtensionDisplay}"
+                                                                                                Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+                                                                                        </Border>
+                                                                                        <TextBlock
+                                                                                            Text="{Binding TypeName}"
+                                                                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                                            TextTrimming="CharacterEllipsis" />
+                                                                                    </StackPanel>
+                                                                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}" HorizontalAlignment="Right">
+                                                                                        <Button Tag="{Binding}" Click="OnLargeFileOpen">
+                                                                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                                                                <SymbolIcon Symbol="OpenFile" />
+                                                                                                <TextBlock Text="Open" />
+                                                                                            </StackPanel>
+                                                                                        </Button>
+                                                                                        <Button Tag="{Binding}" Click="OnLargeFileDelete">
+                                                                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                                                                <SymbolIcon Symbol="Delete" />
+                                                                                                <TextBlock Text="Delete" />
+                                                                                            </StackPanel>
+                                                                                        </Button>
+                                                                                        <Button Tag="{Binding}" Click="OnLargeFileExclude">
+                                                                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                                                                <SymbolIcon Symbol="BlockContact" />
+                                                                                                <TextBlock Text="Exclude" />
+                                                                                            </StackPanel>
+                                                                                        </Button>
+                                                                                    </StackPanel>
+                                                                                </StackPanel>
+                                                                            </StackPanel>
+                                                                        </Grid>
+                                                                    </Border>
+                                                                </DataTemplate>
+                                                            </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+                                                    </StackPanel>
                                                 </DataTemplate>
-                                            </ListView.ItemTemplate>
-                                        </ListView>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
                                     </StackPanel>
                                 </Border>
                             </StackPanel>

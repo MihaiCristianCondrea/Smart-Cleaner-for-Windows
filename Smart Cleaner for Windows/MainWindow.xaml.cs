@@ -17,7 +17,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Hosting;
-using Microsoft.UI.Xaml.Data;
 using Microsoft.Windows.ApplicationModel.Resources;
 using Microsoft.VisualBasic.FileIO;
 using Smart_Cleaner_for_Windows.Core;
@@ -54,7 +53,6 @@ public sealed partial class MainWindow
     private readonly ObservableCollection<DriveUsageViewModel> _driveUsage = new();
     private readonly ObservableCollection<DiskCleanupItemViewModel> _diskCleanupItems = new();
     private readonly ObservableCollection<LargeFileGroupViewModel> _largeFileGroups = new();
-    private readonly CollectionViewSource _largeFilesCollectionView = new();
     private readonly ObservableCollection<string> _largeFileExclusions = new();
     private readonly HashSet<string> _largeFileExclusionLookup = new(OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
     private CancellationTokenSource? _diskCleanupCts;
@@ -148,10 +146,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
         InitializeComponent();
 
-        _largeFilesCollectionView.IsSourceGrouped = true;
-        _largeFilesCollectionView.ItemsPath = new PropertyPath("Items");
-        _largeFilesCollectionView.Source = _largeFileGroups;
-        LargeFilesList.ItemsSource = _largeFilesCollectionView.View;
+        LargeFilesGroupList.ItemsSource = _largeFileGroups;
 
         CaptureDefaultAccentColors();
         LoadPreferences();
@@ -1453,7 +1448,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         LargeFilesMaxItemsBox.IsEnabled = !isBusy;
         LargeFilesExclusionsBox.IsEnabled = !isBusy;
         LargeFilesExclusionsList.IsEnabled = !isBusy;
-        LargeFilesList.IsEnabled = !isBusy;
+        LargeFilesGroupList.IsEnabled = !isBusy;
         UpdateLargeFilesExclusionState();
     }
 
