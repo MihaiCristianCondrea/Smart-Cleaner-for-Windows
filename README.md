@@ -1,101 +1,102 @@
-# Empty Folder Cleaner (Windows, WinUI 3)
+# Smart Cleaner for Windows (WinUI 3)
 
-A fast, safe, and modern Windows app to find and delete empty folders. Built with **.NET 8** and the **Windows App SDK (WinUI 3)** for a Fluent look that respects the system accent, uses Mica, and stays responsive during long scans.
+Smart Cleaner for Windows is a modern WinUI 3 desktop utility that helps you tidy up empty folders, analyze built-in Windows Disk Cleanup handlers, and keep storage usage in check. The app is built with **.NET 8** and the **Windows App SDK 1.8** to deliver Fluent visuals, Mica materials, and responsive layouts that respect your accent color and theme preferences.
 
-## Features
-- **Preview first** – scan any folder and review empty directories before you delete them.
-- **Safe by default** – deletions go to the **Recycle Bin** (you can opt out for permanent removal).
-- **Exclusions** – semicolon separated wildcards (e.g., `.git; build/*; node_modules`).
-- **Depth limit** – constrain traversal depth (0 = unlimited).
-- **Symlink aware** – reparse points are skipped by default.
-- **Progress + cancel** – long operations stay cancellable and surface status in an InfoBar.
-- **Fluent UI** – Mica backdrop, accent-aware buttons, and light implicit animations.
-- **Responsive layout** – adaptive Fluent spacing keeps the UI comfortable from compact panes to wide desktops.
-- **Localized strings** – ships with English (United States) and Spanish (Spain) resources.
+## Highlights
+- **Dashboard overview** – review drive usage at a glance and jump directly into the cleanup tools from a Fluent NavigationView.
+- **Empty folders cleaner** – preview every empty directory before deletion, send removals to the **Recycle Bin** by default, cap traversal depth, skip reparse points, cancel long scans, and exclude folders with wildcard rules such as `.git; build/*; node_modules`.
+- **Disk cleanup integration** – inspect the Windows Disk Cleanup handlers for a volume, see the estimated size reclaimed per category, review warnings (including elevation requirements), and clean only the items you select.
+- **Personal and polished** – supports English (United States) and Spanish (Spain), includes theme/accent controls, and keeps all operations on-device with no telemetry.
 
 ## Requirements
-- Windows 10 2004 (build 19041) or newer.
-- No additional runtime is required when you use the self-contained publish output.
+- Windows 10 version 1809 (build 17763) or later. The project targets `net8.0-windows10.0.19041.0` while maintaining a minimum platform version of 17763 in the package manifest.
+- [.NET 8.0 SDK](https://dotnet.microsoft.com/download) for command-line builds.
+- (Optional) [Visual Studio 2022](https://visualstudio.microsoft.com/) 17.10 or later with the **Windows App SDK C#** workload for an IDE experience.
 
-## Build from PowerShell (portable EXE)
-1. Open **Windows Terminal** or **PowerShell** and change into the repository folder, e.g.:
-   ```powershell
-   cd C:\path\to\Empty-Folders-Cleaner
-   ```
-2. Restore NuGet packages:
-   ```powershell
-   dotnet restore
-   ```
-3. Publish a self-contained, portable build (no runtime required on the target PC):
-   ```powershell
-   dotnet publish src/EmptyFolderCleaner.WinUI/EmptyFolderCleaner.WinUI.csproj -c Release -p:PublishProfile=Win-x64-SelfContained
-   ```
-4. After the command finishes, the portable executable and its dependencies are located at:
-   ```
-   src/EmptyFolderCleaner.WinUI/bin/Release/net8.0-windows10.0.19041.0/win-x64/publish/EmptyFolderCleaner.WinUI.exe
-   ```
-   Distribute the entire **publish** folder (zipping it works well). The Windows App SDK runtime loads from the OS when available, which is standard for unpackaged WinUI apps.
+## Repository layout
+| Path | Description |
+| --- | --- |
+| `Smart Cleaner for Windows/` | WinUI 3 single-project desktop application (XAML, view models, and assets). |
+| `Smart Cleaner for Windows/Core/` | Cross-platform logic for scanning directories and integrating with the Windows Disk Cleanup COM handlers. |
+| `Smart Cleaner for Windows/Strings/` | Localized resources (`en-US` and `es-ES`). |
+| `Smart Cleaner for Windows/Properties/PublishProfiles/` | Publish profiles for x86, x64, and ARM64 self-contained builds. |
 
-### PowerShell helper script
-Instead of running the commands manually, you can execute the helper script from the repository root. It restores packages, publishes the app by using the `Win-x64-SelfContained` profile, and creates a ZIP archive next to the publish output:
-
+## Getting started
+### 1. Clone the repository
 ```powershell
-pwsh ./publish.ps1
+git clone https://github.com/<your-account>/Smart-Cleaner-for-Windows.git
+cd Smart-Cleaner-for-Windows
 ```
 
-You can override the build configuration or skip the ZIP step when needed:
-
+### 2. Restore dependencies
 ```powershell
-pwsh ./publish.ps1 -Configuration Debug -SkipZip
+dotnet restore
 ```
 
-## Build an MSIX package (recommended installer)
-1. Supply the required visual assets in `src/EmptyFolderCleaner.Packaging/Images` (see the `README.md` inside that folder for the expected file names and pixel sizes).
-2. Restore dependencies (only required once per machine):
-   ```powershell
-   dotnet restore
-   ```
-3. Use **MSBuild** to create a signed-ready bundle from the Windows App Packaging project:
-   ```powershell
-   msbuild .\EmptyFolderCleaner.Packaging\EmptyFolderCleaner.Packaging.wapproj `
-     /p:Configuration=Release `
-     /p:UapAppxPackageBuildMode=StoreUpload `
-     /p:GenerateAppxPackageOnBuild=true
-   ```
-4. The output folder contains an **.msixbundle** plus a temporary certificate (\*.cer). Install the certificate into **Local Machine → Trusted People** (or sign the bundle with your own code-signing certificate), then double-click the MSIX bundle to install.
+### 3. Build the solution
+```powershell
+dotnet build "Smart Cleaner for Windows.sln" -c Release
+```
 
-The MSIX build targets **Windows 10, version 2004 (build 19041)** or later and ships in a single file that installs/uninstalls cleanly. Hosting the bundle alongside an **App Installer** XML enables background updates with no extra tooling.
+### 4. Run from the command line
+```powershell
+dotnet run --project "Smart Cleaner for Windows/Smart Cleaner for Windows.csproj" -c Debug
+```
+Alternatively, open `Smart Cleaner for Windows.sln` in Visual Studio and press **F5**.
+
+## Publish a self-contained build
+Use the supplied publish profiles to create portable outputs that do not require the .NET runtime on the target machine:
+
+```powershell
+dotnet publish "Smart Cleaner for Windows/Smart Cleaner for Windows.csproj" -c Release -p:PublishProfile=win-x64
+```
+
+The resulting files live in:
+```
+Smart Cleaner for Windows/bin/Release/net8.0-windows10.0.19041.0/win-x64/publish/
+```
+Distribute the entire **publish** folder (zipping it works well). Switch to `win-x86` or `win-arm64` to generate binaries for other architectures.
 
 ### Choose a Windows App SDK channel
-
-The project supports the Windows App SDK **stable**, **preview**, and **experimental** channels. Pass the `WindowsAppSdkChannel` MSBuild property when building or publishing to switch channels:
+The project references stable, preview, and experimental channels. Override the default (stable) channel with an MSBuild property:
 
 ```powershell
 dotnet build "Smart Cleaner for Windows/Smart Cleaner for Windows.csproj" -p:WindowsAppSdkChannel=preview
-dotnet publish "Smart Cleaner for Windows/Smart Cleaner for Windows.csproj" -p:WindowsAppSdkChannel=experimental
+dotnet publish "Smart Cleaner for Windows/Smart Cleaner for Windows.csproj" -c Release -p:PublishProfile=win-x64 -p:WindowsAppSdkChannel=experimental
 ```
 
-When omitted the build uses the stable channel (`1.8.250916003`). Preview resolves to `1.8.250814004-preview` and experimental resolves to `1.8.250610002-experimental3`, matching the NuGet packages configured in the project file.
+### Package as MSIX
+Smart Cleaner for Windows enables the single-project MSIX tooling. To produce an installer:
 
-### Run the app from source
-If you just want to launch the app (without producing publish artifacts), run the included helper script from the repository root:
+1. Open the solution in Visual Studio on Windows.
+2. Right-click **Smart Cleaner for Windows** and select **Package and Publish → Create App Packages...**.
+3. Follow the wizard to generate an `.msixbundle` and sign it with a trusted certificate.
 
-```powershell
-pwsh ./run.ps1 -Configuration Release
-```
+Advanced users can also run `dotnet publish ... -p:WindowsPackageType=Msix` from PowerShell to create an unsigned MSIX for sideloading.
 
-## Usage
-1. Launch **Empty Folder Cleaner**.
-2. Browse to the root directory you want to inspect.
-3. Adjust exclusion patterns or depth if needed.
-4. Click **Preview** to list empty folders.
-5. Review the results, then click **Delete** to remove them (Recycle Bin by default).
-6. Use **Cancel** whenever you want to stop a long-running scan.
+## Using Smart Cleaner
+### Empty folders cleaner
+1. Select **Empty folders** from the navigation menu.
+2. Choose a root directory and adjust options such as **Recycle Bin**, **Depth limit**, and **Exclusions**.
+3. Click **Preview** to list empty directories and review the results.
+4. Use **Clean now** to remove them or **Cancel** to stop a long-running scan.
+
+### Disk cleanup
+1. Switch to **Disk cleanup**.
+2. Click **Analyze** to enumerate Windows cleanup handlers for the default drive (you can change the drive in settings).
+3. Select the categories you want to remove, paying attention to elevation requirements or warnings.
+4. Choose **Clean selected** to reclaim space. Results summarize the freed space and any failures.
+
+### Personalization
+Open **Settings** to switch between light, dark, or system theme; apply the custom “Zest” accent; and view app information.
+
+## Localization
+The app ships with resource files for **English (United States)** and **Spanish (Spain)**. Add additional `.resw` files under `Strings/` to extend localization coverage.
 
 ## Privacy
-Everything runs locally. The app only reads and deletes directories that you point it to—no telemetry, no uploads.
+All scans and cleanups happen locally on your machine. The app does not collect telemetry or send data over the network.
 
 ## Credits
 - Windows App SDK / WinUI 3
-- Windows Community Toolkit (animations)
-- Fluent design system guidance
+- Windows Community Toolkit (implicit animations and helpers)
+- Fluent Design System guidance
