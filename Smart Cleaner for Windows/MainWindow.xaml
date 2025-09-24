@@ -866,16 +866,16 @@
                                             <ListView.GroupStyle>
                                                 <GroupStyle>
                                                     <GroupStyle.HeaderTemplate>
-                                                        <DataTemplate x:DataType="local:MainWindow+LargeFileGroupViewModel">
+                                                        <DataTemplate>
                                                             <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
                                                                 <Grid.ColumnDefinitions>
                                                                     <ColumnDefinition Width="*" />
                                                                     <ColumnDefinition Width="Auto" />
                                                                 </Grid.ColumnDefinitions>
-                                                                <TextBlock Text="{x:Bind DisplayName}" FontSize="18" FontWeight="SemiBold" />
+                                                                <TextBlock Text="{Binding DisplayName}" FontSize="18" FontWeight="SemiBold" />
                                                                 <TextBlock
                                                                     Grid.Column="1"
-                                                                    Text="{x:Bind Summary}"
+                                                                    Text="{Binding Summary}"
                                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                                     HorizontalAlignment="Right" />
                                                             </Grid>
@@ -884,7 +884,7 @@
                                                 </GroupStyle>
                                             </ListView.GroupStyle>
                                             <ListView.ItemTemplate>
-                                                <DataTemplate x:DataType="local:MainWindow+LargeFileItemViewModel">
+                                                <DataTemplate>
                                                     <Border Padding="16" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="12">
                                                         <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
                                                             <Grid.ColumnDefinitions>
@@ -897,17 +897,17 @@
                                                                         <ColumnDefinition Width="*" />
                                                                         <ColumnDefinition Width="Auto" />
                                                                     </Grid.ColumnDefinitions>
-                                                                    <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
                                                                     <TextBlock
                                                                         Grid.Column="1"
-                                                                        Text="{x:Bind SizeDisplay}"
+                                                                        Text="{Binding SizeDisplay}"
                                                                         Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                                                 </Grid>
                                                                 <TextBlock
-                                                                    Text="{x:Bind Directory}"
+                                                                    Text="{Binding Directory}"
                                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                                     TextTrimming="CharacterEllipsis"
-                                                                    ToolTipService.ToolTip="{x:Bind Directory}" />
+                                                                    ToolTipService.ToolTip="{Binding Directory}" />
                                                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
                                                                     <Border
                                                                         Background="{ThemeResource AccentFillColorTertiaryBrush}"
@@ -915,11 +915,11 @@
                                                                         Padding="8,2"
                                                                         VerticalAlignment="Center">
                                                                         <TextBlock
-                                                                            Text="{x:Bind ExtensionDisplay}"
+                                                                            Text="{Binding ExtensionDisplay}"
                                                                             Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
                                                                     </Border>
                                                                     <TextBlock
-                                                                        Text="{x:Bind TypeName}"
+                                                                        Text="{Binding TypeName}"
                                                                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                                         TextTrimming="CharacterEllipsis" />
                                                                 </StackPanel>
