@@ -5,6 +5,18 @@ namespace Smart_Cleaner_for_Windows.Core.DiskCleanup;
 
 public sealed class DiskCleanupItem
 {
+    public DiskCleanupItem()
+        : this(
+            new DiskCleanupHandlerDescriptor(Guid.Empty, string.Empty, RegistryView.Default),
+            string.Empty,
+            null,
+            0,
+            DiskCleanupFlags.None,
+            null,
+            false)
+    {
+    }
+
     internal DiskCleanupItem(
         DiskCleanupHandlerDescriptor descriptor,
         string name,

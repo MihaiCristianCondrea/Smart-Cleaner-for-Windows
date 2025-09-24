@@ -1,9 +1,15 @@
+using System;
 using System.Collections.Generic;
 
 namespace Smart_Cleaner_for_Windows.Core.DiskCleanup;
 
 public sealed class DiskCleanupCleanResult
 {
+    public DiskCleanupCleanResult()
+        : this(0, 0, Array.Empty<DiskCleanupFailure>())
+    {
+    }
+
     internal DiskCleanupCleanResult(ulong freed, int successCount, IReadOnlyList<DiskCleanupFailure> failures)
     {
         Freed = freed;
@@ -20,4 +26,10 @@ public sealed class DiskCleanupCleanResult
     public bool HasFailures => Failures.Count > 0;
 }
 
-public sealed record DiskCleanupFailure(string Name, string Message);
+public sealed record DiskCleanupFailure(string Name, string Message)
+{
+    public DiskCleanupFailure()
+        : this(string.Empty, string.Empty)
+    {
+    }
+}

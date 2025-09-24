@@ -5,6 +5,11 @@ namespace Smart_Cleaner_for_Windows.Core.LargeFiles;
 
 public sealed class LargeFileEntry
 {
+    public LargeFileEntry()
+        : this(string.Empty, 0, string.Empty)
+    {
+    }
+
     public LargeFileEntry(string path, long size, string type)
     {
         Path = path ?? throw new ArgumentNullException(nameof(path));

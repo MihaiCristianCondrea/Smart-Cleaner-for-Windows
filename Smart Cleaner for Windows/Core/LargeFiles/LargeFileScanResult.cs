@@ -7,6 +7,11 @@ namespace Smart_Cleaner_for_Windows.Core.LargeFiles;
 
 public sealed class LargeFileScanResult
 {
+    public LargeFileScanResult()
+        : this(Array.Empty<LargeFileEntry>(), Array.Empty<LargeFileScanFailure>())
+    {
+    }
+
     public LargeFileScanResult(IEnumerable<LargeFileEntry> files, IEnumerable<LargeFileScanFailure> failures)
     {
         if (files is null)
