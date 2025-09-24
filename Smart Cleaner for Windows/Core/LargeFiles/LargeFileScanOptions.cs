@@ -1,0 +1,18 @@
+using System.Collections.Generic;
+
+namespace Smart_Cleaner_for_Windows.Core.LargeFiles;
+
+public sealed class LargeFileScanOptions
+{
+    public bool IncludeSubdirectories { get; init; } = true;
+
+    public bool SkipReparsePoints { get; init; } = true;
+
+    public int MaxResults { get; init; } = 100;
+
+    public IReadOnlyCollection<string>? ExcludedFullPaths { get; init; }
+        = null;
+
+    public IReadOnlyCollection<string>? ExcludedNamePatterns { get; init; }
+        = null;
+}
