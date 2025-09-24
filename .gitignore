@@ -1,6 +1,102 @@
-bin/
-obj/
+# ---- OS cruft ---------------------------------------------------------------
+.DS_Store
+Thumbs.db
+ehthumbs.db
+$RECYCLE.BIN/
+
+# ---- Editors / IDEs ---------------------------------------------------------
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# VS Code (keep settings.json if you want, otherwise ignore all)
+.vscode/*
+!.vscode/settings.json
+
+# ---- .NET / Build output ----------------------------------------------------
 **/bin/
 **/obj/
-*.user
-*.suo
+**/artifacts/
+**/TestResults/
+**/*.appxrecipe
+**/*.cache
+*.ilk
+*.pdb
+*.ipch
+
+# NuGet
+*.nupkg
+packages/
+.nuget/
+# (dotnet restore will recreate)
+project.lock.json
+project.assets.json
+
+# ---- Publish / Distribution -------------------------------------------------
+# Self-contained & framework-dependent publish directories
+**/publish/
+
+# Zip/archives created by publish scripts
+*.zip
+*.7z
+
+# ---- MSIX / AppX packaging --------------------------------------------------
+AppPackages/
+BundleArtifacts/
+**/*.msix
+**/*.msixbundle
+**/*.appx
+**/*.appxbundle
+**/*.appxsym
+**/_pkginfo.txt
+# Temp certificate or local signing keys
+**/*.cer
+**/*.pfx
+**/*.p12
+
+# ---- Logs / telemetry / diagnostics ----------------------------------------
+logs/
+**/logs/
+*.log
+*.etl
+*.dmp
+
+# ---- Tools / caches ---------------------------------------------------------
+# Rider/Resharper
+_ReSharper.*/
+*.[Rr]e[Ss]harper
+# DotCover / coverage
+*.dotCover
+coverage*/**
+*.coverage
+*.coveragexml
+
+# Node/yarn (if you experiment with web bits for assets)
+node_modules/
+yarn.lock
+
+# ---- Project-specific paths -------------------------------------------------
+# Packaging images: ignore actual PNGs, keep the README with sizes
+src/EmptyFolderCleaner.Packaging/Images/**
+!src/EmptyFolderCleaner.Packaging/Images/README.md
+
+# If you renamed paths, mirror the same rule for your structure:
+Smart Cleaner for Windows/Packaging/Images/**
+!Smart Cleaner for Windows/Packaging/Images/README.md
+
+# Generated PRI/manifest variants that sometimes leak outside obj/bin
+*.pri
+*.manifest
+
+# ---- Secrets just in case ---------------------------------------------------
+*.snk
+*.key
+*.keystore
+*.keystore.jks
