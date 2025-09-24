@@ -4,15 +4,18 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Globalization;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Globalization;
 using Microsoft.UI;
+using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Hosting;
 using Smart_Cleaner_for_Windows.Core;
 using Windows.Graphics;
 using Windows.Storage.Pickers;
@@ -229,17 +232,76 @@ public sealed partial class MainWindow
         var target = item ?? DashboardItem;
         var settingsItem = RootNavigation.SettingsItem;
 
-        DashboardView.Visibility = Equals(target, DashboardItem) ? Visibility.Visible : Visibility.Collapsed;
-        EmptyFoldersView.Visibility = Equals(target, EmptyFoldersItem) ? Visibility.Visible : Visibility.Collapsed;
-        DiskCleanupView.Visibility = Equals(target, DiskCleanupItem) ? Visibility.Visible : Visibility.Collapsed;
-        SettingsView.Visibility = settingsItem is not null && Equals(target, settingsItem)
-            ? Visibility.Visible
-            : Visibility.Collapsed;
+        var isDashboard = Equals(target, DashboardItem);
+        var isEmptyFolders = Equals(target, EmptyFoldersItem);
+        var isDiskCleanup = Equals(target, DiskCleanupItem);
+        var isSettings = settingsItem is not null && Equals(target, settingsItem);
+
+        SetViewVisibility(DashboardView, isDashboard);
+        SetViewVisibility(EmptyFoldersView, isEmptyFolders);
+        SetViewVisibility(DiskCleanupView, isDiskCleanup);
+        SetViewVisibility(SettingsView, isSettings);
+
+        UIElement? activeView = isDashboard
+            ? DashboardView
+            : isEmptyFolders
+                ? EmptyFoldersView
+                : isDiskCleanup
+                    ? DiskCleanupView
+                    : isSettings
+                        ? SettingsView
+                        : null;
+
+        if (activeView is not null)
+        {
+            PlayEntranceTransition(activeView);
+        }
 
         if (Equals(target, DashboardItem))
         {
             UpdateStorageOverview();
         }
+    }
+
+    private static void SetViewVisibility(UIElement view, bool shouldBeVisible)
+    {
+        var desired = shouldBeVisible ? Visibility.Visible : Visibility.Collapsed;
+        if (view.Visibility != desired)
+        {
+            view.Visibility = desired;
+        }
+    }
+
+    private void PlayEntranceTransition(UIElement view)
+    {
+        if (view.XamlRoot is null)
+        {
+            return;
+        }
+
+        ElementCompositionPreview.SetIsTranslationEnabled(view, true);
+
+        var visual = ElementCompositionPreview.GetElementVisual(view);
+        var compositor = visual.Compositor;
+
+        visual.StopAnimation(nameof(visual.Opacity));
+        visual.StopAnimation("Translation");
+
+        visual.Opacity = 0f;
+
+        var easing = compositor.CreateCubicBezierEasingFunction(new Vector2(0.1f, 0.9f), new Vector2(0.2f, 1f));
+
+        var opacityAnimation = compositor.CreateScalarKeyFrameAnimation();
+        opacityAnimation.Duration = TimeSpan.FromMilliseconds(300);
+        opacityAnimation.InsertKeyFrame(0f, 0f);
+        opacityAnimation.InsertKeyFrame(1f, 1f, easing);
+        visual.StartAnimation(nameof(visual.Opacity), opacityAnimation);
+
+        var translationAnimation = compositor.CreateVector3KeyFrameAnimation();
+        translationAnimation.Duration = TimeSpan.FromMilliseconds(300);
+        translationAnimation.InsertKeyFrame(0f, new Vector3(0f, 16f, 0f));
+        translationAnimation.InsertKeyFrame(1f, Vector3.Zero, easing);
+        visual.StartAnimation("Translation", translationAnimation);
     }
 
     private void UpdateStorageOverview()
@@ -469,6 +531,17 @@ public sealed partial class MainWindow
             if (result.HasFailures)
             {
                 message += $" Encountered {result.Failures.Count} issue(s).";
+                var failureSummaries = result.Failures
+                    .Take(3)
+                    .Select(f => $"• {f.Path}: {f.Exception.Message}");
+
+                message += Environment.NewLine + string.Join(Environment.NewLine, failureSummaries);
+
+                if (result.Failures.Count > 3)
+                {
+                    message += Environment.NewLine + $"…and {result.Failures.Count - 3} more.";
+                }
+
                 severity = InfoBarSeverity.Warning;
             }
 
