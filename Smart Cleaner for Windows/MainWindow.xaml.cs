@@ -23,6 +23,10 @@ using Windows.Graphics;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.UI;
+using Windows.Win32;
+using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
+using Windows.Win32.UI.WindowsAndMessaging;
 using WinRT;
 using WinRT.Interop;
 using System.Runtime.CompilerServices;
@@ -58,6 +62,20 @@ public sealed partial class MainWindow
     private const string ThemePreferenceDefault = "default";
     private const string AccentPreferenceZest = "zest";
     private const string AccentPreferenceDefault = "default";
+    private const string TitleBarIconTempFileName = "SmartCleanerTitleIcon.ico";
+    private const string TitleBarIconBase64 = """
+AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAADUeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4
+AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4
+AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4
+AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4
+AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4
+AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4
+AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4
+AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4
+AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4
+AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4
+AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
+""";
     private static readonly string[] AccentResourceKeys = new[]
     {
         "SystemAccentColor",
@@ -223,6 +241,100 @@ public sealed partial class MainWindow
         {
             // Ignore icon failures on unsupported systems.
         }
+    }
+
+    private void basicButton_Click(object sender, RoutedEventArgs e)
+    {
+        customTitleBarPanel.Visibility = Visibility.Collapsed;
+
+        var appWindow = TryGetAppWindow();
+        if (appWindow is not null)
+        {
+            appWindow.TitleBar.ExtendsContentIntoTitleBar = false;
+        }
+
+        SetTitleBar(null);
+
+        var hwndValue = WindowNative.GetWindowHandle(this);
+        if (hwndValue == IntPtr.Zero)
+        {
+            return;
+        }
+
+        var hwnd = new HWND(hwndValue);
+
+        var iconPath = ResolveTitleBarIconPath();
+        if (!string.IsNullOrEmpty(iconPath))
+        {
+            var iconHandle = PInvoke.LoadImage(
+                HINSTANCE.Null,
+                iconPath,
+                GDI_IMAGE_TYPE.IMAGE_ICON,
+                0,
+                0,
+                LOAD_IMAGE_FLAGS.LR_DEFAULTSIZE | LOAD_IMAGE_FLAGS.LR_LOADFROMFILE);
+
+            if (iconHandle != default)
+            {
+                var iconValue = iconHandle.Value;
+                var iconParam = new LPARAM(iconValue);
+
+                _ = PInvoke.SendMessage(
+                    hwnd,
+                    PInvoke.WM_SETICON,
+                    new WPARAM((nuint)PInvoke.ICON_BIG),
+                    iconParam);
+
+                _ = PInvoke.SendMessage(
+                    hwnd,
+                    PInvoke.WM_SETICON,
+                    new WPARAM((nuint)PInvoke.ICON_SMALL),
+                    iconParam);
+            }
+        }
+
+        _ = PInvoke.SetWindowText(hwnd, Title ?? string.Empty);
+    }
+
+    private static string? ResolveTitleBarIconPath()
+    {
+        try
+        {
+            var assetsDirectory = Path.Combine(AppContext.BaseDirectory, "Assets");
+            var appIconPath = Path.Combine(assetsDirectory, "AppIcon.ico");
+            if (File.Exists(appIconPath))
+            {
+                return appIconPath;
+            }
+
+            var tempPath = Path.Combine(Path.GetTempPath(), TitleBarIconTempFileName);
+            if (!File.Exists(tempPath))
+            {
+                var iconBytes = Convert.FromBase64String(TitleBarIconBase64);
+                File.WriteAllBytes(tempPath, iconBytes);
+            }
+
+            return tempPath;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private void customButton_Click(object sender, RoutedEventArgs e)
+    {
+        customTitleBarPanel.Visibility = Visibility.Visible;
+
+        SetTitleBar(customTitleBarPanel);
+
+        var appWindow = TryGetAppWindow();
+        if (appWindow is null)
+        {
+            return;
+        }
+
+        appWindow.TitleBar.ExtendsContentIntoTitleBar = true;
     }
 
     private void OnNavigationLoaded(object sender, RoutedEventArgs e)
