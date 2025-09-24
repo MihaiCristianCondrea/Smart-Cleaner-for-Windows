@@ -275,22 +275,32 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 0,
                 LoadImageFlags.LR_DEFAULTSIZE | LoadImageFlags.LR_LOADFROMFILE);
 
-            if (iconHandle != default)
+            if (iconHandle is not null && !iconHandle.IsInvalid)
             {
-                var iconValue = iconHandle.Value;
+                var iconValue = iconHandle.DangerousGetHandle();
                 var iconParam = new LPARAM(iconValue);
+                var hIcon = new HICON(iconValue);
 
-                _ = PInvoke.SendMessage(
-                    hwnd,
-                    PInvoke.WM_SETICON,
-                    new WPARAM((nuint)PInvoke.ICON_BIG),
-                    iconParam);
+                try
+                {
+                    _ = PInvoke.SendMessage(
+                        hwnd,
+                        PInvoke.WM_SETICON,
+                        new WPARAM((nuint)PInvoke.ICON_BIG),
+                        iconParam);
 
-                _ = PInvoke.SendMessage(
-                    hwnd,
-                    PInvoke.WM_SETICON,
-                    new WPARAM((nuint)PInvoke.ICON_SMALL),
-                    iconParam);
+                    _ = PInvoke.SendMessage(
+                        hwnd,
+                        PInvoke.WM_SETICON,
+                        new WPARAM((nuint)PInvoke.ICON_SMALL),
+                        iconParam);
+                }
+                finally
+                {
+                    _ = PInvoke.DestroyIcon(hIcon);
+                    iconHandle.SetHandleAsInvalid();
+                    iconHandle.Dispose();
+                }
             }
         }
 
