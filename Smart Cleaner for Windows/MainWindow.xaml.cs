@@ -881,7 +881,7 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void ApplyDiskCleanupResults(IReadOnlyCollection<DiskCleanupManager.DiskCleanupItem> items)
+    private void ApplyDiskCleanupResults(IReadOnlyCollection<DiskCleanupItem> items)
     {
         foreach (var item in _diskCleanupItems)
         {
@@ -1140,17 +1140,17 @@ public sealed partial class MainWindow : Window
     {
         private bool _isSelected;
 
-        public DiskCleanupItemViewModel(DiskCleanupManager.DiskCleanupItem item)
+        public DiskCleanupItemViewModel(DiskCleanupItem item)
         {
             Item = item;
-            if (item.CanSelect && (item.Flags.HasFlag(DiskCleanupManager.DiskCleanupFlags.RunByDefault) ||
-                                   item.Flags.HasFlag(DiskCleanupManager.DiskCleanupFlags.EnableByDefault)))
+            if (item.CanSelect && (item.Flags.HasFlag(DiskCleanupFlags.RunByDefault) ||
+                                   item.Flags.HasFlag(DiskCleanupFlags.EnableByDefault)))
             {
                 _isSelected = true;
             }
         }
 
-        internal DiskCleanupManager.DiskCleanupItem Item { get; }
+        internal DiskCleanupItem Item { get; }
 
         public string Name => Item.Name;
 

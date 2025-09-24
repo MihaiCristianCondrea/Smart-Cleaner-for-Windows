@@ -1,0 +1,23 @@
+using System.Collections.Generic;
+
+namespace Smart_Cleaner_for_Windows.Core;
+
+public sealed class DiskCleanupCleanResult
+{
+    internal DiskCleanupCleanResult(ulong freed, int successCount, IReadOnlyList<DiskCleanupFailure> failures)
+    {
+        Freed = freed;
+        SuccessCount = successCount;
+        Failures = failures;
+    }
+
+    public ulong Freed { get; }
+
+    public int SuccessCount { get; }
+
+    public IReadOnlyList<DiskCleanupFailure> Failures { get; }
+
+    public bool HasFailures => Failures.Count > 0;
+}
+
+public sealed record DiskCleanupFailure(string Name, string Message);
