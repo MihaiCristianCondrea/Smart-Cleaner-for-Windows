@@ -32,6 +32,7 @@ namespace Smart_Cleaner_for_Windows;
 public sealed partial class MainWindow
 {
     private readonly IDirectoryCleaner _directoryCleaner;
+    private readonly IDiskCleanupService _diskCleanupService;
     private CancellationTokenSource? _cts;
     private MicaController? _mica;
     private SystemBackdropConfiguration? _backdropConfig;
@@ -40,7 +41,7 @@ public sealed partial class MainWindow
     private readonly ObservableCollection<DriveUsageViewModel> _driveUsage = new();
     private readonly ObservableCollection<DiskCleanupItemViewModel> _diskCleanupItems = new();
     private CancellationTokenSource? _diskCleanupCts;
-    private readonly string _diskCleanupVolume = DiskCleanupManager.GetDefaultVolume();
+    private readonly string _diskCleanupVolume;
     private bool _isDiskCleanupOperation;
     private readonly Dictionary<string, Color> _defaultAccentColors = new();
     private readonly ResourceLoader _resources = new();
@@ -68,13 +69,20 @@ public sealed partial class MainWindow
     };
 
     public MainWindow()
-        : this(DirectoryCleaner.Default)
+        : this(DirectoryCleaner.Default, DiskCleanupServiceFactory.CreateDefault())
     {
     }
 
     public MainWindow(IDirectoryCleaner directoryCleaner)
+        : this(directoryCleaner, DiskCleanupServiceFactory.CreateDefault())
+    {
+    }
+
+    public MainWindow(IDirectoryCleaner directoryCleaner, IDiskCleanupService diskCleanupService)
     {
         _directoryCleaner = directoryCleaner ?? throw new ArgumentNullException(nameof(directoryCleaner));
+        _diskCleanupService = diskCleanupService ?? throw new ArgumentNullException(nameof(diskCleanupService));
+        _diskCleanupVolume = _diskCleanupService.GetDefaultVolume();
 
         InitializeComponent();
 
@@ -953,7 +961,7 @@ public sealed partial class MainWindow
 
         try
         {
-            var items = await DiskCleanupManager.AnalyzeAsync(_diskCleanupVolume, _diskCleanupCts.Token);
+            var items = await _diskCleanupService.AnalyzeAsync(_diskCleanupVolume, _diskCleanupCts.Token);
             ApplyDiskCleanupResults(items);
             UpdateDiskCleanupStatusSummary();
             SetActivity(Localize("ActivityDiskCleanupAnalysisComplete", "Disk cleanup analysis complete."));
@@ -1024,7 +1032,7 @@ public sealed partial class MainWindow
 
         try
         {
-            var result = await DiskCleanupManager.CleanAsync(_diskCleanupVolume, targets, _diskCleanupCts.Token);
+            var result = await _diskCleanupService.CleanAsync(_diskCleanupVolume, targets, _diskCleanupCts.Token);
 
             var severity = result.HasFailures
                 ? InfoBarSeverity.Warning
@@ -1049,7 +1057,7 @@ public sealed partial class MainWindow
             ShowDiskCleanupInfo(message, severity);
             SetActivity(Localize("ActivityDiskCleanupCompleted", "Disk cleanup completed."));
 
-            var refreshed = await DiskCleanupManager.AnalyzeAsync(_diskCleanupVolume, _diskCleanupCts.Token);
+            var refreshed = await _diskCleanupService.AnalyzeAsync(_diskCleanupVolume, _diskCleanupCts.Token);
             ApplyDiskCleanupResults(refreshed);
             UpdateDiskCleanupStatusSummary();
         }
