@@ -866,7 +866,7 @@
                                             <ListView.GroupStyle>
                                                 <GroupStyle>
                                                     <GroupStyle.HeaderTemplate>
-                                                        <DataTemplate x:DataType="local:LargeFileGroupViewModel">
+                                                        <DataTemplate x:DataType="local:MainWindow+LargeFileGroupViewModel">
                                                             <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
                                                                 <Grid.ColumnDefinitions>
                                                                     <ColumnDefinition Width="*" />
@@ -884,7 +884,7 @@
                                                 </GroupStyle>
                                             </ListView.GroupStyle>
                                             <ListView.ItemTemplate>
-                                                <DataTemplate x:DataType="local:LargeFileItemViewModel">
+                                                <DataTemplate x:DataType="local:MainWindow+LargeFileItemViewModel">
                                                     <Border Padding="16" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="12">
                                                         <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
                                                             <Grid.ColumnDefinitions>
