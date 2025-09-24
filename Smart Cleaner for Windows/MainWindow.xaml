@@ -716,13 +716,6 @@
                     x:Name="LargeFilesView"
                     HorizontalScrollBarVisibility="Disabled"
                     Visibility="Collapsed">
-                    <ScrollViewer.Resources>
-                        <CollectionViewSource
-                            x:Key="LargeFilesCollectionView"
-                            x:Name="LargeFilesCollectionView"
-                            IsSourceGrouped="True"
-                            ItemsPath="Items" />
-                    </ScrollViewer.Resources>
                     <Grid Padding="{StaticResource Padding.Page}" RowSpacing="{StaticResource Spacing.Size240}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -859,7 +852,6 @@
 
                                         <ListView
                                             x:Name="LargeFilesList"
-                                            ItemsSource="{Binding Source={StaticResource LargeFilesCollectionView}}"
                                             IsSourceGrouped="True"
                                             SelectionMode="None"
                                             IsItemClickEnabled="False">

@@ -54,6 +54,7 @@ public sealed partial class MainWindow
     private readonly ObservableCollection<DriveUsageViewModel> _driveUsage = new();
     private readonly ObservableCollection<DiskCleanupItemViewModel> _diskCleanupItems = new();
     private readonly ObservableCollection<LargeFileGroupViewModel> _largeFileGroups = new();
+    private readonly CollectionViewSource _largeFilesCollectionView = new();
     private readonly ObservableCollection<string> _largeFileExclusions = new();
     private readonly HashSet<string> _largeFileExclusionLookup = new(OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
     private CancellationTokenSource? _diskCleanupCts;
@@ -147,13 +148,13 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
         InitializeComponent();
 
+        _largeFilesCollectionView.IsSourceGrouped = true;
+        _largeFilesCollectionView.ItemsPath = new PropertyPath("Items");
+        _largeFilesCollectionView.Source = _largeFileGroups;
+        LargeFilesList.ItemsSource = _largeFilesCollectionView.View;
+
         CaptureDefaultAccentColors();
         LoadPreferences();
-
-        if (LargeFilesCollectionView is not null)
-        {
-            LargeFilesCollectionView.Source = _largeFileGroups;
-        }
 
         LargeFilesExclusionsList.ItemsSource = _largeFileExclusions;
         LoadLargeFilePreferences();
