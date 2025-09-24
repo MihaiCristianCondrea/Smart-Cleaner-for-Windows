@@ -219,12 +219,10 @@ public sealed class DirectoryCleaner : IDirectoryCleaner
         private readonly HashSet<string> _fullPathExclusions;
         private readonly string[] _patterns;
         private readonly string _root;
-        private readonly ICollection<DirectoryCleanFailure> _failures; // FIXME: The field is always assigned before being used and can be converted into a local variable
 
         public DirectoryExclusionFilter(string root, DirectoryCleanOptions options, ICollection<DirectoryCleanFailure> failures)
         {
             _root = root;
-            _failures = failures;
             _fullPathExclusions = new HashSet<string>(PathComparer);
 
             if (options.ExcludedFullPaths is { Count: > 0 })
@@ -245,7 +243,7 @@ public sealed class DirectoryCleaner : IDirectoryCleaner
                     }
                     catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException or System.Security.SecurityException)
                     {
-                        _failures.Add(new DirectoryCleanFailure(path, ex));
+                        failures.Add(new DirectoryCleanFailure(path, ex));
                     }
                 }
             }
@@ -267,7 +265,7 @@ public sealed class DirectoryCleaner : IDirectoryCleaner
                     }
                     else if (error is not null)
                     {
-                        _failures.Add(new DirectoryCleanFailure(pattern, error));
+                        failures.Add(new DirectoryCleanFailure(pattern, error));
                     }
                 }
 
