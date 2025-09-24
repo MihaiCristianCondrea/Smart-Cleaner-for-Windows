@@ -268,7 +268,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         if (!string.IsNullOrEmpty(iconPath))
         {
             var iconHandle = PInvoke.LoadImage(
-                hinst: null,
+                default,
                 iconPath,
                 GdiImageType.IMAGE_ICON,
                 0,
