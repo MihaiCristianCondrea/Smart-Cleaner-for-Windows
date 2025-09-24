@@ -35,4 +35,4 @@ public sealed record DirectoryCleanResult(
 /// </summary>
 /// <param name="Path">The path that triggered the error.</param>
 /// <param name="Exception">The captured exception.</param>
-public sealed record DirectoryCleanFailure(string Path, Exception Exception);
+public sealed record DirectoryCleanFailure(string Path, Exception Exception); // FIXME: Positional property 'Smart_Cleaner_for_Windows.Core.DirectoryCleanFailure.Path' is never accessed (except in implicit Equals/ToString implementations) && Positional property 'Smart_Cleaner_for_Windows.Core.DirectoryCleanFailure.Exception' is never accessed (except in implicit Equals/ToString implementations)

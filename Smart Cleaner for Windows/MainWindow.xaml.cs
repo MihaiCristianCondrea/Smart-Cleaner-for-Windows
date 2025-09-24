@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Globalization;
 using Microsoft.UI;
-using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -25,7 +24,7 @@ using System.Security.Principal;
 
 namespace Smart_Cleaner_for_Windows;
 
-public sealed partial class MainWindow : Window
+public sealed partial class MainWindow
 {
     private readonly IDirectoryCleaner _directoryCleaner;
     private CancellationTokenSource? _cts;
@@ -126,7 +125,7 @@ public sealed partial class MainWindow : Window
         };
 
         _mica = new MicaController { Kind = MicaKind.Base };
-        _mica.AddSystemBackdropTarget(this.As<global::Microsoft.UI.Composition.ICompositionSupportsSystemBackdrop>());
+        _mica.AddSystemBackdropTarget(this.As<Microsoft.UI.Composition.ICompositionSupportsSystemBackdrop>());
         _mica.SetSystemBackdropConfiguration(_backdropConfig);
     }
 

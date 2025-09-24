@@ -2,7 +2,7 @@ using Microsoft.UI.Xaml;
 
 namespace Smart_Cleaner_for_Windows;
 
-public partial class App : Application
+public partial class App
 {
     private Window? _window;
 

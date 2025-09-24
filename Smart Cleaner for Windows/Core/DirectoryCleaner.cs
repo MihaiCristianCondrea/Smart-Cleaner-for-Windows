@@ -219,7 +219,7 @@ public sealed class DirectoryCleaner : IDirectoryCleaner
         private readonly HashSet<string> _fullPathExclusions;
         private readonly string[] _patterns;
         private readonly string _root;
-        private readonly ICollection<DirectoryCleanFailure> _failures;
+        private readonly ICollection<DirectoryCleanFailure> _failures; // FIXME: The field is always assigned before being used and can be converted into a local variable
 
         public DirectoryExclusionFilter(string root, DirectoryCleanOptions options, ICollection<DirectoryCleanFailure> failures)
         {
