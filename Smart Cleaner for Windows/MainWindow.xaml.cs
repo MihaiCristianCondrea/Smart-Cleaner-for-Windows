@@ -19,6 +19,7 @@ using Microsoft.UI.Xaml.Hosting;
 using Microsoft.Windows.ApplicationModel.Resources;
 using Smart_Cleaner_for_Windows.Core;
 using Smart_Cleaner_for_Windows.Core.DiskCleanup;
+using Smart_Cleaner_for_Windows.Core.Storage;
 using Windows.Graphics;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -39,6 +40,7 @@ public sealed partial class MainWindow
 {
     private readonly IDirectoryCleaner _directoryCleaner;
     private readonly IDiskCleanupService _diskCleanupService;
+    private readonly IStorageOverviewService _storageOverviewService;
     private CancellationTokenSource? _cts;
     private MicaController? _mica;
     private SystemBackdropConfiguration? _backdropConfig;
@@ -48,6 +50,7 @@ public sealed partial class MainWindow
     private readonly ObservableCollection<DiskCleanupItemViewModel> _diskCleanupItems = new();
     private CancellationTokenSource? _diskCleanupCts;
     private readonly string _diskCleanupVolume;
+    private CancellationTokenSource? _storageOverviewCts;
     private bool _isDiskCleanupOperation;
     private readonly Dictionary<string, Color> _defaultAccentColors = new();
     private readonly ResourceLoader _resources = new();
@@ -89,19 +92,28 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     };
 
     public MainWindow()
-        : this(DirectoryCleaner.Default, DiskCleanupServiceFactory.CreateDefault())
+        : this(DirectoryCleaner.Default, DiskCleanupServiceFactory.CreateDefault(), new StorageOverviewService())
     {
     }
 
     public MainWindow(IDirectoryCleaner directoryCleaner)
-        : this(directoryCleaner, DiskCleanupServiceFactory.CreateDefault())
+        : this(directoryCleaner, DiskCleanupServiceFactory.CreateDefault(), new StorageOverviewService())
     {
     }
 
     public MainWindow(IDirectoryCleaner directoryCleaner, IDiskCleanupService diskCleanupService)
+        : this(directoryCleaner, diskCleanupService, new StorageOverviewService())
+    {
+    }
+
+    public MainWindow(
+        IDirectoryCleaner directoryCleaner,
+        IDiskCleanupService diskCleanupService,
+        IStorageOverviewService storageOverviewService)
     {
         _directoryCleaner = directoryCleaner ?? throw new ArgumentNullException(nameof(directoryCleaner));
         _diskCleanupService = diskCleanupService ?? throw new ArgumentNullException(nameof(diskCleanupService));
+        _storageOverviewService = storageOverviewService ?? throw new ArgumentNullException(nameof(storageOverviewService));
         _diskCleanupVolume = _diskCleanupService.GetDefaultVolume();
 
         InitializeComponent();
@@ -110,7 +122,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         LoadPreferences();
 
         DriveUsageList.ItemsSource = _driveUsage;
-        UpdateStorageOverview();
+        _ = UpdateStorageOverviewAsync();
 
         if (Application.Current.Resources.TryGetValue("AccentButtonStyle", out var accentStyleObj) &&
             accentStyleObj is Style accentStyle)
@@ -160,6 +172,9 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         _diskCleanupCts?.Cancel();
         _diskCleanupCts?.Dispose();
         _diskCleanupCts = null;
+        _storageOverviewCts?.Cancel();
+        _storageOverviewCts?.Dispose();
+        _storageOverviewCts = null;
     }
 
     private void TryEnableMica()
@@ -416,7 +431,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
         if (Equals(target, DashboardItem))
         {
-            UpdateStorageOverview();
+            _ = UpdateStorageOverviewAsync();
         }
     }
 
@@ -461,21 +476,35 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         visual.StartAnimation("Translation", translationAnimation);
     }
 
-    private void UpdateStorageOverview()
+    private async Task UpdateStorageOverviewAsync()
     {
+        _storageOverviewCts?.Cancel();
+        _storageOverviewCts?.Dispose();
+
+        var cts = new CancellationTokenSource();
+        _storageOverviewCts = cts;
+
         try
         {
-            var drives = DriveInfo.GetDrives()
-                .Where(d => d.IsReady && d.TotalSize > 0)
-                .OrderBy(d => d.Name, StringComparer.OrdinalIgnoreCase)
-                .ToList();
+            var result = await _storageOverviewService.GetDriveUsageAsync(cts.Token);
+            if (cts.IsCancellationRequested)
+            {
+                return;
+            }
 
             _driveUsage.Clear();
 
-            if (drives.Count == 0)
+            if (result.ReadyDriveCount == 0)
             {
                 StorageSummaryText.Text = "No ready drives detected.";
                 StorageTipText.Text = "Connect or unlock a drive to view usage details.";
+                return;
+            }
+
+            if (result.Drives.Count == 0)
+            {
+                StorageSummaryText.Text = "No accessible drives detected.";
+                StorageTipText.Text = "We couldn't read your drive information. Try running the app with higher permissions.";
                 return;
             }
 
@@ -483,67 +512,42 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             ulong totalFree = 0;
             DriveUsageViewModel? busiestDrive = null;
 
-            foreach (var drive in drives)
+            foreach (var drive in result.Drives)
             {
-                try
+                var capacityValue = drive.TotalSize;
+                var freeValue = drive.FreeSpace;
+                if (freeValue > capacityValue)
                 {
-                    var capacity = drive.TotalSize;
-                    if (capacity <= 0)
-                    {
-                        continue;
-                    }
-
-                    var freeSpace = drive.TotalFreeSpace;
-                    var capacityValue = (ulong)capacity;
-                    var freeValue = freeSpace <= 0 ? 0UL : (ulong)freeSpace;
-                    if (freeValue > capacityValue)
-                    {
-                        freeValue = capacityValue;
-                    }
-
-                    totalCapacity += capacityValue;
-                    totalFree += freeValue;
-
-                    var usedValue = capacityValue - freeValue;
-                    var usedPercentage = capacityValue == 0
-                        ? 0
-                        : (double)usedValue / capacityValue * 100;
-
-                    var displayName = GetDriveDisplayName(drive);
-                    var details = string.Format(
-                        CultureInfo.CurrentCulture,
-                        "{0} free of {1}",
-                        FormatBytes(freeValue),
-                        FormatBytes(capacityValue));
-                    var usageSummary = string.Format(
-                        CultureInfo.CurrentCulture,
-                        "{0:0}% used ({1})",
-                        usedPercentage,
-                        FormatBytes(usedValue));
-
-                    var viewModel = new DriveUsageViewModel(displayName, details, usedPercentage, usageSummary);
-                    _driveUsage.Add(viewModel);
-
-                    if (busiestDrive is null || viewModel.UsedPercentage > busiestDrive.UsedPercentage)
-                    {
-                        busiestDrive = viewModel;
-                    }
+                    freeValue = capacityValue;
                 }
-                catch (IOException)
+
+                totalCapacity += capacityValue;
+                totalFree += freeValue;
+
+                var usedValue = capacityValue - freeValue;
+                var usedPercentage = capacityValue == 0
+                    ? 0
+                    : (double)usedValue / capacityValue * 100;
+
+                var displayName = GetDriveDisplayName(drive);
+                var details = string.Format(
+                    CultureInfo.CurrentCulture,
+                    "{0} free of {1}",
+                    FormatBytes(freeValue),
+                    FormatBytes(capacityValue));
+                var usageSummary = string.Format(
+                    CultureInfo.CurrentCulture,
+                    "{0:0}% used ({1})",
+                    usedPercentage,
+                    FormatBytes(usedValue));
+
+                var viewModel = new DriveUsageViewModel(displayName, details, usedPercentage, usageSummary);
+                _driveUsage.Add(viewModel);
+
+                if (busiestDrive is null || viewModel.UsedPercentage > busiestDrive.UsedPercentage)
                 {
-                    continue;
+                    busiestDrive = viewModel;
                 }
-                catch (UnauthorizedAccessException)
-                {
-                    continue;
-                }
-            }
-
-            if (_driveUsage.Count == 0)
-            {
-                StorageSummaryText.Text = "No accessible drives detected.";
-                StorageTipText.Text = "We couldn't read your drive information. Try running the app with higher permissions.";
-                return;
             }
 
             var driveLabel = _driveUsage.Count == 1 ? "drive" : "drives";
@@ -564,15 +568,28 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 StorageTipText.Text = "Storage tips will appear once drives are detected.";
             }
         }
+        catch (OperationCanceledException)
+        {
+            // Swallow cancellations when refreshing the storage overview.
+        }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             _driveUsage.Clear();
             StorageSummaryText.Text = "Storage overview is unavailable.";
             StorageTipText.Text = "We couldn't access drive information. Try again later or adjust your permissions.";
         }
+        finally
+        {
+            if (ReferenceEquals(_storageOverviewCts, cts))
+            {
+                _storageOverviewCts = null;
+            }
+
+            cts.Dispose();
+        }
     }
 
-    private static string GetDriveDisplayName(DriveInfo drive)
+    private static string GetDriveDisplayName(StorageDriveInfo drive)
     {
         var name = drive.Name.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         var label = drive.VolumeLabel;
