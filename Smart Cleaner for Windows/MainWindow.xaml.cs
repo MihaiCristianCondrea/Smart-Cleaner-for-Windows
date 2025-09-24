@@ -839,7 +839,7 @@ public sealed partial class MainWindow
 
     private Brush GetStatusHeroBrush(Symbol symbol) => symbol switch
     {
-        Symbol.Accept or Symbol.CheckMarkLegacy => GetBrushResource("Brush.Hero.Positive", "Brush.Hero.Neutral"),
+        Symbol.Accept => GetBrushResource("Brush.Hero.Positive", "Brush.Hero.Neutral"),
         Symbol.Sync or Symbol.Delete => GetBrushResource("Brush.Hero.Warning", "Brush.Hero.Neutral"),
         Symbol.Important or Symbol.Cancel => GetBrushResource("Brush.Hero.Critical", "Brush.Hero.Neutral"),
         _ => GetBrushResource("Brush.Hero.Neutral"),
@@ -847,7 +847,7 @@ public sealed partial class MainWindow
 
     private Brush GetStatusGlyphBrush(Symbol symbol) => symbol switch
     {
-        Symbol.Accept or Symbol.CheckMarkLegacy => GetBrushResource("Brush.SharedPositive", "Brush.BrandPrimary"),
+        Symbol.Accept => GetBrushResource("Brush.SharedPositive", "Brush.BrandPrimary"),
         Symbol.Sync or Symbol.Delete => GetBrushResource("Brush.SharedCaution", "Brush.BrandSecondary"),
         Symbol.Important or Symbol.Cancel => GetBrushResource("Brush.SharedCritical", "Brush.BrandSecondary"),
         _ => GetBrushResource("Brush.BrandSecondary"),
