@@ -11,6 +11,21 @@
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
     <Nullable>enable</Nullable>
+    <DefaultLanguage>en-US</DefaultLanguage>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <WindowsAppSdkChannel Condition="'$(WindowsAppSdkChannel)'==''">stable</WindowsAppSdkChannel>
+    <WindowsAppSdkStableVersion>1.8.250916003</WindowsAppSdkStableVersion>
+    <WindowsAppSdkPreviewVersion>1.8.250814004-preview</WindowsAppSdkPreviewVersion>
+    <WindowsAppSdkExperimentalVersion>1.8.250610002-experimental3</WindowsAppSdkExperimentalVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <WindowsAppSdkPackageVersion Condition="'$(WindowsAppSdkChannel)'=='stable'">$(WindowsAppSdkStableVersion)</WindowsAppSdkPackageVersion>
+    <WindowsAppSdkPackageVersion Condition="'$(WindowsAppSdkChannel)'=='preview'">$(WindowsAppSdkPreviewVersion)</WindowsAppSdkPackageVersion>
+    <WindowsAppSdkPackageVersion Condition="'$(WindowsAppSdkChannel)'=='experimental'">$(WindowsAppSdkExperimentalVersion)</WindowsAppSdkPackageVersion>
+    <WindowsAppSdkPackageVersion Condition="'$(WindowsAppSdkPackageVersion)'==''">$(WindowsAppSdkStableVersion)</WindowsAppSdkPackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -37,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4948" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.250916003" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="$(WindowsAppSdkPackageVersion)" />
   </ItemGroup>
 
   <!--

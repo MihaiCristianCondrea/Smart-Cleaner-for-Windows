@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="StatusReadyTitle" xml:space="preserve">
+    <value>Ready when you are</value>
+  </data>
+  <data name="StatusReadyDescription" xml:space="preserve">
+    <value>Select a folder to begin.</value>
+  </data>
+  <data name="ActivityIdle" xml:space="preserve">
+    <value>Waiting for the next action.</value>
+  </data>
+  <data name="ResultsPlaceholder" xml:space="preserve">
+    <value>Preview results will appear here once you run a scan.</value>
+  </data>
+  <data name="ResultsAvailable" xml:space="preserve">
+    <value>Review the folders below before cleaning.</value>
+  </data>
+  <data name="DiskCleanupStatusReady" xml:space="preserve">
+    <value>Ready to analyze disk cleanup handlers for {0}.</value>
+  </data>
+  <data name="DiskCleanupIntro" xml:space="preserve">
+    <value>Analyze Windows cleanup handlers. Some categories require Administrator privileges.</value>
+  </data>
+  <data name="StatusFolderSelectedTitle" xml:space="preserve">
+    <value>Folder selected</value>
+  </data>
+  <data name="StatusFolderSelectedDescription" xml:space="preserve">
+    <value>Run Preview to identify empty directories.</value>
+  </data>
+  <data name="ActivityReadyToScan" xml:space="preserve">
+    <value>Ready to scan the selected folder.</value>
+  </data>
+  <data name="InfoSelectValidFolder" xml:space="preserve">
+    <value>Select a valid folder.</value>
+  </data>
+  <data name="StatusSelectValidFolderTitle" xml:space="preserve">
+    <value>Select a valid folder</value>
+  </data>
+  <data name="StatusSelectValidFolderDescription" xml:space="preserve">
+    <value>Choose a folder before scanning.</value>
+  </data>
+  <data name="ResultsNeedValidFolder" xml:space="preserve">
+    <value>Select a valid folder to run a scan.</value>
+  </data>
+  <data name="ActivityWaitingForValidFolder" xml:space="preserve">
+    <value>Waiting for a valid folder.</value>
+  </data>
+  <data name="ActivityScanning" xml:space="preserve">
+    <value>Scanning for empty folders…</value>
+  </data>
+  <data name="StatusScanningTitle" xml:space="preserve">
+    <value>Scanning in progress…</value>
+  </data>
+  <data name="StatusScanningDescription" xml:space="preserve">
+    <value>Looking for empty folders. You can cancel the scan if needed.</value>
+  </data>
+  <data name="ResultsScanning" xml:space="preserve">
+    <value>Scanning for empty folders…</value>
+  </data>
+  <data name="ResultsMissingDueToAccess" xml:space="preserve">
+    <value>Some folders might be missing from the preview due to access issues.</value>
+  </data>
+  <data name="ResultsReadyToReview" xml:space="preserve">
+    <value>Review the folders below before cleaning.</value>
+  </data>
+  <data name="ResultsNoneDetected" xml:space="preserve">
+    <value>No empty folders were detected for this location.</value>
+  </data>
+  <data name="InfoFoundEmptyFolders" xml:space="preserve">
+    <value>Found {0} empty folder(s).</value>
+  </data>
+  <data name="InfoEncounteredIssues" xml:space="preserve">
+    <value>Encountered {0} issue(s).</value>
+  </data>
+  <data name="InfoAdditionalIssues" xml:space="preserve">
+    <value>…and {0} more.</value>
+  </data>
+  <data name="StatusScanWarningsTitle" xml:space="preserve">
+    <value>Scan completed with warnings</value>
+  </data>
+  <data name="StatusFoundEmptyFoldersTitle" xml:space="preserve">
+    <value>Found {0} empty folder(s)</value>
+  </data>
+  <data name="StatusNoEmptyFoldersTitle" xml:space="preserve">
+    <value>No empty folders detected</value>
+  </data>
+  <data name="StatusScanWarningsDescription" xml:space="preserve">
+    <value>Some items could not be analyzed. Review the message below.</value>
+  </data>
+  <data name="StatusScanHasResultsDescription" xml:space="preserve">
+    <value>Review the folders list below before cleaning.</value>
+  </data>
+  <data name="StatusScanCleanDescription" xml:space="preserve">
+    <value>Everything looks tidy. Try adjusting filters if you expected more.</value>
+  </data>
+  <data name="ActivityScanComplete" xml:space="preserve">
+    <value>Scan complete.</value>
+  </data>
+  <data name="ActivityScanCancelled" xml:space="preserve">
+    <value>Scan cancelled.</value>
+  </data>
+  <data name="StatusScanCancelledTitle" xml:space="preserve">
+    <value>Scan cancelled</value>
+  </data>
+  <data name="StatusScanCancelledDescription" xml:space="preserve">
+    <value>Preview was cancelled. Adjust settings or try again.</value>
+  </data>
+  <data name="ResultsScanCancelled" xml:space="preserve">
+    <value>Preview was cancelled. Run Preview to refresh the list.</value>
+  </data>
+  <data name="InfoPreviewCancelled" xml:space="preserve">
+    <value>Preview cancelled.</value>
+  </data>
+  <data name="ActivitySomethingWentWrong" xml:space="preserve">
+    <value>Something went wrong.</value>
+  </data>
+  <data name="StatusScanFailedTitle" xml:space="preserve">
+    <value>Scan failed</value>
+  </data>
+  <data name="StatusScanFailedDescription" xml:space="preserve">
+    <value>An unexpected error occurred. Review the message below.</value>
+  </data>
+  <data name="ResultsScanFailed" xml:space="preserve">
+    <value>The scan failed. Review the message above and try again.</value>
+  </data>
+  <data name="StatusSelectValidFolderForCleaningDescription" xml:space="preserve">
+    <value>Choose a folder before cleaning.</value>
+  </data>
+  <data name="ResultsNeedValidFolderForCleaning" xml:space="preserve">
+    <value>Select a valid folder before cleaning.</value>
+  </data>
+  <data name="ActivityCleaning" xml:space="preserve">
+    <value>Cleaning empty folders…</value>
+  </data>
+  <data name="StatusCleaningTitle" xml:space="preserve">
+    <value>Cleaning in progress…</value>
+  </data>
+  <data name="StatusCleaningDescription" xml:space="preserve">
+    <value>Removing empty folders safely. You can cancel the operation if needed.</value>
+  </data>
+  <data name="ResultsCleaningProgressWithPreview" xml:space="preserve">
+    <value>Cleaning in progress. We'll refresh the preview afterwards.</value>
+  </data>
+  <data name="ResultsCleaningProgress" xml:space="preserve">
+    <value>Cleaning in progress…</value>
+  </data>
+  <data name="InfoNoEmptyFoldersDetected" xml:space="preserve">
+    <value>No empty folders detected.</value>
+  </data>
+  <data name="InfoDeletedFolders" xml:space="preserve">
+    <value>Deleted {0} folder(s).</value>
+  </data>
+  <data name="InfoItemsNotRemoved" xml:space="preserve">
+    <value>{0} item(s) could not be removed.</value>
+  </data>
+  <data name="StatusCleanWarningsTitle" xml:space="preserve">
+    <value>Clean completed with warnings</value>
+  </data>
+  <data name="StatusCleanPartialTitle" xml:space="preserve">
+    <value>Some folders could not be removed</value>
+  </data>
+  <data name="StatusCleanRemovedTitle" xml:space="preserve">
+    <value>Removed {0} folder(s)</value>
+  </data>
+  <data name="StatusCleanWarningsDescription" xml:space="preserve">
+    <value>Some folders could not be removed. Review the message below.</value>
+  </data>
+  <data name="StatusCleanNoResultsDescription" xml:space="preserve">
+    <value>Run Preview to check another location.</value>
+  </data>
+  <data name="StatusCleanPartialDescription" xml:space="preserve">
+    <value>Some items remain because they could not be deleted.</value>
+  </data>
+  <data name="StatusCleanSuccessDescription" xml:space="preserve">
+    <value>Your workspace is tidier. Run Preview again to double-check.</value>
+  </data>
+  <data name="ActivityCleanComplete" xml:space="preserve">
+    <value>Clean complete.</value>
+  </data>
+  <data name="ResultsCleanCompleted" xml:space="preserve">
+    <value>Clean completed. Run Preview again to scan another location.</value>
+  </data>
+  <data name="ResultsCleanNoRemovals" xml:space="preserve">
+    <value>No empty folders were removed. Run Preview to check again.</value>
+  </data>
+  <data name="ActivityCleanCancelled" xml:space="preserve">
+    <value>Clean cancelled.</value>
+  </data>
+  <data name="StatusCleanCancelledTitle" xml:space="preserve">
+    <value>Clean cancelled</value>
+  </data>
+  <data name="StatusCleanCancelledDescription" xml:space="preserve">
+    <value>Deletion was cancelled. Preview again when you're ready.</value>
+  </data>
+  <data name="ResultsCleanCancelled" xml:space="preserve">
+    <value>Clean cancelled. Run Preview to refresh the list.</value>
+  </data>
+  <data name="InfoDeletionCancelled" xml:space="preserve">
+    <value>Deletion cancelled.</value>
+  </data>
+  <data name="ActivityPermissionRequired" xml:space="preserve">
+    <value>Permission required.</value>
+  </data>
+  <data name="StatusAccessDeniedTitle" xml:space="preserve">
+    <value>Access denied</value>
+  </data>
+  <data name="StatusAccessDeniedDescription" xml:space="preserve">
+    <value>Run the app as Administrator to remove protected folders.</value>
+  </data>
+  <data name="ResultsAccessDenied" xml:space="preserve">
+    <value>Some folders could not be removed due to permissions.</value>
+  </data>
+  <data name="InfoAccessDenied" xml:space="preserve">
+    <value>Access denied. Try running as Administrator.</value>
+  </data>
+  <data name="StatusCleanFailedTitle" xml:space="preserve">
+    <value>Clean failed</value>
+  </data>
+  <data name="StatusCleanFailedDescription" xml:space="preserve">
+    <value>An unexpected error occurred. Review the message below.</value>
+  </data>
+  <data name="ResultsCleanFailed" xml:space="preserve">
+    <value>Cleaning failed. Review the details and try again.</value>
+  </data>
+  <data name="ActivityCancelling" xml:space="preserve">
+    <value>Cancelling current operation…</value>
+  </data>
+  <data name="DiskCleanupInfoFinishAnalysis" xml:space="preserve">
+    <value>Finish the current operation before analyzing disk cleanup.</value>
+  </data>
+  <data name="ActivityDiskCleanupAnalyzing" xml:space="preserve">
+    <value>Analyzing disk cleanup handlers…</value>
+  </data>
+  <data name="ActivityDiskCleanupAnalysisComplete" xml:space="preserve">
+    <value>Disk cleanup analysis complete.</value>
+  </data>
+  <data name="InfoDiskCleanupAnalyzed" xml:space="preserve">
+    <value>Analyzed {0} handler(s).</value>
+  </data>
+  <data name="InfoDiskCleanupAnalysisCancelled" xml:space="preserve">
+    <value>Disk cleanup analysis cancelled.</value>
+  </data>
+  <data name="ActivityDiskCleanupAnalysisCancelled" xml:space="preserve">
+    <value>Disk cleanup analysis cancelled.</value>
+  </data>
+  <data name="InfoDiskCleanupAnalysisFailed" xml:space="preserve">
+    <value>Disk cleanup analysis failed: {0}</value>
+  </data>
+  <data name="ActivityDiskCleanupAnalysisFailed" xml:space="preserve">
+    <value>Disk cleanup analysis failed.</value>
+  </data>
+  <data name="DiskCleanupInfoFinishCleaning" xml:space="preserve">
+    <value>Finish the current operation before cleaning disk handlers.</value>
+  </data>
+  <data name="DiskCleanupInfoSelectCategory" xml:space="preserve">
+    <value>Select at least one category to clean.</value>
+  </data>
+  <data name="ActivityDiskCleanupRunning" xml:space="preserve">
+    <value>Running disk cleanup handlers…</value>
+  </data>
+  <data name="InfoDiskCleanupCleaned" xml:space="preserve">
+    <value>Cleaned {0} handler(s) and freed {1}.</value>
+  </data>
+  <data name="InfoDiskCleanupNoChanges" xml:space="preserve">
+    <value>No disk cleanup handlers reported any changes.</value>
+  </data>
+  <data name="ActivityDiskCleanupCompleted" xml:space="preserve">
+    <value>Disk cleanup completed.</value>
+  </data>
+  <data name="InfoDiskCleanupCancelled" xml:space="preserve">
+    <value>Disk cleanup cancelled.</value>
+  </data>
+  <data name="ActivityDiskCleanupCancelled" xml:space="preserve">
+    <value>Disk cleanup cancelled.</value>
+  </data>
+  <data name="InfoDiskCleanupFailed" xml:space="preserve">
+    <value>Disk cleanup failed: {0}</value>
+  </data>
+  <data name="ActivityDiskCleanupFailed" xml:space="preserve">
+    <value>Disk cleanup failed.</value>
+  </data>
+  <data name="DiskCleanupStatusNoData" xml:space="preserve">
+    <value>No Disk Cleanup handlers reported data for {0}. Try running as Administrator.</value>
+  </data>
+  <data name="DiskCleanupStatusNoSpace" xml:space="preserve">
+    <value>No reclaimable space detected on {0}.</value>
+  </data>
+  <data name="DiskCleanupCategorySingular" xml:space="preserve">
+    <value>category</value>
+  </data>
+  <data name="DiskCleanupCategoryPlural" xml:space="preserve">
+    <value>categories</value>
+  </data>
+  <data name="DiskCleanupStatusPotential" xml:space="preserve">
+    <value>Potential savings: {0} across {1} {2} on {3}.</value>
+  </data>
+  <data name="DiskCleanupStatusNeedsElevation" xml:space="preserve">
+    <value>Some handlers require Administrator privileges.</value>
+  </data>
+  <data name="DiskCleanupStatusHasIssues" xml:space="preserve">
+    <value>Some handlers reported issues.</value>
+  </data>
+</root>

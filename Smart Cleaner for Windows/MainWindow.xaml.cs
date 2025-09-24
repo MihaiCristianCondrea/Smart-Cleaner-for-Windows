@@ -16,6 +16,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Hosting;
+using Microsoft.Windows.ApplicationModel.Resources;
 using Smart_Cleaner_for_Windows.Core;
 using Windows.Graphics;
 using Windows.Storage.Pickers;
@@ -41,6 +42,7 @@ public sealed partial class MainWindow
     private readonly string _diskCleanupVolume = DiskCleanupManager.GetDefaultVolume();
     private bool _isDiskCleanupOperation;
     private readonly Dictionary<string, Color> _defaultAccentColors = new();
+    private readonly ResourceLoader _resources = new();
     private static readonly string[] AccentResourceKeys = new[]
     {
         "SystemAccentColor",
@@ -75,15 +77,23 @@ public sealed partial class MainWindow
             DiskCleanupCleanBtn.Style = accentStyle;
         }
 
-        SetStatus(Symbol.Folder, "Ready when you are", "Select a folder to begin.");
-        SetActivity("Waiting for the next action.");
-        UpdateResultsSummary(0, "Preview results will appear here once you run a scan.");
+        SetStatus(
+            Symbol.Folder,
+            Localize("StatusReadyTitle", "Ready when you are"),
+            Localize("StatusReadyDescription", "Select a folder to begin."));
+        SetActivity(Localize("ActivityIdle", "Waiting for the next action."));
+        UpdateResultsSummary(0, Localize("ResultsPlaceholder", "Preview results will appear here once you run a scan."));
 
         DiskCleanupList.ItemsSource = _diskCleanupItems;
-        DiskCleanupStatusText.Text = $"Ready to analyze disk cleanup handlers for {_diskCleanupVolume}.";
+        DiskCleanupStatusText.Text = LocalizeFormat(
+            "DiskCleanupStatusReady",
+            "Ready to analyze disk cleanup handlers for {0}.",
+            _diskCleanupVolume);
         if (!IsAdministrator())
         {
-            DiskCleanupIntro.Text = "Analyze Windows cleanup handlers. Some categories require Administrator privileges.";
+            DiskCleanupIntro.Text = Localize(
+                "DiskCleanupIntro",
+                "Analyze Windows cleanup handlers. Some categories require Administrator privileges.");
         }
         UpdateDiskCleanupActionState();
 
@@ -467,9 +477,12 @@ public sealed partial class MainWindow
         {
             RootPathBox.Text = folder.Path;
             DeleteBtn.IsEnabled = !_isBusy && _previewCandidates.Count > 0;
-            SetStatus(Symbol.Folder, "Folder selected", "Run Preview to identify empty directories.");
-            SetActivity("Ready to scan the selected folder.");
-            UpdateResultsSummary(0, "Preview results will appear here once you run a scan.");
+            SetStatus(
+                Symbol.Folder,
+                Localize("StatusFolderSelectedTitle", "Folder selected"),
+                Localize("StatusFolderSelectedDescription", "Run Preview to identify empty directories."));
+            SetActivity(Localize("ActivityReadyToScan", "Ready to scan the selected folder."));
+            UpdateResultsSummary(0, Localize("ResultsPlaceholder", "Preview results will appear here once you run a scan."));
         }
     }
 
@@ -483,7 +496,7 @@ public sealed partial class MainWindow
         _previewCandidates.Clear();
         Candidates.ItemsSource = null;
         DeleteBtn.IsEnabled = false;
-        UpdateResultsSummary(0, "Preview results will appear here once you run a scan.");
+        UpdateResultsSummary(0, Localize("ResultsPlaceholder", "Preview results will appear here once you run a scan."));
     }
 
     private async void OnPreview(object sender, RoutedEventArgs e)
@@ -491,10 +504,13 @@ public sealed partial class MainWindow
         Info.IsOpen = false;
         if (!TryGetRootPath(out var root))
         {
-            ShowInfo("Select a valid folder.", InfoBarSeverity.Warning);
-            SetStatus(Symbol.Important, "Select a valid folder", "Choose a folder before scanning.");
-            UpdateResultsSummary(0, "Select a valid folder to run a scan.");
-            SetActivity("Waiting for a valid folder.");
+            ShowInfo(Localize("InfoSelectValidFolder", "Select a valid folder."), InfoBarSeverity.Warning);
+            SetStatus(
+                Symbol.Important,
+                Localize("StatusSelectValidFolderTitle", "Select a valid folder"),
+                Localize("StatusSelectValidFolderDescription", "Choose a folder before scanning."));
+            UpdateResultsSummary(0, Localize("ResultsNeedValidFolder", "Select a valid folder to run a scan."));
+            SetActivity(Localize("ActivityWaitingForValidFolder", "Waiting for a valid folder."));
             return;
         }
 
@@ -505,9 +521,12 @@ public sealed partial class MainWindow
         DeleteBtn.IsEnabled = false;
 
         SetBusy(true);
-        SetActivity("Scanning for empty folders…");
-        SetStatus(Symbol.Sync, "Scanning in progress…", "Looking for empty folders. You can cancel the scan if needed.");
-        UpdateResultsSummary(0, "Scanning for empty folders…");
+        SetActivity(Localize("ActivityScanning", "Scanning for empty folders…"));
+        SetStatus(
+            Symbol.Sync,
+            Localize("StatusScanningTitle", "Scanning in progress…"),
+            Localize("StatusScanningDescription", "Looking for empty folders. You can cancel the scan if needed."));
+        UpdateResultsSummary(0, Localize("ResultsScanning", "Scanning for empty folders…"));
 
         try
         {
@@ -520,17 +539,17 @@ public sealed partial class MainWindow
 
             var hasResults = result.EmptyFound > 0;
             var resultsMessage = result.HasFailures
-                ? "Some folders might be missing from the preview due to access issues."
+                ? Localize("ResultsMissingDueToAccess", "Some folders might be missing from the preview due to access issues.")
                 : hasResults
-                    ? "Review the folders below before cleaning."
-                    : "No empty folders were detected for this location.";
+                    ? Localize("ResultsReadyToReview", "Review the folders below before cleaning.")
+                    : Localize("ResultsNoneDetected", "No empty folders were detected for this location.");
             UpdateResultsSummary(result.EmptyFound, resultsMessage);
 
-            var message = $"Found {result.EmptyFound} empty folder(s).";
+            var message = LocalizeFormat("InfoFoundEmptyFolders", "Found {0} empty folder(s).", result.EmptyFound);
             var severity = InfoBarSeverity.Informational;
             if (result.HasFailures)
             {
-                message += $" Encountered {result.Failures.Count} issue(s).";
+                message += " " + LocalizeFormat("InfoEncounteredIssues", "Encountered {0} issue(s).", result.Failures.Count);
                 var failureSummaries = result.Failures
                     .Take(3)
                     .Select(f => $"• {f.Path}: {f.Exception.Message}");
@@ -539,22 +558,25 @@ public sealed partial class MainWindow
 
                 if (result.Failures.Count > 3)
                 {
-                    message += Environment.NewLine + $"…and {result.Failures.Count - 3} more.";
+                    message += Environment.NewLine + LocalizeFormat(
+                        "InfoAdditionalIssues",
+                        "…and {0} more.",
+                        result.Failures.Count - 3);
                 }
 
                 severity = InfoBarSeverity.Warning;
             }
 
             var statusTitle = result.HasFailures
-                ? "Scan completed with warnings"
+                ? Localize("StatusScanWarningsTitle", "Scan completed with warnings")
                 : hasResults
-                    ? $"Found {result.EmptyFound} empty folder(s)"
-                    : "No empty folders detected";
+                    ? LocalizeFormat("StatusFoundEmptyFoldersTitle", "Found {0} empty folder(s)", result.EmptyFound)
+                    : Localize("StatusNoEmptyFoldersTitle", "No empty folders detected");
             var statusDescription = result.HasFailures
-                ? "Some items could not be analyzed. Review the message below."
+                ? Localize("StatusScanWarningsDescription", "Some items could not be analyzed. Review the message below.")
                 : hasResults
-                    ? "Review the folders list below before cleaning."
-                    : "Everything looks tidy. Try adjusting filters if you expected more.";
+                    ? Localize("StatusScanHasResultsDescription", "Review the folders list below before cleaning.")
+                    : Localize("StatusScanCleanDescription", "Everything looks tidy. Try adjusting filters if you expected more.");
             var statusSymbol = result.HasFailures
                 ? Symbol.Important
                 : hasResults
@@ -563,22 +585,28 @@ public sealed partial class MainWindow
             int? badgeValue = hasResults ? result.EmptyFound : null;
 
             SetStatus(statusSymbol, statusTitle, statusDescription, badgeValue);
-            SetActivity("Scan complete.");
+            SetActivity(Localize("ActivityScanComplete", "Scan complete."));
 
             ShowInfo(message, severity);
         }
         catch (OperationCanceledException)
         {
-            SetActivity("Scan cancelled.");
-            SetStatus(Symbol.Cancel, "Scan cancelled", "Preview was cancelled. Adjust settings or try again.");
-            UpdateResultsSummary(0, "Preview was cancelled. Run Preview to refresh the list.");
-            ShowInfo("Preview cancelled.", InfoBarSeverity.Informational);
+            SetActivity(Localize("ActivityScanCancelled", "Scan cancelled."));
+            SetStatus(
+                Symbol.Cancel,
+                Localize("StatusScanCancelledTitle", "Scan cancelled"),
+                Localize("StatusScanCancelledDescription", "Preview was cancelled. Adjust settings or try again."));
+            UpdateResultsSummary(0, Localize("ResultsScanCancelled", "Preview was cancelled. Run Preview to refresh the list."));
+            ShowInfo(Localize("InfoPreviewCancelled", "Preview cancelled."), InfoBarSeverity.Informational);
         }
         catch (Exception ex)
         {
-            SetActivity("Something went wrong.");
-            SetStatus(Symbol.Important, "Scan failed", "An unexpected error occurred. Review the message below.");
-            UpdateResultsSummary(0, "The scan failed. Review the message above and try again.");
+            SetActivity(Localize("ActivitySomethingWentWrong", "Something went wrong."));
+            SetStatus(
+                Symbol.Important,
+                Localize("StatusScanFailedTitle", "Scan failed"),
+                Localize("StatusScanFailedDescription", "An unexpected error occurred. Review the message below."));
+            UpdateResultsSummary(0, Localize("ResultsScanFailed", "The scan failed. Review the message above and try again."));
             ShowInfo($"Error: {ex.Message}", InfoBarSeverity.Error);
         }
         finally
@@ -594,27 +622,30 @@ public sealed partial class MainWindow
         Info.IsOpen = false;
         if (!TryGetRootPath(out var root))
         {
-            ShowInfo("Select a valid folder.", InfoBarSeverity.Warning);
-            SetStatus(Symbol.Important, "Select a valid folder", "Choose a folder before cleaning.");
-            UpdateResultsSummary(0, "Select a valid folder before cleaning.");
-            SetActivity("Waiting for a valid folder.");
+            ShowInfo(Localize("InfoSelectValidFolder", "Select a valid folder."), InfoBarSeverity.Warning);
+            SetStatus(
+                Symbol.Important,
+                Localize("StatusSelectValidFolderTitle", "Select a valid folder"),
+                Localize("StatusSelectValidFolderForCleaningDescription", "Choose a folder before cleaning."));
+            UpdateResultsSummary(0, Localize("ResultsNeedValidFolderForCleaning", "Select a valid folder before cleaning."));
+            SetActivity(Localize("ActivityWaitingForValidFolder", "Waiting for a valid folder."));
             return;
         }
 
         CancelActiveOperation();
         _cts = new CancellationTokenSource();
         SetBusy(true);
-        SetActivity("Cleaning empty folders…");
+        SetActivity(Localize("ActivityCleaning", "Cleaning empty folders…"));
         var pendingCount = _previewCandidates.Count;
         int? pendingBadge = pendingCount > 0 ? pendingCount : null;
         SetStatus(
             Symbol.Delete,
-            "Cleaning in progress…",
-            "Removing empty folders safely. You can cancel the operation if needed.",
+            Localize("StatusCleaningTitle", "Cleaning in progress…"),
+            Localize("StatusCleaningDescription", "Removing empty folders safely. You can cancel the operation if needed."),
             pendingBadge);
         UpdateResultsSummary(pendingCount, pendingCount > 0
-            ? "Cleaning in progress. We'll refresh the preview afterwards."
-            : "Cleaning in progress…");
+            ? Localize("ResultsCleaningProgressWithPreview", "Cleaning in progress. We'll refresh the preview afterwards.")
+            : Localize("ResultsCleaningProgress", "Cleaning in progress…"));
 
         try
         {
@@ -626,19 +657,19 @@ public sealed partial class MainWindow
             DeleteBtn.IsEnabled = false;
 
             var message = result.EmptyFound == 0
-                ? "No empty folders detected."
-                : $"Deleted {result.DeletedCount} folder(s).";
+                ? Localize("InfoNoEmptyFoldersDetected", "No empty folders detected.")
+                : LocalizeFormat("InfoDeletedFolders", "Deleted {0} folder(s).", result.DeletedCount);
             var severity = result.EmptyFound == 0 ? InfoBarSeverity.Informational : InfoBarSeverity.Success;
 
             if (result.EmptyFound > result.DeletedCount)
             {
                 var remaining = result.EmptyFound - result.DeletedCount;
-                message += $" {remaining} item(s) could not be removed.";
+                message += " " + LocalizeFormat("InfoItemsNotRemoved", "{0} item(s) could not be removed.", remaining);
             }
 
             if (result.HasFailures)
             {
-                message += $" Encountered {result.Failures.Count} issue(s).";
+                message += " " + LocalizeFormat("InfoEncounteredIssues", "Encountered {0} issue(s).", result.Failures.Count);
                 severity = InfoBarSeverity.Warning;
             }
 
@@ -649,47 +680,56 @@ public sealed partial class MainWindow
                     ? Symbol.Accept
                     : Symbol.Message;
             var statusTitle = result.HasFailures
-                ? "Clean completed with warnings"
+                ? Localize("StatusCleanWarningsTitle", "Clean completed with warnings")
                 : result.EmptyFound == 0
-                    ? "No empty folders detected"
+                    ? Localize("StatusNoEmptyFoldersTitle", "No empty folders detected")
                     : result.EmptyFound > result.DeletedCount
-                        ? "Some folders could not be removed"
-                        : $"Removed {result.DeletedCount} folder(s)";
+                        ? Localize("StatusCleanPartialTitle", "Some folders could not be removed")
+                        : LocalizeFormat("StatusCleanRemovedTitle", "Removed {0} folder(s)", result.DeletedCount);
             var statusDescription = result.HasFailures
-                ? "Some folders could not be removed. Review the message below."
+                ? Localize("StatusCleanWarningsDescription", "Some folders could not be removed. Review the message below.")
                 : result.EmptyFound == 0
-                    ? "Run Preview to check another location."
+                    ? Localize("StatusCleanNoResultsDescription", "Run Preview to check another location.")
                     : result.EmptyFound > result.DeletedCount
-                        ? "Some items remain because they could not be deleted."
-                        : "Your workspace is tidier. Run Preview again to double-check.";
+                        ? Localize("StatusCleanPartialDescription", "Some items remain because they could not be deleted.")
+                        : Localize("StatusCleanSuccessDescription", "Your workspace is tidier. Run Preview again to double-check.");
 
             SetStatus(statusSymbol, statusTitle, statusDescription, badgeValue);
-            SetActivity("Clean complete.");
+            SetActivity(Localize("ActivityCleanComplete", "Clean complete."));
             UpdateResultsSummary(0, result.DeletedCount > 0
-                ? "Clean completed. Run Preview again to scan another location."
-                : "No empty folders were removed. Run Preview to check again.");
+                ? Localize("ResultsCleanCompleted", "Clean completed. Run Preview again to scan another location.")
+                : Localize("ResultsCleanNoRemovals", "No empty folders were removed. Run Preview to check again."));
 
             ShowInfo(message, severity);
         }
         catch (OperationCanceledException)
         {
-            SetActivity("Clean cancelled.");
-            SetStatus(Symbol.Cancel, "Clean cancelled", "Deletion was cancelled. Preview again when you're ready.");
-            UpdateResultsSummary(0, "Clean cancelled. Run Preview to refresh the list.");
-            ShowInfo("Deletion cancelled.", InfoBarSeverity.Informational);
+            SetActivity(Localize("ActivityCleanCancelled", "Clean cancelled."));
+            SetStatus(
+                Symbol.Cancel,
+                Localize("StatusCleanCancelledTitle", "Clean cancelled"),
+                Localize("StatusCleanCancelledDescription", "Deletion was cancelled. Preview again when you're ready."));
+            UpdateResultsSummary(0, Localize("ResultsCleanCancelled", "Clean cancelled. Run Preview to refresh the list."));
+            ShowInfo(Localize("InfoDeletionCancelled", "Deletion cancelled."), InfoBarSeverity.Informational);
         }
         catch (UnauthorizedAccessException)
         {
-            SetActivity("Permission required.");
-            SetStatus(Symbol.Important, "Access denied", "Run the app as Administrator to remove protected folders.");
-            UpdateResultsSummary(0, "Some folders could not be removed due to permissions.");
-            ShowInfo("Access denied. Try running as Administrator.", InfoBarSeverity.Warning);
+            SetActivity(Localize("ActivityPermissionRequired", "Permission required."));
+            SetStatus(
+                Symbol.Important,
+                Localize("StatusAccessDeniedTitle", "Access denied"),
+                Localize("StatusAccessDeniedDescription", "Run the app as Administrator to remove protected folders."));
+            UpdateResultsSummary(0, Localize("ResultsAccessDenied", "Some folders could not be removed due to permissions."));
+            ShowInfo(Localize("InfoAccessDenied", "Access denied. Try running as Administrator."), InfoBarSeverity.Warning);
         }
         catch (Exception ex)
         {
-            SetActivity("Something went wrong.");
-            SetStatus(Symbol.Important, "Clean failed", "An unexpected error occurred. Review the message below.");
-            UpdateResultsSummary(0, "Cleaning failed. Review the details and try again.");
+            SetActivity(Localize("ActivitySomethingWentWrong", "Something went wrong."));
+            SetStatus(
+                Symbol.Important,
+                Localize("StatusCleanFailedTitle", "Clean failed"),
+                Localize("StatusCleanFailedDescription", "An unexpected error occurred. Review the message below."));
+            UpdateResultsSummary(0, Localize("ResultsCleanFailed", "Cleaning failed. Review the details and try again."));
             ShowInfo($"Error: {ex.Message}", InfoBarSeverity.Error);
         }
         finally
@@ -720,7 +760,7 @@ public sealed partial class MainWindow
 
         if (cancelled && (_isBusy || _isDiskCleanupOperation))
         {
-            SetActivity("Cancelling current operation…");
+            SetActivity(Localize("ActivityCancelling", "Cancelling current operation…"));
         }
     }
 
@@ -765,11 +805,25 @@ public sealed partial class MainWindow
             .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
     }
 
+    private string Localize(string key, string fallback)
+    {
+        var value = _resources.GetString(key);
+        return string.IsNullOrEmpty(value) ? fallback : value;
+    }
+
+    private string LocalizeFormat(string key, string fallback, params object[] args)
+    {
+        var format = Localize(key, fallback);
+        return string.Format(CultureInfo.CurrentCulture, format, args);
+    }
+
     private void SetStatus(Symbol symbol, string title, string description, int? badgeValue = null)
     {
         StatusGlyph.Symbol = symbol;
         StatusTitle.Text = title;
         StatusDescription.Text = description;
+        StatusHero.Background = GetStatusHeroBrush(symbol);
+        StatusGlyph.Foreground = GetStatusGlyphBrush(symbol);
 
         if (badgeValue.HasValue && badgeValue.Value > 0)
         {
@@ -783,6 +837,39 @@ public sealed partial class MainWindow
         }
     }
 
+    private Brush GetStatusHeroBrush(Symbol symbol) => symbol switch
+    {
+        Symbol.Accept => GetBrushResource("Brush.Hero.Positive", "Brush.Hero.Neutral"),
+        Symbol.Sync or Symbol.Delete => GetBrushResource("Brush.Hero.Warning", "Brush.Hero.Neutral"),
+        Symbol.Important or Symbol.Cancel => GetBrushResource("Brush.Hero.Critical", "Brush.Hero.Neutral"),
+        _ => GetBrushResource("Brush.Hero.Neutral"),
+    };
+
+    private Brush GetStatusGlyphBrush(Symbol symbol) => symbol switch
+    {
+        Symbol.Accept => GetBrushResource("Brush.SharedPositive", "Brush.BrandPrimary"),
+        Symbol.Sync or Symbol.Delete => GetBrushResource("Brush.SharedCaution", "Brush.BrandSecondary"),
+        Symbol.Important or Symbol.Cancel => GetBrushResource("Brush.SharedCritical", "Brush.BrandSecondary"),
+        _ => GetBrushResource("Brush.BrandSecondary"),
+    };
+
+    private Brush GetBrushResource(string key, string? fallbackKey = null)
+    {
+        if (Application.Current.Resources.TryGetValue(key, out var brushObj) && brushObj is Brush brush)
+        {
+            return brush;
+        }
+
+        if (fallbackKey is not null &&
+            Application.Current.Resources.TryGetValue(fallbackKey, out var fallbackObj) &&
+            fallbackObj is Brush fallbackBrush)
+        {
+            return fallbackBrush;
+        }
+
+        return new SolidColorBrush(Colors.Transparent);
+    }
+
     private void UpdateResultsSummary(int count, string? customMessage = null)
     {
         if (!string.IsNullOrWhiteSpace(customMessage))
@@ -792,8 +879,8 @@ public sealed partial class MainWindow
         }
 
         ResultsCaption.Text = count > 0
-            ? "Review the folders below before cleaning."
-            : "Preview results will appear here once you run a scan.";
+            ? Localize("ResultsAvailable", "Review the folders below before cleaning.")
+            : Localize("ResultsPlaceholder", "Preview results will appear here once you run a scan.");
     }
 
     private void SetActivity(string message)
@@ -833,7 +920,9 @@ public sealed partial class MainWindow
     {
         if (_isBusy)
         {
-            ShowDiskCleanupInfo("Finish the current operation before analyzing disk cleanup.", InfoBarSeverity.Warning);
+            ShowDiskCleanupInfo(
+                Localize("DiskCleanupInfoFinishAnalysis", "Finish the current operation before analyzing disk cleanup."),
+                InfoBarSeverity.Warning);
             return;
         }
 
@@ -844,7 +933,7 @@ public sealed partial class MainWindow
         DiskCleanupInfoBar.IsOpen = false;
         _isDiskCleanupOperation = true;
         DiskCleanupProgress.Visibility = Visibility.Visible;
-        SetActivity("Analyzing disk cleanup handlers…");
+        SetActivity(Localize("ActivityDiskCleanupAnalyzing", "Analyzing disk cleanup handlers…"));
         SetBusy(true);
 
         try
@@ -852,18 +941,27 @@ public sealed partial class MainWindow
             var items = await DiskCleanupManager.AnalyzeAsync(_diskCleanupVolume, _diskCleanupCts.Token);
             ApplyDiskCleanupResults(items);
             UpdateDiskCleanupStatusSummary();
-            SetActivity("Disk cleanup analysis complete.");
-            ShowDiskCleanupInfo($"Analyzed {items.Count} handler(s).", InfoBarSeverity.Success);
+            SetActivity(Localize("ActivityDiskCleanupAnalysisComplete", "Disk cleanup analysis complete."));
+            ShowDiskCleanupInfo(
+                LocalizeFormat("InfoDiskCleanupAnalyzed", "Analyzed {0} handler(s).", items.Count),
+                InfoBarSeverity.Success);
         }
         catch (OperationCanceledException)
         {
-            ShowDiskCleanupInfo("Disk cleanup analysis cancelled.", InfoBarSeverity.Informational);
-            SetActivity("Disk cleanup analysis cancelled.");
+            ShowDiskCleanupInfo(
+                Localize("InfoDiskCleanupAnalysisCancelled", "Disk cleanup analysis cancelled."),
+                InfoBarSeverity.Informational);
+            SetActivity(Localize("ActivityDiskCleanupAnalysisCancelled", "Disk cleanup analysis cancelled."));
         }
         catch (Exception ex)
         {
-            ShowDiskCleanupInfo($"Disk cleanup analysis failed: {ex.Message}", InfoBarSeverity.Error);
-            SetActivity("Disk cleanup analysis failed.");
+            ShowDiskCleanupInfo(
+                string.Format(
+                    CultureInfo.CurrentCulture,
+                    Localize("InfoDiskCleanupAnalysisFailed", "Disk cleanup analysis failed: {0}"),
+                    ex.Message),
+                InfoBarSeverity.Error);
+            SetActivity(Localize("ActivityDiskCleanupAnalysisFailed", "Disk cleanup analysis failed."));
         }
         finally
         {
@@ -880,7 +978,9 @@ public sealed partial class MainWindow
     {
         if (_isBusy)
         {
-            ShowDiskCleanupInfo("Finish the current operation before cleaning disk handlers.", InfoBarSeverity.Warning);
+            ShowDiskCleanupInfo(
+                Localize("DiskCleanupInfoFinishCleaning", "Finish the current operation before cleaning disk handlers."),
+                InfoBarSeverity.Warning);
             return;
         }
 
@@ -891,7 +991,9 @@ public sealed partial class MainWindow
 
         if (targets.Count == 0)
         {
-            ShowDiskCleanupInfo("Select at least one category to clean.", InfoBarSeverity.Warning);
+            ShowDiskCleanupInfo(
+                Localize("DiskCleanupInfoSelectCategory", "Select at least one category to clean."),
+                InfoBarSeverity.Warning);
             return;
         }
 
@@ -902,7 +1004,7 @@ public sealed partial class MainWindow
         DiskCleanupInfoBar.IsOpen = false;
         _isDiskCleanupOperation = true;
         DiskCleanupProgress.Visibility = Visibility.Visible;
-        SetActivity("Running disk cleanup handlers…");
+        SetActivity(Localize("ActivityDiskCleanupRunning", "Running disk cleanup handlers…"));
         SetBusy(true);
 
         try
@@ -916,8 +1018,12 @@ public sealed partial class MainWindow
                     : InfoBarSeverity.Informational;
 
             var message = result.SuccessCount > 0
-                ? $"Cleaned {result.SuccessCount} handler(s) and freed {FormatBytes(result.Freed)}."
-                : "No disk cleanup handlers reported any changes.";
+                ? LocalizeFormat(
+                    "InfoDiskCleanupCleaned",
+                    "Cleaned {0} handler(s) and freed {1}.",
+                    result.SuccessCount,
+                    FormatBytes(result.Freed))
+                : Localize("InfoDiskCleanupNoChanges", "No disk cleanup handlers reported any changes.");
 
             if (result.HasFailures)
             {
@@ -926,7 +1032,7 @@ public sealed partial class MainWindow
             }
 
             ShowDiskCleanupInfo(message, severity);
-            SetActivity("Disk cleanup completed.");
+            SetActivity(Localize("ActivityDiskCleanupCompleted", "Disk cleanup completed."));
 
             var refreshed = await DiskCleanupManager.AnalyzeAsync(_diskCleanupVolume, _diskCleanupCts.Token);
             ApplyDiskCleanupResults(refreshed);
@@ -934,13 +1040,20 @@ public sealed partial class MainWindow
         }
         catch (OperationCanceledException)
         {
-            ShowDiskCleanupInfo("Disk cleanup cancelled.", InfoBarSeverity.Informational);
-            SetActivity("Disk cleanup cancelled.");
+            ShowDiskCleanupInfo(
+                Localize("InfoDiskCleanupCancelled", "Disk cleanup cancelled."),
+                InfoBarSeverity.Informational);
+            SetActivity(Localize("ActivityDiskCleanupCancelled", "Disk cleanup cancelled."));
         }
         catch (Exception ex)
         {
-            ShowDiskCleanupInfo($"Disk cleanup failed: {ex.Message}", InfoBarSeverity.Error);
-            SetActivity("Disk cleanup failed.");
+            ShowDiskCleanupInfo(
+                string.Format(
+                    CultureInfo.CurrentCulture,
+                    Localize("InfoDiskCleanupFailed", "Disk cleanup failed: {0}"),
+                    ex.Message),
+                InfoBarSeverity.Error);
+            SetActivity(Localize("ActivityDiskCleanupFailed", "Disk cleanup failed."));
         }
         finally
         {
@@ -994,7 +1107,10 @@ public sealed partial class MainWindow
     {
         if (_diskCleanupItems.Count == 0)
         {
-            DiskCleanupStatusText.Text = $"No Disk Cleanup handlers reported data for {_diskCleanupVolume}. Try running as Administrator.";
+            DiskCleanupStatusText.Text = LocalizeFormat(
+                "DiskCleanupStatusNoData",
+                "No Disk Cleanup handlers reported data for {0}. Try running as Administrator.",
+                _diskCleanupVolume);
             return;
         }
 
@@ -1003,22 +1119,39 @@ public sealed partial class MainWindow
 
         if (selectable.Count == 0)
         {
-            DiskCleanupStatusText.Text = $"No reclaimable space detected on {_diskCleanupVolume}.";
+            DiskCleanupStatusText.Text = LocalizeFormat(
+                "DiskCleanupStatusNoSpace",
+                "No reclaimable space detected on {0}.",
+                _diskCleanupVolume);
         }
         else
         {
-            var label = selectable.Count == 1 ? "category" : "categories";
-            DiskCleanupStatusText.Text = $"Potential savings: {FormatBytes(totalBytes)} across {selectable.Count} {label} on {_diskCleanupVolume}.";
+            var label = selectable.Count == 1
+                ? Localize("DiskCleanupCategorySingular", "category")
+                : Localize("DiskCleanupCategoryPlural", "categories");
+            DiskCleanupStatusText.Text = string.Format(
+                CultureInfo.CurrentCulture,
+                Localize(
+                    "DiskCleanupStatusPotential",
+                    "Potential savings: {0} across {1} {2} on {3}."),
+                FormatBytes(totalBytes),
+                selectable.Count,
+                label,
+                _diskCleanupVolume);
         }
 
         if (_diskCleanupItems.Any(item => item.Item.RequiresElevation))
         {
-            DiskCleanupStatusText.Text += " Some handlers require Administrator privileges.";
+            DiskCleanupStatusText.Text += " " + Localize(
+                "DiskCleanupStatusNeedsElevation",
+                "Some handlers require Administrator privileges.");
         }
 
         if (_diskCleanupItems.Any(item => !string.IsNullOrWhiteSpace(item.ErrorMessage)))
         {
-            DiskCleanupStatusText.Text += " Some handlers reported issues.";
+            DiskCleanupStatusText.Text += " " + Localize(
+                "DiskCleanupStatusHasIssues",
+                "Some handlers reported issues.");
         }
     }
 

@@ -29,16 +29,16 @@
         <NavigationView.Resources>
             <CornerRadius x:Key="CardCornerRadius">20</CornerRadius>
             <LinearGradientBrush x:Key="HeroCardBrush" StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#5D6CFF" Offset="0" />
-                <GradientStop Color="#29C0FF" Offset="1" />
+                <GradientStop Color="{StaticResource Color.BrandPrimary}" Offset="0" />
+                <GradientStop Color="{StaticResource Color.BrandSecondary}" Offset="1" />
             </LinearGradientBrush>
-            <SolidColorBrush x:Key="HeroCardOverlayBrush" Color="#1AFFFFFF" />
+            <SolidColorBrush x:Key="HeroCardOverlayBrush" Color="{StaticResource Color.BrandOverlay}" />
             <Style x:Key="CardStyle" TargetType="Border">
                 <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}" />
                 <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}" />
-                <Setter Property="Padding" Value="24" />
+                <Setter Property="Padding" Value="{StaticResource Padding.Card}" />
             </Style>
             <Style TargetType="ListViewItem">
                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -88,8 +88,8 @@
         <NavigationView.Content>
             <Grid>
                 <ScrollViewer x:Name="DashboardView" HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel Padding="32" Spacing="24">
-                        <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                    <StackPanel Padding="{StaticResource Padding.Page}" Spacing="{StaticResource Spacing.Size240}">
+                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size160}" VerticalAlignment="Center">
                             <Border
                                 Width="56"
                                 Height="56"
@@ -104,7 +104,7 @@
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center" />
                             </Border>
-                            <StackPanel Spacing="4" VerticalAlignment="Center">
+                            <StackPanel Spacing="{StaticResource Spacing.Size40}" VerticalAlignment="Center">
                                 <TextBlock Text="Dashboard" FontSize="32" FontWeight="SemiBold" />
                                 <TextBlock
                                     Text="Choose a tool to continue."
@@ -113,8 +113,8 @@
                         </StackPanel>
 
                         <Border Style="{StaticResource CardStyle}">
-                            <StackPanel Spacing="16">
-                                <StackPanel Orientation="Horizontal" Spacing="12">
+                            <StackPanel Spacing="{StaticResource Spacing.Size160}">
+                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
                                     <Border
                                         Width="48"
                                         Height="48"
@@ -140,24 +140,24 @@
                                 <ItemsControl x:Name="DriveUsageList">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <StackPanel Spacing="12" />
+                                            <StackPanel Spacing="{StaticResource Spacing.Size120}" />
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Grid ColumnSpacing="12">
+                                            <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="160" />
                                                 </Grid.ColumnDefinitions>
-                                                <StackPanel Spacing="2">
+                                                <StackPanel Spacing="{StaticResource Spacing.Size40}">
                                                     <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
                                                     <TextBlock
                                                         Text="{Binding Details}"
                                                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                         TextWrapping="Wrap" />
                                                 </StackPanel>
-                                                <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                                                <StackPanel Grid.Column="1" Spacing="{StaticResource Spacing.Size40}" VerticalAlignment="Center">
                                                     <ProgressBar Minimum="0" Maximum="100" Value="{Binding UsedPercentage}" Height="6" />
                                                     <TextBlock
                                                         Text="{Binding UsageSummary}"
@@ -168,7 +168,7 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
                                     <FontIcon
                                         Glyph="&#xE946;"
                                         FontFamily="Segoe MDL2 Assets"
@@ -254,15 +254,20 @@
                     x:Name="EmptyFoldersView"
                     HorizontalScrollBarVisibility="Disabled"
                     Visibility="Collapsed">
-                    <Grid Padding="32" RowSpacing="24">
+                    <Grid Padding="{StaticResource Padding.Page}" RowSpacing="{StaticResource Spacing.Size240}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <Border Grid.Row="0" Background="{StaticResource HeroCardBrush}" CornerRadius="28" Padding="28">
-                            <Grid ColumnSpacing="24">
+                        <Border
+                            x:Name="StatusHero"
+                            Grid.Row="0"
+                            Background="{StaticResource Brush.Hero.Neutral}"
+                            CornerRadius="28"
+                            Padding="{StaticResource Padding.Hero}">
+                            <Grid ColumnSpacing="{StaticResource Spacing.Size240}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
@@ -283,7 +288,7 @@
                                         VerticalAlignment="Center" />
                                 </Border>
 
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="8">
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="{StaticResource Spacing.Size80}">
                                     <TextBlock
                                         Text="Cleanup overview"
                                         Foreground="#B3FFFFFF"
@@ -302,7 +307,7 @@
                                         TextWrapping="WrapWholeWords" />
                                 </StackPanel>
 
-                                <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="4">
+                                <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="{StaticResource Spacing.Size40}">
                                     <TextBlock Text="Current results" Foreground="#B3FFFFFF" />
                                     <InfoBadge
                                         x:Name="ResultBadge"
@@ -312,21 +317,65 @@
                             </Grid>
                         </Border>
 
-                        <Grid Grid.Row="1" ColumnSpacing="24">
+                        <Grid x:Name="EmptyFoldersLayout" Grid.Row="1" ColumnSpacing="{StaticResource Spacing.Size240}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="360" />
+                                <ColumnDefinition x:Name="EmptyFoldersPrimaryColumn" Width="*" />
+                                <ColumnDefinition x:Name="EmptyFoldersSecondaryColumn" Width="360" />
                             </Grid.ColumnDefinitions>
 
-                            <StackPanel Grid.Column="0" Spacing="16">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup>
+                                    <VisualState x:Name="EmptyFoldersCompactState">
+                                        <VisualState.StateTriggers>
+                                            <AdaptiveTrigger MinWindowWidth="0" />
+                                        </VisualState.StateTriggers>
+                                        <VisualState.Setters>
+                                            <Setter Target="EmptyFoldersSecondaryColumn.Width" Value="0" />
+                                            <Setter Target="EmptyFoldersLayout.ColumnSpacing" Value="{StaticResource Spacing.Size160}" />
+                                            <Setter Target="EmptyFoldersPrimaryPanel.(Grid.ColumnSpan)" Value="2" />
+                                            <Setter Target="EmptyFoldersDetailsPanel.(Grid.Row)" Value="1" />
+                                            <Setter Target="EmptyFoldersDetailsPanel.(Grid.Column)" Value="0" />
+                                            <Setter Target="EmptyFoldersDetailsPanel.(Grid.ColumnSpan)" Value="2" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="EmptyFoldersMediumState">
+                                        <VisualState.StateTriggers>
+                                            <AdaptiveTrigger MinWindowWidth="840" />
+                                        </VisualState.StateTriggers>
+                                        <VisualState.Setters>
+                                            <Setter Target="EmptyFoldersSecondaryColumn.Width" Value="320" />
+                                            <Setter Target="EmptyFoldersLayout.ColumnSpacing" Value="{StaticResource Spacing.Size240}" />
+                                            <Setter Target="EmptyFoldersPrimaryPanel.(Grid.ColumnSpan)" Value="1" />
+                                            <Setter Target="EmptyFoldersDetailsPanel.(Grid.Row)" Value="0" />
+                                            <Setter Target="EmptyFoldersDetailsPanel.(Grid.Column)" Value="1" />
+                                            <Setter Target="EmptyFoldersDetailsPanel.(Grid.ColumnSpan)" Value="1" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="EmptyFoldersWideState">
+                                        <VisualState.StateTriggers>
+                                            <AdaptiveTrigger MinWindowWidth="1024" />
+                                        </VisualState.StateTriggers>
+                                        <VisualState.Setters>
+                                            <Setter Target="EmptyFoldersSecondaryColumn.Width" Value="360" />
+                                            <Setter Target="EmptyFoldersLayout.ColumnSpacing" Value="{StaticResource Spacing.Size240}" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+
+                            <StackPanel x:Name="EmptyFoldersPrimaryPanel" Grid.Column="0" Spacing="{StaticResource Spacing.Size160}">
                                 <Border Style="{StaticResource CardStyle}">
-                                    <Grid RowSpacing="20">
+                                    <Grid RowSpacing="{StaticResource Spacing.Size200}">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition Height="Auto" />
                                         </Grid.RowDefinitions>
 
-                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
                                             <Border
                                                 Width="40"
                                                 Height="40"
@@ -347,8 +396,8 @@
                                             </StackPanel>
                                         </StackPanel>
 
-                                        <StackPanel Grid.Row="1" Spacing="16">
-                                            <Grid ColumnSpacing="12">
+                                        <StackPanel Grid.Row="1" Spacing="{StaticResource Spacing.Size160}">
+                                            <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
@@ -359,21 +408,21 @@
                                                     PlaceholderText="Select a root folder…"
                                                     TextChanged="RootPathBox_TextChanged" />
                                                 <Button x:Name="BrowseBtn" Grid.Column="1" Click="OnBrowse">
-                                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
                                                         <SymbolIcon Symbol="OpenFile" />
                                                         <TextBlock Text="Browse" />
                                                     </StackPanel>
                                                 </Button>
                                             </Grid>
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{StaticResource Spacing.Size80}">
                                                 <Button x:Name="PreviewBtn" Click="OnPreview">
-                                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
                                                         <SymbolIcon Symbol="PreviewLink" />
                                                         <TextBlock Text="Preview" />
                                                     </StackPanel>
                                                 </Button>
                                                 <Button x:Name="DeleteBtn" Click="OnDelete" IsEnabled="False">
-                                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
                                                         <SymbolIcon Symbol="Delete" />
                                                         <TextBlock Text="Clean now" />
                                                     </StackPanel>
@@ -384,8 +433,8 @@
                                 </Border>
 
                                 <Border Style="{StaticResource CardStyle}">
-                                    <StackPanel Spacing="20">
-                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <StackPanel Spacing="{StaticResource Spacing.Size200}">
+                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
                                             <Border
                                                 Width="40"
                                                 Height="40"
@@ -406,15 +455,15 @@
                                             </StackPanel>
                                         </StackPanel>
 
-                                        <StackPanel Spacing="16">
+                                        <StackPanel Spacing="{StaticResource Spacing.Size160}">
                                             <CheckBox x:Name="RecycleChk" IsChecked="True">
-                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
                                                     <FontIcon Glyph="&#xE107;" FontFamily="Segoe MDL2 Assets" />
                                                     <TextBlock Text="Send deleted folders to Recycle Bin" />
                                                 </StackPanel>
                                             </CheckBox>
 
-                                            <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}" VerticalAlignment="Center">
                                                 <SymbolIcon
                                                     Symbol="Sort"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
@@ -427,7 +476,7 @@
                                                     Value="0" />
                                             </StackPanel>
 
-                                            <StackPanel Spacing="4">
+                                            <StackPanel Spacing="{StaticResource Spacing.Size40}">
                                                 <TextBlock Text="Exclusions" FontWeight="SemiBold" />
                                                 <TextBox
                                                     x:Name="ExcludeBox"
@@ -443,10 +492,10 @@
                                 </Border>
                             </StackPanel>
 
-                            <StackPanel Grid.Column="1" Spacing="16">
+                            <StackPanel x:Name="EmptyFoldersDetailsPanel" Grid.Column="1" Spacing="{StaticResource Spacing.Size160}">
                                 <Border Style="{StaticResource CardStyle}">
-                                    <StackPanel Spacing="16">
-                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <StackPanel Spacing="{StaticResource Spacing.Size160}">
+                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
                                             <Border
                                                 Width="40"
                                                 Height="40"
@@ -476,7 +525,7 @@
 
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                             <Button x:Name="CancelBtn" Click="OnCancel" Visibility="Collapsed" IsEnabled="False">
-                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
                                                     <SymbolIcon Symbol="Cancel" />
                                                     <TextBlock Text="Cancel" />
                                                 </StackPanel>
@@ -488,8 +537,8 @@
                                 </Border>
 
                                 <Border Style="{StaticResource CardStyle}">
-                                    <StackPanel Spacing="12">
-                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <StackPanel Spacing="{StaticResource Spacing.Size120}">
+                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
                                             <Border
                                                 Width="40"
                                                 Height="40"
@@ -505,15 +554,15 @@
                                             <TextBlock Text="Cleaner highlights" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" />
                                         </StackPanel>
 
-                                        <StackPanel Spacing="12">
-                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <StackPanel Spacing="{StaticResource Spacing.Size120}">
+                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
                                                 <SymbolIcon Symbol="PreviewLink" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                                 <TextBlock
                                                     Text="Preview empty directories before committing to a cleanup."
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                     TextWrapping="Wrap" />
                                             </StackPanel>
-                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
                                                 <SymbolIcon Symbol="ProtectedDocument" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                                 <TextBlock
                                                     Text="Recycle Bin support keeps removals safe."
@@ -614,14 +663,14 @@
                     x:Name="DiskCleanupView"
                     HorizontalScrollBarVisibility="Disabled"
                     Visibility="Collapsed">
-                    <Grid Padding="32" RowSpacing="24">
+                    <Grid Padding="{StaticResource Padding.Page}" RowSpacing="{StaticResource Spacing.Size240}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <Border Grid.Row="0" Background="{StaticResource HeroCardBrush}" CornerRadius="28" Padding="28">
-                            <Grid ColumnSpacing="24">
+                        <Border Grid.Row="0" Background="{StaticResource Brush.Hero.Neutral}" CornerRadius="28" Padding="{StaticResource Padding.Hero}">
+                            <Grid ColumnSpacing="{StaticResource Spacing.Size240}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
@@ -641,7 +690,7 @@
                                         VerticalAlignment="Center" />
                                 </Border>
 
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="8">
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="{StaticResource Spacing.Size80}">
                                     <TextBlock Text="Disk cleanup" Foreground="#B3FFFFFF" FontWeight="SemiBold" />
                                     <TextBlock
                                         x:Name="DiskCleanupIntro"
@@ -658,8 +707,8 @@
                         </Border>
 
                         <Border Grid.Row="1" Style="{StaticResource CardStyle}">
-                            <StackPanel Spacing="16">
-                                <StackPanel Orientation="Horizontal" Spacing="12">
+                            <StackPanel Spacing="{StaticResource Spacing.Size160}">
+                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
                                     <Border
                                         Width="40"
                                         Height="40"
@@ -682,21 +731,21 @@
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                     TextWrapping="Wrap" />
 
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{StaticResource Spacing.Size80}">
                                     <Button x:Name="DiskCleanupAnalyzeBtn" Click="OnDiskCleanupAnalyze">
-                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
                                             <SymbolIcon Symbol="Refresh" />
                                             <TextBlock Text="Analyze" />
                                         </StackPanel>
                                     </Button>
                                     <Button x:Name="DiskCleanupCleanBtn" Click="OnDiskCleanupClean" IsEnabled="False">
-                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
                                             <SymbolIcon Symbol="Delete" />
                                             <TextBlock Text="Clean selected" />
                                         </StackPanel>
                                     </Button>
                                     <Button x:Name="DiskCleanupCancelBtn" Click="OnCancel" Visibility="Collapsed" IsEnabled="False">
-                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
                                             <SymbolIcon Symbol="Cancel" />
                                             <TextBlock Text="Cancel" />
                                         </StackPanel>
@@ -776,7 +825,7 @@
                     x:Name="SettingsView"
                     HorizontalScrollBarVisibility="Disabled"
                     Visibility="Collapsed">
-                    <StackPanel Padding="32" Spacing="24">
+                    <StackPanel Padding="{StaticResource Padding.Page}" Spacing="{StaticResource Spacing.Size240}">
                         <StackPanel Spacing="4">
                             <TextBlock Text="Settings" FontSize="32" FontWeight="SemiBold" />
                             <TextBlock
