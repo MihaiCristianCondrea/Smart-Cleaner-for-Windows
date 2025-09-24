@@ -19,6 +19,7 @@ using Microsoft.UI.Xaml.Hosting;
 using Microsoft.Windows.ApplicationModel.Resources;
 using Smart_Cleaner_for_Windows.Core;
 using Windows.Graphics;
+using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.UI;
 using WinRT;
@@ -43,6 +44,18 @@ public sealed partial class MainWindow
     private bool _isDiskCleanupOperation;
     private readonly Dictionary<string, Color> _defaultAccentColors = new();
     private readonly ResourceLoader _resources = new();
+    private readonly ApplicationDataContainer? _settings = TryGetLocalSettings();
+    private bool _isInitializingSettings;
+    private string _themePreference = ThemePreferenceDefault;
+    private string _accentPreference = AccentPreferenceDefault;
+
+    private const string ThemePreferenceKey = "Settings.ThemePreference";
+    private const string AccentPreferenceKey = "Settings.AccentPreference";
+    private const string ThemePreferenceLight = "light";
+    private const string ThemePreferenceDark = "dark";
+    private const string ThemePreferenceDefault = "default";
+    private const string AccentPreferenceZest = "zest";
+    private const string AccentPreferenceDefault = "default";
     private static readonly string[] AccentResourceKeys = new[]
     {
         "SystemAccentColor",
@@ -66,6 +79,7 @@ public sealed partial class MainWindow
         InitializeComponent();
 
         CaptureDefaultAccentColors();
+        LoadPreferences();
 
         DriveUsageList.ItemsSource = _driveUsage;
         UpdateStorageOverview();
@@ -98,6 +112,7 @@ public sealed partial class MainWindow
         UpdateDiskCleanupActionState();
 
         TryEnableMica();
+        ApplyThemePreference(_themePreference, save: false);
         TryConfigureAppWindow();
         Activated += OnWindowActivated;
         Closed += OnClosed;
@@ -1182,6 +1197,284 @@ public sealed partial class MainWindow
         return string.Format(CultureInfo.CurrentCulture, "{0:0.##} {1}", size, suffixes[index]);
     }
 
+    private void LoadPreferences()
+    {
+        if (ThemeRadioButtons is null || AccentColorRadioButtons is null)
+        {
+            return;
+        }
+
+        _isInitializingSettings = true;
+
+        var savedTheme = ReadSetting(ThemePreferenceKey);
+        ApplyThemePreference(savedTheme, save: false);
+        SelectThemeOption(_themePreference);
+
+        var savedAccent = ReadSetting(AccentPreferenceKey);
+        ApplyAccentPreference(savedAccent, save: false);
+        SelectAccentOption(_accentPreference);
+
+        _isInitializingSettings = false;
+    }
+
+    private void OnThemeSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isInitializingSettings)
+        {
+            return;
+        }
+
+        if (sender is not RadioButtons radioButtons)
+        {
+            return;
+        }
+
+        if (radioButtons.SelectedItem is RadioButton button && button.Tag is string tag)
+        {
+            ApplyThemePreference(tag, save: true);
+        }
+    }
+
+    private void OnAccentPreferenceChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isInitializingSettings)
+        {
+            return;
+        }
+
+        if (sender is not RadioButtons radioButtons)
+        {
+            return;
+        }
+
+        if (radioButtons.SelectedItem is RadioButton button && button.Tag is string tag)
+        {
+            ApplyAccentPreference(tag, save: true);
+        }
+    }
+
+    private void ApplyThemePreference(string? preference, bool save)
+    {
+        var normalized = NormalizeThemePreference(preference);
+        _themePreference = normalized;
+
+        var theme = normalized switch
+        {
+            ThemePreferenceLight => ElementTheme.Light,
+            ThemePreferenceDark => ElementTheme.Dark,
+            _ => ElementTheme.Default
+        };
+
+        RootNavigation.RequestedTheme = theme;
+
+        if (_backdropConfig is not null)
+        {
+            _backdropConfig.Theme = theme switch
+            {
+                ElementTheme.Dark => SystemBackdropTheme.Dark,
+                ElementTheme.Light => SystemBackdropTheme.Light,
+                _ => SystemBackdropTheme.Default
+            };
+        }
+
+        ThemeSummaryText.Text = normalized switch
+        {
+            ThemePreferenceLight => "Light",
+            ThemePreferenceDark => "Dark",
+            _ => "Use system setting"
+        };
+
+        if (save)
+        {
+            SaveSetting(ThemePreferenceKey, normalized);
+        }
+    }
+
+    private static string NormalizeThemePreference(string? preference)
+    {
+        if (string.IsNullOrWhiteSpace(preference))
+        {
+            return ThemePreferenceDefault;
+        }
+
+        return preference.Trim().ToLowerInvariant() switch
+        {
+            ThemePreferenceLight => ThemePreferenceLight,
+            ThemePreferenceDark => ThemePreferenceDark,
+            ThemePreferenceDefault => ThemePreferenceDefault,
+            "system" => ThemePreferenceDefault,
+            _ => ThemePreferenceDefault
+        };
+    }
+
+    private void SelectThemeOption(string preference)
+    {
+        ThemeRadioButtons.SelectedIndex = preference switch
+        {
+            ThemePreferenceLight => 0,
+            ThemePreferenceDark => 1,
+            _ => 2
+        };
+    }
+
+    private void ApplyAccentPreference(string? preference, bool save)
+    {
+        var normalized = NormalizeAccentPreference(preference);
+        _accentPreference = normalized;
+
+        if (string.Equals(normalized, AccentPreferenceDefault, StringComparison.OrdinalIgnoreCase))
+        {
+            RestoreAccentColors();
+        }
+        else if (string.Equals(normalized, AccentPreferenceZest, StringComparison.OrdinalIgnoreCase))
+        {
+            ApplyAccentColor(GetZestAccentColor());
+        }
+        else if (TryParseColor(normalized, out var color))
+        {
+            ApplyAccentColor(color);
+        }
+        else
+        {
+            RestoreAccentColors();
+            _accentPreference = AccentPreferenceDefault;
+        }
+
+        AccentSummaryText.Text = FormatAccentSummary(_accentPreference);
+
+        if (save)
+        {
+            SaveSetting(AccentPreferenceKey, _accentPreference);
+        }
+    }
+
+    private static string NormalizeAccentPreference(string? preference)
+    {
+        if (string.IsNullOrWhiteSpace(preference))
+        {
+            return AccentPreferenceDefault;
+        }
+
+        var trimmed = preference.Trim();
+
+        if (trimmed.StartsWith('#'))
+        {
+            return trimmed;
+        }
+
+        var lower = trimmed.ToLowerInvariant();
+        return lower switch
+        {
+            AccentPreferenceZest => AccentPreferenceZest,
+            AccentPreferenceDefault => AccentPreferenceDefault,
+            "system" => AccentPreferenceDefault,
+            _ => trimmed
+        };
+    }
+
+    private void SelectAccentOption(string preference)
+    {
+        AccentColorRadioButtons.SelectedIndex = preference switch
+        {
+            AccentPreferenceZest => 0,
+            AccentPreferenceDefault => 1,
+            _ => -1
+        };
+    }
+
+    private string FormatAccentSummary(string preference)
+    {
+        if (string.Equals(preference, AccentPreferenceZest, StringComparison.OrdinalIgnoreCase))
+        {
+            return "Zest";
+        }
+
+        if (string.Equals(preference, AccentPreferenceDefault, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(preference))
+        {
+            return "Use system setting";
+        }
+
+        if (preference.StartsWith('#'))
+        {
+            return string.Format(CultureInfo.CurrentCulture, "Custom ({0})", preference.ToUpperInvariant());
+        }
+
+        return preference;
+    }
+
+    private static ApplicationDataContainer? TryGetLocalSettings()
+    {
+        if (!OperatingSystem.IsWindows())
+        {
+            return null;
+        }
+
+        try
+        {
+            return ApplicationData.Current.LocalSettings;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private string? ReadSetting(string key)
+    {
+        var settings = _settings;
+        if (settings is null)
+        {
+            return null;
+        }
+
+        try
+        {
+            if (settings.Values.TryGetValue(key, out var value))
+            {
+                return value switch
+                {
+                    string text => text,
+                    IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
+                    _ => value?.ToString()
+                };
+            }
+        }
+        catch
+        {
+            return null;
+        }
+
+        return null;
+    }
+
+    private void SaveSetting(string key, string value)
+    {
+        var settings = _settings;
+        if (settings is null)
+        {
+            return;
+        }
+
+        try
+        {
+            settings.Values[key] = value;
+        }
+        catch
+        {
+            // Ignore persistence failures on unsupported platforms.
+        }
+    }
+
+    private Color GetZestAccentColor()
+    {
+        if (Application.Current.Resources.TryGetValue("Color.BrandPrimary", out var value) && value is Color color)
+        {
+            return color;
+        }
+
+        return Color.FromArgb(255, 0x00, 0x67, 0xC0);
+    }
+
     private void CaptureDefaultAccentColors()
     {
         foreach (var key in AccentResourceKeys)
@@ -1190,30 +1483,6 @@ public sealed partial class MainWindow
             {
                 _defaultAccentColors[key] = color;
             }
-        }
-    }
-
-    private void OnAccentColorChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (sender is not ComboBox combo || combo.SelectedItem is not ComboBoxItem item)
-        {
-            return;
-        }
-
-        if (item.Tag is not string tag)
-        {
-            return;
-        }
-
-        if (string.Equals(tag, "default", StringComparison.OrdinalIgnoreCase))
-        {
-            RestoreAccentColors();
-            return;
-        }
-
-        if (TryParseColor(tag, out var color))
-        {
-            ApplyAccentColor(color);
         }
     }
 
