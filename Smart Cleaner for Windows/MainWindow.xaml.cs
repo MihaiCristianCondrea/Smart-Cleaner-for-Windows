@@ -25,8 +25,9 @@ using Windows.Storage.Pickers;
 using Windows.UI;
 using Windows.Win32;
 using Windows.Win32.Foundation;
-using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.UI.WindowsAndMessaging;
+using GdiImageType = Windows.Win32.UI.WindowsAndMessaging.GDI_IMAGE_TYPE;
+using LoadImageFlags = Windows.Win32.UI.WindowsAndMessaging.LOAD_IMAGE_FLAGS;
 using WinRT;
 using WinRT.Interop;
 using System.Runtime.CompilerServices;
@@ -269,10 +270,10 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             var iconHandle = PInvoke.LoadImage(
                 HINSTANCE.Null,
                 iconPath,
-                GDI_IMAGE_TYPE.IMAGE_ICON,
+                GdiImageType.IMAGE_ICON,
                 0,
                 0,
-                LOAD_IMAGE_FLAGS.LR_DEFAULTSIZE | LOAD_IMAGE_FLAGS.LR_LOADFROMFILE);
+                LoadImageFlags.LR_DEFAULTSIZE | LoadImageFlags.LR_LOADFROMFILE);
 
             if (iconHandle != default)
             {
