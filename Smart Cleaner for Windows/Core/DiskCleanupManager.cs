@@ -47,7 +47,8 @@ public static class DiskCleanupManager
     {
         var volumeService = new DiskCleanupVolumeService();
         var staTaskScheduler = new StaTaskScheduler();
-        var operations = new RegistryDiskCleanupOperations();
-        return new DiskCleanupService(volumeService, staTaskScheduler, operations, operations);
+        var analyzer = new RegistryDiskCleanupAnalyzer();
+        var executor = new RegistryDiskCleanupExecutor();
+        return new DiskCleanupService(volumeService, staTaskScheduler, analyzer, executor);
     }
 }
