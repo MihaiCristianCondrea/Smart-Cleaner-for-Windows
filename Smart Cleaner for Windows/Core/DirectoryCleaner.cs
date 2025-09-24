@@ -19,11 +19,6 @@ public sealed class DirectoryCleaner : IDirectoryCleaner
 
     public static IDirectoryCleaner Default { get; } = new DirectoryCleaner();
 
-    public static Task<DirectoryCleanResult> CleanAsync(string root, DirectoryCleanOptions? options = null, CancellationToken cancellationToken = default)
-    {
-        return Default.CleanAsync(root, options, cancellationToken);
-    }
-
     public static DirectoryCleanResult Clean(string root, DirectoryCleanOptions? options = null, CancellationToken cancellationToken = default)
     {
         return Default.Clean(root, options, cancellationToken);
