@@ -16,7 +16,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel
-            x:Name="customTitleBarPanel"
+            x:Name="CustomTitleBarPanel"
             Grid.Row="0"
             Orientation="Horizontal"
             VerticalAlignment="Center"
@@ -125,8 +125,8 @@
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
-                                <Button x:Name="basicButton" Content="Use system title bar" Click="basicButton_Click" />
-                                <Button x:Name="customButton" Content="Use custom title bar" Click="customButton_Click" />
+                                <Button x:Name="BasicButton" Content="Use system title bar" Click="basicButton_Click" />
+                                <Button x:Name="CustomButton" Content="Use custom title bar" Click="customButton_Click" />
                             </StackPanel>
 
                             <Border Style="{StaticResource CardStyle}">

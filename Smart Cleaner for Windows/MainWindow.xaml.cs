@@ -374,7 +374,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
     private void basicButton_Click(object sender, RoutedEventArgs e)
     {
-        customTitleBarPanel.Visibility = Visibility.Collapsed;
+        CustomTitleBarPanel.Visibility = Visibility.Collapsed;
 
         var appWindow = TryGetAppWindow();
         if (appWindow is not null)
@@ -463,9 +463,9 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
     private void customButton_Click(object sender, RoutedEventArgs e)
     {
-        customTitleBarPanel.Visibility = Visibility.Visible;
+        CustomTitleBarPanel.Visibility = Visibility.Visible;
 
-        SetTitleBar(customTitleBarPanel);
+        SetTitleBar(CustomTitleBarPanel);
 
         var appWindow = TryGetAppWindow();
         if (appWindow is null)
