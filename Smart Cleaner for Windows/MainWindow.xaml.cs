@@ -224,25 +224,93 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
     private void TryEnableMica()
     {
-        if (!MicaController.IsSupported())
+        DisposeBackdropController();
+
+        if (!OperatingSystem.IsWindows())
+        {
+            SystemBackdrop = null;
+            return;
+        }
+
+        if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000) &&
+            MicaController.IsSupported() &&
+            TrySetSystemBackdropSafe(new MicaBackdrop()))
         {
             return;
         }
 
-        _backdropConfig = new SystemBackdropConfiguration
+        if (TryInitializeLegacyMicaController())
         {
-            IsInputActive = true,
-            Theme = Application.Current.RequestedTheme switch
-            {
-                ApplicationTheme.Dark => SystemBackdropTheme.Dark,
-                ApplicationTheme.Light => SystemBackdropTheme.Light,
-                _ => SystemBackdropTheme.Default
-            }
-        };
+            return;
+        }
 
-        _mica = new MicaController { Kind = MicaKind.Base };
-        _mica.AddSystemBackdropTarget(this.As<Microsoft.UI.Composition.ICompositionSupportsSystemBackdrop>());
-        _mica.SetSystemBackdropConfiguration(_backdropConfig);
+        TryEnableDesktopAcrylic();
+    }
+
+    private void DisposeBackdropController()
+    {
+        _mica?.Dispose();
+        _mica = null;
+        _backdropConfig = null;
+    }
+
+    private bool TrySetSystemBackdropSafe(SystemBackdrop backdrop)
+    {
+        try
+        {
+            SystemBackdrop = backdrop;
+            return true;
+        }
+        catch
+        {
+            SystemBackdrop = null;
+            return false;
+        }
+    }
+
+    private bool TryInitializeLegacyMicaController()
+    {
+        if (!MicaController.IsSupported())
+        {
+            return false;
+        }
+
+        try
+        {
+            SystemBackdrop = null;
+            _backdropConfig = new SystemBackdropConfiguration
+            {
+                IsInputActive = true,
+                Theme = Application.Current.RequestedTheme switch
+                {
+                    ApplicationTheme.Dark => SystemBackdropTheme.Dark,
+                    ApplicationTheme.Light => SystemBackdropTheme.Light,
+                    _ => SystemBackdropTheme.Default
+                }
+            };
+
+            _mica = new MicaController { Kind = MicaKind.Base };
+            _mica.AddSystemBackdropTarget(this.As<Microsoft.UI.Composition.ICompositionSupportsSystemBackdrop>());
+            _mica.SetSystemBackdropConfiguration(_backdropConfig);
+            return true;
+        }
+        catch
+        {
+            DisposeBackdropController();
+            SystemBackdrop = null;
+            return false;
+        }
+    }
+
+    private void TryEnableDesktopAcrylic()
+    {
+        if (!DesktopAcrylicController.IsSupported())
+        {
+            SystemBackdrop = null;
+            return;
+        }
+
+        _ = TrySetSystemBackdropSafe(new DesktopAcrylicBackdrop());
     }
 
     private void OnWindowActivated(object sender, WindowActivatedEventArgs args)
