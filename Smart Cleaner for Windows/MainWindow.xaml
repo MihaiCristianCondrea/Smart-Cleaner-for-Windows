@@ -1333,91 +1333,359 @@
                         </StackPanel>
 
                         <Border Style="{StaticResource CardStyle}">
-                            <StackPanel Spacing="12">
+                            <StackPanel Spacing="{StaticResource Spacing.Size200}">
                                 <TextBlock Text="About" FontSize="22" FontWeight="SemiBold" />
-                                <TextBlock Text="Smart Cleaner for Windows" FontWeight="SemiBold" />
-                                <TextBlock
-                                    Text="A modern utility for tidying empty folders and reclaiming disk space."
-                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                    TextWrapping="Wrap" />
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon
-                                        Glyph="&#xE946;"
-                                        FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    <TextBlock Text="Version 1.0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <StackPanel Spacing="{StaticResource Spacing.Size40}">
+                                    <TextBlock Text="Smart Cleaner for Windows" FontWeight="SemiBold" />
+                                    <TextBlock
+                                        Text="A modern utility for tidying empty folders and reclaiming disk space."
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        TextWrapping="Wrap" />
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon
+                                            Glyph="&#xE946;"
+                                            FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        <TextBlock Text="Version 1.0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                    <HyperlinkButton Content="Documentation" NavigateUri="https://github.com/MihaiCristianCondrea/Smart-Cleaner-for-Windows" />
+                                    <HyperlinkButton Content="Privacy policy" NavigateUri="https://github.com/MihaiCristianCondrea/Smart-Cleaner-for-Windows/blob/main/PRIVACY.md" />
                                 </StackPanel>
                             </StackPanel>
                         </Border>
 
                         <Border Style="{StaticResource CardStyle}">
                             <StackPanel Spacing="{StaticResource Spacing.Size200}">
-                                <TextBlock Text="Personalization" FontSize="22" FontWeight="SemiBold" />
-
-                                <StackPanel Spacing="{StaticResource Spacing.Size80}">
-                                    <Grid ColumnSpacing="{StaticResource Spacing.Size160}">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <StackPanel Spacing="{StaticResource Spacing.Size40}">
-                                            <TextBlock Text="App theme" FontSize="18" FontWeight="SemiBold" />
-                                            <TextBlock
-                                                Text="Choose how Smart Cleaner looks."
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                TextWrapping="Wrap" />
-                                        </StackPanel>
-
-                                        <TextBlock
-                                            x:Name="ThemeSummaryText"
-                                            Grid.Column="1"
-                                            Text="Use system setting"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                    <Border
+                                        Width="40"
+                                        Height="40"
+                                        CornerRadius="14"
+                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                        VerticalAlignment="Center">
+                                        <SymbolIcon
+                                            Symbol="Setting"
+                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                            HorizontalAlignment="Center"
                                             VerticalAlignment="Center" />
-                                    </Grid>
-
-                                    <RadioButtons
-                                        x:Name="ThemeRadioButtons"
-                                        MaxColumns="1"
-                                        SelectionChanged="OnThemeSelectionChanged">
-                                        <RadioButton Content="Light" Tag="light" />
-                                        <RadioButton Content="Dark" Tag="dark" />
-                                        <RadioButton Content="Use system setting" Tag="default" />
-                                    </RadioButtons>
+                                    </Border>
+                                    <StackPanel>
+                                        <TextBlock Text="Cleaner defaults" FontSize="22" FontWeight="SemiBold" />
+                                        <TextBlock
+                                            Text="Choose how empty folders are handled by default before each run."
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
                                 </StackPanel>
 
-                                <StackPanel Spacing="{StaticResource Spacing.Size80}">
-                                    <Grid ColumnSpacing="{StaticResource Spacing.Size160}">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="{StaticResource Spacing.Size160}">
+                                    <TextBlock
+                                        x:Name="CleanerDefaultsSummaryText"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Text="Recycle Bin • No depth limit" />
 
-                                        <StackPanel Spacing="{StaticResource Spacing.Size40}">
-                                            <TextBlock Text="Accent color" FontSize="18" FontWeight="SemiBold" />
-                                            <TextBlock
-                                                Text="Personalize buttons and highlights with a custom accent."
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                TextWrapping="Wrap" />
+                                    <ToggleSwitch
+                                        x:Name="CleanerRecycleToggle"
+                                        Header="Send deleted folders to Recycle Bin"
+                                        OnContent="Recycle Bin"
+                                        OffContent="Delete permanently"
+                                        Toggled="OnCleanerRecyclePreferenceToggled" />
+
+                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}" VerticalAlignment="Center">
+                                        <SymbolIcon
+                                            Symbol="Sort"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        <TextBlock VerticalAlignment="Center" Text="Default depth limit" />
+                                        <NumberBox
+                                            x:Name="CleanerDepthPreferenceBox"
+                                            Width="96"
+                                            Minimum="0"
+                                            Maximum="999"
+                                            ValueChanged="OnCleanerDepthPreferenceChanged" />
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="{StaticResource Spacing.Size40}">
+                                        <TextBlock Text="Default exclusions" FontWeight="SemiBold" />
+                                        <TextBox
+                                            x:Name="CleanerExclusionsPreferenceBox"
+                                            PlaceholderText=".git; build/*; node_modules"
+                                            TextChanged="OnCleanerExclusionsPreferenceChanged" />
+                                        <TextBlock
+                                            Text="Use semicolons to separate names or wildcard patterns."
+                                            FontSize="12"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Button Click="OnApplyCleanerDefaults">
+                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                <SymbolIcon Symbol="Sync" />
+                                                <TextBlock Text="Apply to current session" />
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+
+                                    <InfoBar x:Name="CleanerDefaultsInfoBar" IsOpen="False" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel Spacing="{StaticResource Spacing.Size200}">
+                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                    <Border
+                                        Width="40"
+                                        Height="40"
+                                        CornerRadius="14"
+                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                        VerticalAlignment="Center">
+                                        <SymbolIcon
+                                            Symbol="Sync"
+                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel>
+                                        <TextBlock Text="Automation" FontSize="22" FontWeight="SemiBold" />
+                                        <TextBlock
+                                            Text="Streamline routine scans with automation options."
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <StackPanel Spacing="{StaticResource Spacing.Size160}">
+                                    <TextBlock
+                                        x:Name="AutomationSummaryText"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Text="Automation disabled" />
+
+                                    <ToggleSwitch
+                                        x:Name="AutomationAutoPreviewToggle"
+                                        Header="Automatically run Preview after selecting a folder"
+                                        Toggled="OnAutomationPreferenceToggled" />
+
+                                    <ToggleSwitch
+                                        x:Name="AutomationReminderToggle"
+                                        Header="Remind me to clean weekly"
+                                        Toggled="OnAutomationPreferenceToggled" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel Spacing="{StaticResource Spacing.Size200}">
+                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                    <Border
+                                        Width="40"
+                                        Height="40"
+                                        CornerRadius="14"
+                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                        VerticalAlignment="Center">
+                                        <SymbolIcon
+                                            Symbol="Message"
+                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel>
+                                        <TextBlock Text="Notifications" FontSize="22" FontWeight="SemiBold" />
+                                        <TextBlock
+                                            Text="Choose how Smart Cleaner keeps you informed."
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <StackPanel Spacing="{StaticResource Spacing.Size160}">
+                                    <TextBlock
+                                        x:Name="NotificationSummaryText"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Text="All notifications enabled" />
+
+                                    <ToggleSwitch
+                                        x:Name="NotificationCompletionToggle"
+                                        Header="Show a summary after cleaning"
+                                        IsOn="True"
+                                        Toggled="OnNotificationPreferenceToggled" />
+
+                                    <ToggleSwitch
+                                        x:Name="NotificationDesktopToggle"
+                                        Header="Send desktop alerts when automation runs"
+                                        Toggled="OnNotificationPreferenceToggled" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel Spacing="{StaticResource Spacing.Size200}">
+                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                    <Border
+                                        Width="40"
+                                        Height="40"
+                                        CornerRadius="14"
+                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                        VerticalAlignment="Center">
+                                        <SymbolIcon
+                                            Symbol="Save"
+                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel>
+                                        <TextBlock Text="History & data" FontSize="22" FontWeight="SemiBold" />
+                                        <TextBlock
+                                            Text="Control how long Smart Cleaner keeps past actions."
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <StackPanel Spacing="{StaticResource Spacing.Size160}">
+                                    <TextBlock
+                                        x:Name="HistoryRetentionSummaryText"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Text="Keep history for 30 days" />
+
+                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}" VerticalAlignment="Center">
+                                        <SymbolIcon
+                                            Symbol="Calendar"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        <TextBlock VerticalAlignment="Center" Text="Days to keep history" />
+                                        <NumberBox
+                                            x:Name="HistoryRetentionNumberBox"
+                                            Width="96"
+                                            Minimum="0"
+                                            Maximum="365"
+                                            Value="30"
+                                            ValueChanged="OnHistoryRetentionChanged" />
+                                    </StackPanel>
+
+                                    <TextBlock
+                                        Text="Set to 0 to clear history automatically after each run."
+                                        FontSize="12"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel Spacing="{StaticResource Spacing.Size200}">
+                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                    <Border
+                                        Width="40"
+                                        Height="40"
+                                        CornerRadius="14"
+                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                                        VerticalAlignment="Center">
+                                        <SymbolIcon
+                                            Symbol="Highlight"
+                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel>
+                                        <TextBlock Text="Personalization" FontSize="22" FontWeight="SemiBold" />
+                                        <TextBlock
+                                            Text="Preview theme and accent tweaks before applying them."
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <Grid ColumnSpacing="{StaticResource Spacing.Size200}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0" Spacing="{StaticResource Spacing.Size160}">
+                                        <StackPanel Spacing="{StaticResource Spacing.Size80}">
+                                            <Grid ColumnSpacing="{StaticResource Spacing.Size160}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <StackPanel Spacing="{StaticResource Spacing.Size40}">
+                                                    <TextBlock Text="App theme" FontSize="18" FontWeight="SemiBold" />
+                                                    <TextBlock
+                                                        Text="Choose how Smart Cleaner looks."
+                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        TextWrapping="Wrap" />
+                                                </StackPanel>
+
+                                                <TextBlock
+                                                    x:Name="ThemeSummaryText"
+                                                    Grid.Column="1"
+                                                    Text="Use system setting"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    VerticalAlignment="Center" />
+                                            </Grid>
+
+                                            <RadioButtons
+                                                x:Name="ThemeRadioButtons"
+                                                MaxColumns="1"
+                                                SelectionChanged="OnThemeSelectionChanged">
+                                                <RadioButton Content="Light" Tag="light" />
+                                                <RadioButton Content="Dark" Tag="dark" />
+                                                <RadioButton Content="Use system setting" Tag="default" />
+                                            </RadioButtons>
                                         </StackPanel>
 
-                                        <TextBlock
-                                            x:Name="AccentSummaryText"
-                                            Grid.Column="1"
-                                            Text="Use system setting"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                            VerticalAlignment="Center" />
-                                    </Grid>
+                                        <StackPanel Spacing="{StaticResource Spacing.Size80}">
+                                            <Grid ColumnSpacing="{StaticResource Spacing.Size160}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
 
-                                    <RadioButtons
-                                        x:Name="AccentColorRadioButtons"
-                                        MaxColumns="1"
-                                        SelectionChanged="OnAccentPreferenceChanged">
-                                        <RadioButton Content="Zest (default color scheme)" Tag="zest" />
-                                        <RadioButton Content="Use system setting" Tag="default" />
-                                    </RadioButtons>
-                                </StackPanel>
+                                                <StackPanel Spacing="{StaticResource Spacing.Size40}">
+                                                    <TextBlock Text="Accent color" FontSize="18" FontWeight="SemiBold" />
+                                                    <TextBlock
+                                                        Text="Personalize buttons and highlights with a custom accent."
+                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        TextWrapping="Wrap" />
+                                                </StackPanel>
+
+                                                <TextBlock
+                                                    x:Name="AccentSummaryText"
+                                                    Grid.Column="1"
+                                                    Text="Use system setting"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    VerticalAlignment="Center" />
+                                            </Grid>
+
+                                            <RadioButtons
+                                                x:Name="AccentColorRadioButtons"
+                                                MaxColumns="1"
+                                                SelectionChanged="OnAccentPreferenceChanged">
+                                                <RadioButton Content="Zest (default color scheme)" Tag="zest" />
+                                                <RadioButton Content="Use system setting" Tag="default" />
+                                            </RadioButtons>
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" Spacing="{StaticResource Spacing.Size120}" VerticalAlignment="Center">
+                                        <TextBlock Text="Preview" FontWeight="SemiBold" />
+                                        <Border
+                                            Padding="16"
+                                            CornerRadius="12"
+                                            Background="{ThemeResource LayerFillColorDefaultBrush}">
+                                            <StackPanel Spacing="{StaticResource Spacing.Size80}">
+                                                <Rectangle Height="12" Fill="{ThemeResource AccentFillColorDefaultBrush}" RadiusX="4" RadiusY="4" />
+                                                <StackPanel Spacing="{StaticResource Spacing.Size60}">
+                                                    <Rectangle Height="8" Fill="{ThemeResource TextFillColorPrimaryBrush}" RadiusX="4" RadiusY="4" />
+                                                    <Rectangle Height="8" Fill="{ThemeResource TextFillColorSecondaryBrush}" RadiusX="4" RadiusY="4" />
+                                                    <Rectangle Height="8" Fill="{ThemeResource TextFillColorSecondaryBrush}" RadiusX="4" RadiusY="4" Width="120" />
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </Grid>
                             </StackPanel>
                         </Border>
                     </StackPanel>
