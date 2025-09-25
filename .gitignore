@@ -11,12 +11,18 @@ $RECYCLE.BIN/
 *.user
 *.userosscache
 *.sln.docstates
+# VS database/caches
+*.VC.db
+*.opendb
+ipch/
 
 # JetBrains Rider
 .idea/
 *.sln.iml
+_ReSharper.*/
+*.[Rr]e[Ss]harper
 
-# VS Code (keep settings.json if you want, otherwise ignore all)
+# VS Code (keep workspace settings if you like)
 .vscode/*
 !.vscode/settings.json
 
@@ -25,25 +31,38 @@ $RECYCLE.BIN/
 **/obj/
 **/artifacts/
 **/TestResults/
-**/*.appxrecipe
-**/*.cache
-*.ilk
-*.pdb
+*.pidb
 *.ipch
 
-# NuGet
-*.nupkg
-packages/
-.nuget/
-# (dotnet restore will recreate)
+# Intermediate / compiler
+*.ilk
+*.pdb
+*.pch
+*.obj
+*.iobj
+*.log
+*.tlog
+*.tmp
+*.cache
+*.cachefile
+
+# Roslyn/IDE caches
+*.ide/
+
+# ---- NuGet / restore --------------------------------------------------------
+# packages folder (restore will repopulate)
+**/packages/
+# NuGet v3 assets
 project.lock.json
 project.assets.json
+# nupkgs you might create locally
+*.nupkg
+.nuget/
 
-# ---- Publish / Distribution -------------------------------------------------
+# ---- Publish / distribution -------------------------------------------------
 # Self-contained & framework-dependent publish directories
 **/publish/
-
-# Zip/archives created by publish scripts
+# Archives from scripts
 *.zip
 *.7z
 
@@ -56,7 +75,8 @@ BundleArtifacts/
 **/*.appxbundle
 **/*.appxsym
 **/_pkginfo.txt
-# Temp certificate or local signing keys
+
+# Signing bits (never commit private keys/certs)
 **/*.cer
 **/*.pfx
 **/*.p12
@@ -67,36 +87,37 @@ logs/
 *.log
 *.etl
 *.dmp
-
-# ---- Tools / caches ---------------------------------------------------------
-# Rider/Resharper
-_ReSharper.*/
-*.[Rr]e[Ss]harper
-# DotCover / coverage
-*.dotCover
-coverage*/**
 *.coverage
 *.coveragexml
+*.dotCover
+coverage*/**
 
-# Node/yarn (if you experiment with web bits for assets)
+# ---- Node/yarn (if you generate assets with web tooling) -------------------
 node_modules/
-yarn.lock
+# lockfile optional; ignore if repo policy prefers reproducible restores via .csproj
+# yarn.lock
 
 # ---- Project-specific paths -------------------------------------------------
-# Packaging images: ignore actual PNGs, keep the README with sizes
-src/EmptyFolderCleaner.Packaging/Images/**
-!src/EmptyFolderCleaner.Packaging/Images/README.md
-
-# If you renamed paths, mirror the same rule for your structure:
+# Packaging images: keep the README that lists required sizes
 Smart Cleaner for Windows/Packaging/Images/**
 !Smart Cleaner for Windows/Packaging/Images/README.md
 
-# Generated PRI/manifest variants that sometimes leak outside obj/bin
+# Generated PRI sometimes ends up outside obj
 *.pri
-*.manifest
 
-# ---- Secrets just in case ---------------------------------------------------
+# Win32 .manifest (NOT the Package.appxmanifest)
+# (WinUI 3 single-project uses Package.appxmanifest; this keeps stray .manifest out)
+*.manifest
+!**/Package.appxmanifest
+
+# ---- Secrets / signing / misc ----------------------------------------------
 *.snk
 *.key
 *.keystore
 *.keystore.jks
+
+# ---- Optional: test runners & misc vendors ---------------------------------
+# Chutzpah, NCrunch, etc. (add if you use them)
+# _Chutzpah*
+# _NCrunch_*
+# .*crunch*.local.xml
