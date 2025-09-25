@@ -2290,18 +2290,11 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
         try
         {
-            return ResourceLoader.GetForViewIndependentUse();
+            return new ResourceLoader();
         }
         catch
         {
-            try
-            {
-                return new ResourceLoader();
-            }
-            catch
-            {
-                return null;
-            }
+            return null;
         }
     }
 
