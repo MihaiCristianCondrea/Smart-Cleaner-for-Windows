@@ -683,10 +683,7 @@
                                         HorizontalAlignment="Right"
                                         Spacing="{StaticResource Spacing.Size80}">
                                         <Button x:Name="SelectVisibleBtn" Click="OnSelectVisibleCandidates">
-                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size40}">
-                                                <SymbolIcon Symbol="MultiSelect" />
-                                                <TextBlock Text="Select visible" />
-                                            </StackPanel>
+                                            <TextBlock Text="Select visible" />
                                         </Button>
                                         <Button x:Name="ClearSelectionBtn" Click="OnClearCandidateSelection">
                                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size40}">
