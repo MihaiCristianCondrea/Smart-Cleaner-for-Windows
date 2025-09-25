@@ -463,10 +463,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 }
 
                 topLevelSegments.Add(_rootDisplayName);
-                var rootNode = new EmptyFolderNode(this, name, normalized, string.Empty, 0, isVirtual: false, _rootDisplayName, null)
-                {
-                    IsExpanded = true,
-                };
+                var rootNode = new EmptyFolderNode(this, name, normalized, string.Empty, 0, isVirtual: false, _rootDisplayName, null);
                 _candidateRoots.Add(rootNode);
                 _allCandidateNodes.Add(rootNode);
                 nodeLookup[normalized] = rootNode;
@@ -506,10 +503,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                         i + 1,
                         isVirtual: !isLeaf,
                         segments[0],
-                        parent)
-                    {
-                        IsExpanded = true,
-                    };
+                        parent);
 
                     if (parent is null)
                     {
@@ -3592,7 +3586,6 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         private bool _isSelected;
         private bool _isExcluded;
         private bool _isVisible = true;
-        private bool _isExpanded = true;
 
         public EmptyFolderNode(
             MainWindow owner,
@@ -3703,19 +3696,6 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         }
 
         public Visibility Visibility => _isVisible ? Visibility.Visible : Visibility.Collapsed;
-
-        public bool IsExpanded
-        {
-            get => _isExpanded;
-            set
-            {
-                if (_isExpanded != value)
-                {
-                    _isExpanded = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

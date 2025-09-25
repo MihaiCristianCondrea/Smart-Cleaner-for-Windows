@@ -710,7 +710,7 @@
                                         Grid.Row="2"
                                         SelectionMode="None">
                                         <TreeView.ItemTemplate>
-                                            <TreeViewItemTemplate ItemsSource="{Binding Children}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+                                            <TreeViewItemTemplate ItemsSource="{Binding Children}">
                                                 <Border
                                                     Background="{ThemeResource LayerFillColorDefaultBrush}"
                                                     CornerRadius="12"
