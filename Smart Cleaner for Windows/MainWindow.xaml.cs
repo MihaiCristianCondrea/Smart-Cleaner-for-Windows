@@ -67,6 +67,14 @@ public sealed partial class MainWindow
     private bool _isInitializingSettings;
     private string _themePreference = ThemePreferenceDefault;
     private string _accentPreference = AccentPreferenceDefault;
+    private bool _cleanerSendToRecycleBin = true;
+    private int _cleanerDepthLimit;
+    private string _cleanerExclusions = string.Empty;
+    private bool _automationAutoPreview;
+    private bool _automationWeeklyReminder;
+    private bool _notificationShowCompletion = true;
+    private bool _notificationDesktopAlerts;
+    private int _historyRetentionDays = HistoryRetentionDefaultDays;
 
     private const string ThemePreferenceKey = "Settings.ThemePreference";
     private const string AccentPreferenceKey = "Settings.AccentPreference";
@@ -75,6 +83,17 @@ public sealed partial class MainWindow
     private const string ThemePreferenceDefault = "default";
     private const string AccentPreferenceZest = "zest";
     private const string AccentPreferenceDefault = "default";
+    private const string CleanerRecyclePreferenceKey = "Settings.Cleaner.SendToRecycleBin";
+    private const string CleanerDepthPreferenceKey = "Settings.Cleaner.DepthLimit";
+    private const string CleanerExclusionsPreferenceKey = "Settings.Cleaner.Exclusions";
+    private const string AutomationAutoPreviewKey = "Settings.Automation.AutoPreview";
+    private const string AutomationReminderKey = "Settings.Automation.Reminder";
+    private const string NotificationShowCompletionKey = "Settings.Notifications.ShowCompletion";
+    private const string NotificationDesktopAlertsKey = "Settings.Notifications.DesktopAlerts";
+    private const string HistoryRetentionKey = "Settings.History.RetentionDays";
+    private const int HistoryRetentionDefaultDays = 30;
+    private const int HistoryRetentionMinDays = 0;
+    private const int HistoryRetentionMaxDays = 365;
     private const string LargeFilesExclusionsKey = "LargeFiles.Exclusions";
     private const string TitleBarIconTempFileName = "SmartCleanerTitleIcon.ico";
     private const string TitleBarIconBase64 = """
@@ -1099,6 +1118,159 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
     }
 
+    private static bool ParseBoolSetting(string? value, bool defaultValue)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return defaultValue;
+        }
+
+        if (bool.TryParse(value, out var result))
+        {
+            return result;
+        }
+
+        if (int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var numeric))
+        {
+            return numeric != 0;
+        }
+
+        return defaultValue;
+    }
+
+    private static int ParseIntSetting(string? value, int defaultValue, int min, int max)
+    {
+        if (!string.IsNullOrWhiteSpace(value) &&
+            int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed))
+        {
+            defaultValue = parsed;
+        }
+
+        return Math.Clamp(defaultValue, min, max);
+    }
+
+    private void ApplyCleanerDefaultsToSession()
+    {
+        if (RecycleChk is not null)
+        {
+            RecycleChk.IsChecked = _cleanerSendToRecycleBin;
+        }
+
+        if (DepthBox is not null)
+        {
+            DepthBox.Value = _cleanerDepthLimit;
+        }
+
+        if (ExcludeBox is not null)
+        {
+            ExcludeBox.Text = _cleanerExclusions;
+        }
+    }
+
+    private void UpdateCleanerDefaultsSummary()
+    {
+        if (CleanerDefaultsSummaryText is null)
+        {
+            return;
+        }
+
+        var recycleText = _cleanerSendToRecycleBin
+            ? Localize("SettingsCleanerDefaultsRecycle", "Recycle Bin")
+            : Localize("SettingsCleanerDefaultsPermanent", "Permanent delete");
+        var depthText = _cleanerDepthLimit > 0
+            ? string.Format(
+                CultureInfo.CurrentCulture,
+                Localize("SettingsCleanerDefaultsDepth", "Depth limit {0}"),
+                _cleanerDepthLimit)
+            : Localize("SettingsCleanerDefaultsNoDepth", "No depth limit");
+
+        CleanerDefaultsSummaryText.Text = string.Format(
+            CultureInfo.CurrentCulture,
+            Localize("SettingsCleanerDefaultsSummary", "{0} • {1}"),
+            recycleText,
+            depthText);
+    }
+
+    private void UpdateAutomationSummary()
+    {
+        if (AutomationSummaryText is null)
+        {
+            return;
+        }
+
+        var descriptors = new List<string>();
+        if (_automationAutoPreview)
+        {
+            descriptors.Add(Localize("SettingsAutomationAutoPreview", "Auto preview"));
+        }
+
+        if (_automationWeeklyReminder)
+        {
+            descriptors.Add(Localize("SettingsAutomationWeeklyReminder", "Weekly reminders"));
+        }
+
+        AutomationSummaryText.Text = descriptors.Count > 0
+            ? string.Join(" • ", descriptors)
+            : Localize("SettingsAutomationDisabled", "Automation disabled");
+    }
+
+    private void UpdateNotificationSummary()
+    {
+        if (NotificationSummaryText is null)
+        {
+            return;
+        }
+
+        string summary;
+        if (_notificationShowCompletion && _notificationDesktopAlerts)
+        {
+            summary = Localize("SettingsNotificationsAll", "All notifications enabled");
+        }
+        else if (_notificationShowCompletion)
+        {
+            summary = Localize("SettingsNotificationsCompletionOnly", "Completion summary only");
+        }
+        else if (_notificationDesktopAlerts)
+        {
+            summary = Localize("SettingsNotificationsDesktopOnly", "Desktop alerts only");
+        }
+        else
+        {
+            summary = Localize("SettingsNotificationsMuted", "Notifications muted");
+        }
+
+        NotificationSummaryText.Text = summary;
+    }
+
+    private void UpdateHistoryRetentionSummary()
+    {
+        if (HistoryRetentionSummaryText is null)
+        {
+            return;
+        }
+
+        var summary = _historyRetentionDays > 0
+            ? string.Format(
+                CultureInfo.CurrentCulture,
+                Localize("SettingsHistoryRetentionSummary", "Keep history for {0} day(s)"),
+                _historyRetentionDays)
+            : Localize("SettingsHistoryRetentionOff", "Do not keep history");
+
+        HistoryRetentionSummaryText.Text = summary;
+    }
+
+    private void ShowCleanerDefaultsInfo(string message, InfoBarSeverity severity)
+    {
+        if (CleanerDefaultsInfoBar is null)
+        {
+            return;
+        }
+
+        CleanerDefaultsInfoBar.Message = message;
+        CleanerDefaultsInfoBar.Severity = severity;
+        CleanerDefaultsInfoBar.IsOpen = true;
+    }
+
     private async void OnLargeFilesBrowse(object sender, RoutedEventArgs e)
     {
         var picker = new FolderPicker();
@@ -2078,11 +2250,6 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
     private void LoadPreferences()
     {
-        if (ThemeRadioButtons is null || AccentColorRadioButtons is null)
-        {
-            return;
-        }
-
         _isInitializingSettings = true;
 
         var savedTheme = ReadSetting(ThemePreferenceKey);
@@ -2093,7 +2260,72 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         ApplyAccentPreference(savedAccent, save: false);
         SelectAccentOption(_accentPreference);
 
+        _cleanerSendToRecycleBin = ParseBoolSetting(ReadSetting(CleanerRecyclePreferenceKey), defaultValue: true);
+        _cleanerDepthLimit = ParseIntSetting(
+            ReadSetting(CleanerDepthPreferenceKey),
+            defaultValue: 0,
+            min: 0,
+            max: 999);
+        _cleanerExclusions = ReadSetting(CleanerExclusionsPreferenceKey) ?? string.Empty;
+
+        _automationAutoPreview = ParseBoolSetting(ReadSetting(AutomationAutoPreviewKey), defaultValue: false);
+        _automationWeeklyReminder = ParseBoolSetting(ReadSetting(AutomationReminderKey), defaultValue: false);
+        _notificationShowCompletion = ParseBoolSetting(ReadSetting(NotificationShowCompletionKey), defaultValue: true);
+        _notificationDesktopAlerts = ParseBoolSetting(ReadSetting(NotificationDesktopAlertsKey), defaultValue: false);
+        _historyRetentionDays = ParseIntSetting(
+            ReadSetting(HistoryRetentionKey),
+            HistoryRetentionDefaultDays,
+            min: HistoryRetentionMinDays,
+            max: HistoryRetentionMaxDays);
+
+        if (CleanerRecycleToggle is not null)
+        {
+            CleanerRecycleToggle.IsOn = _cleanerSendToRecycleBin;
+        }
+
+        if (CleanerDepthPreferenceBox is not null)
+        {
+            CleanerDepthPreferenceBox.Value = _cleanerDepthLimit;
+        }
+
+        if (CleanerExclusionsPreferenceBox is not null)
+        {
+            CleanerExclusionsPreferenceBox.Text = _cleanerExclusions;
+        }
+
+        if (AutomationAutoPreviewToggle is not null)
+        {
+            AutomationAutoPreviewToggle.IsOn = _automationAutoPreview;
+        }
+
+        if (AutomationReminderToggle is not null)
+        {
+            AutomationReminderToggle.IsOn = _automationWeeklyReminder;
+        }
+
+        if (NotificationCompletionToggle is not null)
+        {
+            NotificationCompletionToggle.IsOn = _notificationShowCompletion;
+        }
+
+        if (NotificationDesktopToggle is not null)
+        {
+            NotificationDesktopToggle.IsOn = _notificationDesktopAlerts;
+        }
+
+        if (HistoryRetentionNumberBox is not null)
+        {
+            HistoryRetentionNumberBox.Value = _historyRetentionDays;
+        }
+
+        UpdateCleanerDefaultsSummary();
+        UpdateAutomationSummary();
+        UpdateNotificationSummary();
+        UpdateHistoryRetentionSummary();
+
         _isInitializingSettings = false;
+
+        ApplyCleanerDefaultsToSession();
     }
 
     private void OnThemeSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -2188,6 +2420,11 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
     private void SelectThemeOption(string preference)
     {
+        if (ThemeRadioButtons is null)
+        {
+            return;
+        }
+
         ThemeRadioButtons.SelectedIndex = preference switch
         {
             ThemePreferenceLight => 0,
@@ -2253,6 +2490,11 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
     private void SelectAccentOption(string preference)
     {
+        if (AccentColorRadioButtons is null)
+        {
+            return;
+        }
+
         AccentColorRadioButtons.SelectedIndex = preference switch
         {
             AccentPreferenceZest => 0,
@@ -2279,6 +2521,138 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         }
 
         return preference;
+    }
+
+    private void OnCleanerRecyclePreferenceToggled(object sender, RoutedEventArgs e)
+    {
+        if (_isInitializingSettings)
+        {
+            return;
+        }
+
+        if (sender is ToggleSwitch toggle)
+        {
+            _cleanerSendToRecycleBin = toggle.IsOn;
+            SaveSetting(
+                CleanerRecyclePreferenceKey,
+                _cleanerSendToRecycleBin.ToString(CultureInfo.InvariantCulture));
+            UpdateCleanerDefaultsSummary();
+            ApplyCleanerDefaultsToSession();
+        }
+    }
+
+    private void OnCleanerDepthPreferenceChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+    {
+        if (_isInitializingSettings)
+        {
+            return;
+        }
+
+        var value = sender.Value;
+        if (double.IsNaN(value))
+        {
+            value = 0;
+        }
+
+        var depth = (int)Math.Clamp(Math.Round(value), 0, 999);
+        sender.Value = depth;
+        _cleanerDepthLimit = depth;
+        SaveSetting(CleanerDepthPreferenceKey, depth.ToString(CultureInfo.InvariantCulture));
+        UpdateCleanerDefaultsSummary();
+        ApplyCleanerDefaultsToSession();
+    }
+
+    private void OnCleanerExclusionsPreferenceChanged(object sender, TextChangedEventArgs e)
+    {
+        if (_isInitializingSettings)
+        {
+            return;
+        }
+
+        if (sender is TextBox textBox)
+        {
+            _cleanerExclusions = textBox.Text?.Trim() ?? string.Empty;
+            SaveSetting(CleanerExclusionsPreferenceKey, _cleanerExclusions);
+            ApplyCleanerDefaultsToSession();
+        }
+    }
+
+    private void OnApplyCleanerDefaults(object sender, RoutedEventArgs e)
+    {
+        ApplyCleanerDefaultsToSession();
+        ShowCleanerDefaultsInfo(
+            Localize("SettingsCleanerDefaultsApplied", "Defaults applied to current session."),
+            InfoBarSeverity.Success);
+    }
+
+    private void OnAutomationPreferenceToggled(object sender, RoutedEventArgs e)
+    {
+        if (_isInitializingSettings)
+        {
+            return;
+        }
+
+        if (AutomationAutoPreviewToggle is not null && sender == AutomationAutoPreviewToggle)
+        {
+            _automationAutoPreview = AutomationAutoPreviewToggle.IsOn;
+            SaveSetting(
+                AutomationAutoPreviewKey,
+                _automationAutoPreview.ToString(CultureInfo.InvariantCulture));
+        }
+        else if (AutomationReminderToggle is not null && sender == AutomationReminderToggle)
+        {
+            _automationWeeklyReminder = AutomationReminderToggle.IsOn;
+            SaveSetting(
+                AutomationReminderKey,
+                _automationWeeklyReminder.ToString(CultureInfo.InvariantCulture));
+        }
+
+        UpdateAutomationSummary();
+    }
+
+    private void OnNotificationPreferenceToggled(object sender, RoutedEventArgs e)
+    {
+        if (_isInitializingSettings)
+        {
+            return;
+        }
+
+        if (NotificationCompletionToggle is not null && sender == NotificationCompletionToggle)
+        {
+            _notificationShowCompletion = NotificationCompletionToggle.IsOn;
+            SaveSetting(
+                NotificationShowCompletionKey,
+                _notificationShowCompletion.ToString(CultureInfo.InvariantCulture));
+        }
+        else if (NotificationDesktopToggle is not null && sender == NotificationDesktopToggle)
+        {
+            _notificationDesktopAlerts = NotificationDesktopToggle.IsOn;
+            SaveSetting(
+                NotificationDesktopAlertsKey,
+                _notificationDesktopAlerts.ToString(CultureInfo.InvariantCulture));
+        }
+
+        UpdateNotificationSummary();
+    }
+
+    private void OnHistoryRetentionChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+    {
+        if (_isInitializingSettings)
+        {
+            return;
+        }
+
+        var value = sender.Value;
+        if (double.IsNaN(value))
+        {
+            value = HistoryRetentionDefaultDays;
+        }
+
+        var days = (int)Math.Clamp(Math.Round(value), HistoryRetentionMinDays, HistoryRetentionMaxDays);
+        sender.Value = days;
+        _historyRetentionDays = days;
+        SaveSetting(HistoryRetentionKey, days.ToString(CultureInfo.InvariantCulture));
+        UpdateHistoryRetentionSummary();
     }
 
     private static ResourceLoader? TryCreateResourceLoader()
