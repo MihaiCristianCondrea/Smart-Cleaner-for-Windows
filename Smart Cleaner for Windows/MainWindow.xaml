@@ -1536,7 +1536,7 @@
                                             VerticalAlignment="Center" />
                                     </Border>
                                     <StackPanel>
-                                        <TextBlock Text="History & data" FontSize="22" FontWeight="SemiBold" />
+                                        <TextBlock Text="History &amp; data" FontSize="22" FontWeight="SemiBold" />
                                         <TextBlock
                                             Text="Control how long Smart Cleaner keeps past actions."
                                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
