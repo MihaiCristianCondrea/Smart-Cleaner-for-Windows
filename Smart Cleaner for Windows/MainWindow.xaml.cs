@@ -62,7 +62,7 @@ public sealed partial class MainWindow
     private bool _isDiskCleanupOperation;
     private bool _isLargeFilesBusy;
     private readonly Dictionary<string, Color> _defaultAccentColors = new();
-    private readonly ResourceLoader _resources = new();
+    private readonly ResourceLoader? _resources = TryCreateResourceLoader();
     private readonly ApplicationDataContainer? _settings = TryGetLocalSettings();
     private bool _isInitializingSettings;
     private string _themePreference = ThemePreferenceDefault;
@@ -1688,8 +1688,21 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
     private string Localize(string key, string fallback)
     {
-        var value = _resources.GetString(key);
-        return string.IsNullOrEmpty(value) ? fallback : value;
+        var resources = _resources;
+        if (resources is null)
+        {
+            return fallback;
+        }
+
+        try
+        {
+            var value = resources.GetString(key);
+            return string.IsNullOrEmpty(value) ? fallback : value;
+        }
+        catch
+        {
+            return fallback;
+        }
     }
 
     private string LocalizeFormat(string key, string fallback, params object[] args)
@@ -2266,6 +2279,30 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         }
 
         return preference;
+    }
+
+    private static ResourceLoader? TryCreateResourceLoader()
+    {
+        if (!OperatingSystem.IsWindows())
+        {
+            return null;
+        }
+
+        try
+        {
+            return ResourceLoader.GetForViewIndependentUse();
+        }
+        catch
+        {
+            try
+            {
+                return new ResourceLoader();
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 
     private static ApplicationDataContainer? TryGetLocalSettings()
