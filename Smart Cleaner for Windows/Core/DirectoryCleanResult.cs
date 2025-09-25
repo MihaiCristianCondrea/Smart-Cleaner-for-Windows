@@ -14,6 +14,11 @@ public sealed record DirectoryCleanResult(
     IReadOnlyList<string> DeletedDirectories,
     IReadOnlyList<DirectoryCleanFailure> Failures)
 {
+    public DirectoryCleanResult()
+        : this(Array.Empty<string>(), Array.Empty<string>(), Array.Empty<DirectoryCleanFailure>())
+    {
+    }
+
     /// <summary>
     /// Gets a value indicating whether any directories were deleted.
     /// </summary>
@@ -35,6 +40,11 @@ public sealed record DirectoryCleanResult(
 /// </summary>
 public sealed record class DirectoryCleanFailure
 {
+    public DirectoryCleanFailure()
+        : this(string.Empty, new InvalidOperationException("Uninitialized failure"))
+    {
+    }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="DirectoryCleanFailure"/> class.
     /// </summary>

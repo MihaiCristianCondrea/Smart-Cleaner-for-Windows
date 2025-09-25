@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Smart_Cleaner_for_Windows.Core.Storage;
@@ -7,6 +8,11 @@ namespace Smart_Cleaner_for_Windows.Core.Storage;
 /// </summary>
 public sealed class StorageOverviewResult
 {
+    public StorageOverviewResult()
+        : this(0, Array.Empty<StorageDriveInfo>())
+    {
+    }
+
     public StorageOverviewResult(int readyDriveCount, IReadOnlyList<StorageDriveInfo> drives)
     {
         ReadyDriveCount = readyDriveCount;
