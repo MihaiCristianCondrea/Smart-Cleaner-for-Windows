@@ -10,36 +10,8 @@
     Title="Smart Cleaner for Windows">
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-
-        <StackPanel
-            x:Name="CustomTitleBarPanel"
-            Grid.Row="0"
-            Orientation="Horizontal"
-            VerticalAlignment="Center"
-            Visibility="Collapsed"
-            Background="{ThemeResource WindowCaptionBackground}"
-            Padding="12,0"
-            Spacing="{StaticResource Spacing.Size80}">
-            <FontIcon
-                Glyph="&#xE15E;"
-                FontFamily="Segoe MDL2 Assets"
-                Foreground="{ThemeResource WindowCaptionForeground}"
-                VerticalAlignment="Center" />
-            <TextBlock
-                Text="Smart Cleaner for Windows"
-                FontSize="20"
-                FontWeight="SemiBold"
-                VerticalAlignment="Center"
-                Foreground="{ThemeResource WindowCaptionForeground}" />
-        </StackPanel>
-
         <NavigationView
             x:Name="RootNavigation"
-            Grid.Row="1"
             IsBackButtonVisible="Collapsed"
             IsSettingsVisible="True"
             PaneDisplayMode="Left"
@@ -122,11 +94,6 @@
                                     Text="Choose a tool to continue."
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                             </StackPanel>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
-                                <Button x:Name="BasicButton" Content="Use system title bar" Click="basicButton_Click" />
-                                <Button x:Name="CustomButton" Content="Use custom title bar" Click="customButton_Click" />
                             </StackPanel>
 
                             <Border Style="{StaticResource CardStyle}">

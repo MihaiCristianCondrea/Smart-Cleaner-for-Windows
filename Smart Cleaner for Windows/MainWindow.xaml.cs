@@ -17,6 +17,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Hosting;
+using Microsoft.UI.Dispatching;
 using Microsoft.Windows.ApplicationModel.Resources;
 using Microsoft.VisualBasic.FileIO;
 using Smart_Cleaner_for_Windows.Core;
@@ -75,6 +76,7 @@ public sealed partial class MainWindow
     private bool _notificationShowCompletion = true;
     private bool _notificationDesktopAlerts;
     private int _historyRetentionDays = HistoryRetentionDefaultDays;
+    private bool _isSystemTitleBarInitialized;
 
     private const string ThemePreferenceKey = "Settings.ThemePreference";
     private const string AccentPreferenceKey = "Settings.AccentPreference";
@@ -215,6 +217,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         TryEnableMica();
         ApplyThemePreference(_themePreference, save: false);
         TryConfigureAppWindow();
+        InitializeSystemTitleBar();
         Activated += OnWindowActivated;
         Closed += OnClosed;
 
@@ -391,9 +394,38 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         }
     }
 
-    private void basicButton_Click(object sender, RoutedEventArgs e)
+    private static string? ResolveTitleBarIconPath()
     {
-        CustomTitleBarPanel.Visibility = Visibility.Collapsed;
+        try
+        {
+            var assetsDirectory = Path.Combine(AppContext.BaseDirectory, "Assets");
+            var appIconPath = Path.Combine(assetsDirectory, "AppIcon.ico");
+            if (File.Exists(appIconPath))
+            {
+                return appIconPath;
+            }
+
+            var tempPath = Path.Combine(Path.GetTempPath(), TitleBarIconTempFileName);
+            if (!File.Exists(tempPath))
+            {
+                var iconBytes = Convert.FromBase64String(TitleBarIconBase64);
+                File.WriteAllBytes(tempPath, iconBytes);
+            }
+
+            return tempPath;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private void InitializeSystemTitleBar()
+    {
+        if (_isSystemTitleBarInitialized)
+        {
+            return;
+        }
 
         var appWindow = TryGetAppWindow();
         if (appWindow is not null)
@@ -403,10 +435,22 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
         SetTitleBar(null);
 
+        if (TryApplySystemTitleBarIcon())
+        {
+            _isSystemTitleBarInitialized = true;
+        }
+        else
+        {
+            _ = DispatcherQueue?.TryEnqueue(InitializeSystemTitleBar);
+        }
+    }
+
+    private bool TryApplySystemTitleBarIcon()
+    {
         var hwndValue = WindowNative.GetWindowHandle(this);
         if (hwndValue == IntPtr.Zero)
         {
-            return;
+            return false;
         }
 
         var hwnd = new HWND(hwndValue);
@@ -452,47 +496,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         }
 
         _ = PInvoke.SetWindowText(hwnd, Title ?? string.Empty);
-    }
-
-    private static string? ResolveTitleBarIconPath()
-    {
-        try
-        {
-            var assetsDirectory = Path.Combine(AppContext.BaseDirectory, "Assets");
-            var appIconPath = Path.Combine(assetsDirectory, "AppIcon.ico");
-            if (File.Exists(appIconPath))
-            {
-                return appIconPath;
-            }
-
-            var tempPath = Path.Combine(Path.GetTempPath(), TitleBarIconTempFileName);
-            if (!File.Exists(tempPath))
-            {
-                var iconBytes = Convert.FromBase64String(TitleBarIconBase64);
-                File.WriteAllBytes(tempPath, iconBytes);
-            }
-
-            return tempPath;
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    private void customButton_Click(object sender, RoutedEventArgs e)
-    {
-        CustomTitleBarPanel.Visibility = Visibility.Visible;
-
-        SetTitleBar(CustomTitleBarPanel);
-
-        var appWindow = TryGetAppWindow();
-        if (appWindow is null)
-        {
-            return;
-        }
-
-        appWindow.TitleBar.ExtendsContentIntoTitleBar = true;
+        return true;
     }
 
     private void OnNavigationLoaded(object sender, RoutedEventArgs e)
