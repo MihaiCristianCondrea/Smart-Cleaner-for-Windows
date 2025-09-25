@@ -14,6 +14,7 @@ using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Hosting;
@@ -50,6 +51,23 @@ public sealed partial class MainWindow
     private MicaController? _mica;
     private SystemBackdropConfiguration? _backdropConfig;
     private List<string> _previewCandidates = new();
+    private readonly ObservableCollection<EmptyFolderNode> _candidateRoots = new();
+    private readonly List<EmptyFolderNode> _allCandidateNodes = new();
+    private readonly HashSet<string> _inlineExcludedPaths = new(OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+    private readonly StringComparer _pathComparer = OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+    private readonly StringComparison _pathComparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+    private string? _currentRootPath;
+    private string? _normalizedRootPath;
+    private string _rootDisplayName = "Root";
+    private string _candidateSearchText = string.Empty;
+    private string? _selectedPathFilter;
+    private bool _hideExcluded;
+    private CandidateSortMode _candidateSortMode = CandidateSortMode.NameAscending;
+    private bool _suppressSelectionChanged;
+    private bool _suppressFilterUpdates;
+    private bool _suppressCandidateRefresh;
+    private int _candidateTotalCount;
+    private int _candidateVisibleCount;
     private bool _isBusy;
     private readonly ObservableCollection<DriveUsageViewModel> _driveUsage = new();
     private readonly ObservableCollection<DiskCleanupItemViewModel> _diskCleanupItems = new();
@@ -77,6 +95,8 @@ public sealed partial class MainWindow
     private bool _notificationDesktopAlerts;
     private int _historyRetentionDays = HistoryRetentionDefaultDays;
     private bool _isSystemTitleBarInitialized;
+
+    public ObservableCollection<EmptyFolderNode> CandidateRoots => _candidateRoots;
 
     private const string ThemePreferenceKey = "Settings.ThemePreference";
     private const string AccentPreferenceKey = "Settings.AccentPreference";
@@ -198,6 +218,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             Symbol.Folder,
             Localize("StatusReadyTitle", "Ready when you are"),
             Localize("StatusReadyDescription", "Select a folder to begin."));
+        ClearCandidateView(resetFilters: true);
         SetActivity(Localize("ActivityIdle", "Waiting for the next action."));
         UpdateResultsSummary(0, Localize("ResultsPlaceholder", "Preview results will appear here once you run a scan."));
 
@@ -288,6 +309,672 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             SystemBackdrop = null;
             return false;
         }
+    }
+
+    private void ClearCandidateView(bool resetFilters)
+    {
+        _candidateRoots.Clear();
+        _allCandidateNodes.Clear();
+        _inlineExcludedPaths.Clear();
+        _candidateTotalCount = 0;
+        _candidateVisibleCount = 0;
+        UpdateResultBadge(0, 0);
+
+        if (resetFilters)
+        {
+            _candidateSearchText = string.Empty;
+            _selectedPathFilter = null;
+            _hideExcluded = false;
+            _candidateSortMode = CandidateSortMode.NameAscending;
+        }
+
+        UpdateFilterControls();
+        UpdatePathFilterOptions(Array.Empty<string>());
+        UpdateDeleteButtonState();
+        UpdateSelectionControls();
+        UpdateResultsSummary(0);
+    }
+
+    private void UpdateFilterControls()
+    {
+        _suppressFilterUpdates = true;
+        try
+        {
+            if (CandidateSearchBox is not null && CandidateSearchBox.Text != _candidateSearchText)
+            {
+                CandidateSearchBox.Text = _candidateSearchText;
+            }
+
+            if (HideExcludedCheck is not null)
+            {
+                HideExcludedCheck.IsChecked = _hideExcluded;
+            }
+
+            if (SortModeBox is not null)
+            {
+                var desiredIndex = _candidateSortMode switch
+                {
+                    CandidateSortMode.NameDescending => 1,
+                    CandidateSortMode.PathLength => 2,
+                    _ => 0,
+                };
+
+                if (SortModeBox.SelectedIndex != desiredIndex)
+                {
+                    SortModeBox.SelectedIndex = desiredIndex;
+                }
+            }
+        }
+        finally
+        {
+            _suppressFilterUpdates = false;
+        }
+    }
+
+    private void UpdatePathFilterOptions(IEnumerable<string> segments)
+    {
+        if (PathFilterBox is null)
+        {
+            return;
+        }
+
+        var distinctSegments = segments
+            .Where(segment => !string.IsNullOrWhiteSpace(segment))
+            .Distinct(_pathComparer)
+            .OrderBy(segment => segment, _pathComparer)
+            .ToList();
+
+        _suppressFilterUpdates = true;
+        try
+        {
+            PathFilterBox.Items.Clear();
+
+            var allItem = new ComboBoxItem
+            {
+                Content = Localize("CandidateFilterAll", "All paths"),
+                Tag = null,
+                IsSelected = _selectedPathFilter is null,
+            };
+            PathFilterBox.Items.Add(allItem);
+
+            var hasSegments = distinctSegments.Count > 0;
+            PathFilterBox.IsEnabled = hasSegments;
+
+            if (!hasSegments)
+            {
+                allItem.IsSelected = true;
+            }
+
+            foreach (var segment in distinctSegments)
+            {
+                var item = new ComboBoxItem
+                {
+                    Content = segment,
+                    Tag = segment,
+                    IsSelected = _selectedPathFilter is not null && _pathComparer.Equals(segment, _selectedPathFilter),
+                };
+                PathFilterBox.Items.Add(item);
+            }
+
+            if (hasSegments && _selectedPathFilter is not null && !distinctSegments.Any(segment => _pathComparer.Equals(segment, _selectedPathFilter)))
+            {
+                _selectedPathFilter = null;
+                allItem.IsSelected = true;
+            }
+        }
+        finally
+        {
+            _suppressFilterUpdates = false;
+        }
+    }
+
+    private void BuildCandidateTree(IEnumerable<string> paths)
+    {
+        _candidateRoots.Clear();
+        _allCandidateNodes.Clear();
+        var nodeLookup = new Dictionary<string, EmptyFolderNode>(_pathComparer);
+        var topLevelSegments = new HashSet<string>(_pathComparer);
+
+        foreach (var path in paths)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                continue;
+            }
+
+            var normalized = NormalizeCandidatePath(path);
+            if (string.IsNullOrEmpty(normalized))
+            {
+                continue;
+            }
+
+            var relative = GetRelativeCandidatePath(normalized);
+            var segments = SplitCandidateSegments(relative);
+
+            if (segments.Length == 0)
+            {
+                var name = Path.GetFileName(normalized);
+                if (string.IsNullOrEmpty(name))
+                {
+                    name = normalized;
+                }
+
+                topLevelSegments.Add(_rootDisplayName);
+                var rootNode = new EmptyFolderNode(this, name, normalized, string.Empty, 0, isVirtual: false, _rootDisplayName, null)
+                {
+                    IsExpanded = true,
+                };
+                _candidateRoots.Add(rootNode);
+                _allCandidateNodes.Add(rootNode);
+                nodeLookup[normalized] = rootNode;
+                continue;
+            }
+
+            topLevelSegments.Add(segments[0]);
+
+            EmptyFolderNode? parent = null;
+            for (int i = 0; i < segments.Length; i++)
+            {
+                var segment = segments[i];
+                var isLeaf = i == segments.Length - 1;
+                var relativeSubPath = string.Join(Path.DirectorySeparatorChar, segments.Take(i + 1));
+                string currentFull;
+
+                if (!string.IsNullOrEmpty(_normalizedRootPath))
+                {
+                    currentFull = NormalizeCandidatePath(Path.Combine(_normalizedRootPath!, relativeSubPath));
+                }
+                else if (!string.IsNullOrEmpty(_currentRootPath))
+                {
+                    currentFull = NormalizeCandidatePath(Path.Combine(_currentRootPath!, relativeSubPath));
+                }
+                else
+                {
+                    currentFull = normalized;
+                }
+
+                if (!nodeLookup.TryGetValue(currentFull, out var node))
+                {
+                    node = new EmptyFolderNode(
+                        this,
+                        segment,
+                        currentFull,
+                        relativeSubPath,
+                        i + 1,
+                        isVirtual: !isLeaf,
+                        segments[0],
+                        parent)
+                    {
+                        IsExpanded = true,
+                    };
+
+                    if (parent is null)
+                    {
+                        _candidateRoots.Add(node);
+                    }
+                    else
+                    {
+                        parent.Children.Add(node);
+                    }
+
+                    nodeLookup[currentFull] = node;
+
+                    if (!node.IsVirtual)
+                    {
+                        _allCandidateNodes.Add(node);
+                    }
+                }
+
+                parent = node;
+            }
+        }
+
+        UpdatePathFilterOptions(topLevelSegments);
+    }
+
+    private void RefreshCandidateView()
+    {
+        ApplyCandidateOrdering();
+        var (visibleCount, totalCount) = ApplyCandidateFilters();
+        _candidateVisibleCount = visibleCount;
+        _candidateTotalCount = totalCount;
+        UpdateResultBadge(totalCount, visibleCount);
+        UpdateResultsSummary(totalCount, null, visibleCount);
+        UpdateDeleteButtonState();
+        UpdateSelectionControls();
+    }
+
+    private void ApplyCandidateOrdering()
+    {
+        SortNodeCollection(_candidateRoots);
+    }
+
+    private void SortNodeCollection(IList<EmptyFolderNode> nodes)
+    {
+        if (nodes.Count == 0)
+        {
+            return;
+        }
+
+        var ordered = OrderNodes(nodes).ToList();
+        for (int index = 0; index < ordered.Count; index++)
+        {
+            var target = ordered[index];
+            var currentIndex = nodes.IndexOf(target);
+            if (currentIndex != index)
+            {
+                nodes.RemoveAt(currentIndex);
+                nodes.Insert(index, target);
+            }
+
+            if (target.Children.Count > 0)
+            {
+                SortNodeCollection(target.Children);
+            }
+        }
+    }
+
+    private IEnumerable<EmptyFolderNode> OrderNodes(IEnumerable<EmptyFolderNode> nodes)
+    {
+        return _candidateSortMode switch
+        {
+            CandidateSortMode.NameDescending => nodes
+                .OrderBy(node => node.IsVirtual)
+                .ThenByDescending(node => node.DisplayName, _pathComparer),
+            CandidateSortMode.PathLength => nodes
+                .OrderBy(node => node.IsVirtual)
+                .ThenByDescending(node => node.FullPath.Length)
+                .ThenBy(node => node.DisplayName, _pathComparer),
+            _ => nodes
+                .OrderBy(node => node.IsVirtual)
+                .ThenBy(node => node.DisplayName, _pathComparer),
+        };
+    }
+
+    private (int VisibleCount, int TotalCount) ApplyCandidateFilters()
+    {
+        int total = 0;
+        int visible = 0;
+
+        _suppressSelectionChanged = true;
+        try
+        {
+            foreach (var root in _candidateRoots)
+            {
+                visible += ApplyCandidateFilters(root, ref total);
+            }
+        }
+        finally
+        {
+            _suppressSelectionChanged = false;
+        }
+
+        return (visible, total);
+    }
+
+    private int ApplyCandidateFilters(EmptyFolderNode node, ref int total)
+    {
+        var matches = NodeMatchesFilter(node);
+        var visibleLeaves = 0;
+
+        if (node.Children.Count == 0)
+        {
+            total++;
+            var include = matches && (!_hideExcluded || !node.IsExcluded);
+            node.IsVisible = include;
+
+            if (!include && node.IsSelected)
+            {
+                node.IsSelected = false;
+            }
+
+            if (include)
+            {
+                visibleLeaves++;
+            }
+        }
+        else
+        {
+            foreach (var child in node.Children)
+            {
+                visibleLeaves += ApplyCandidateFilters(child, ref total);
+            }
+
+            node.IsVisible = matches || visibleLeaves > 0;
+        }
+
+        return visibleLeaves;
+    }
+
+    private bool NodeMatchesFilter(EmptyFolderNode node)
+    {
+        if (!string.IsNullOrEmpty(_selectedPathFilter) && !_pathComparer.Equals(node.TopLevelSegment, _selectedPathFilter))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(_candidateSearchText))
+        {
+            return true;
+        }
+
+        return node.FullPath.Contains(_candidateSearchText, _pathComparison) ||
+            (!string.IsNullOrEmpty(node.RelativePath) && node.RelativePath.Contains(_candidateSearchText, _pathComparison)) ||
+            node.DisplayName.Contains(_candidateSearchText, _pathComparison);
+    }
+
+    private void UpdateResultBadge(int totalCount, int visibleCount)
+    {
+        if (ResultBadge is null)
+        {
+            return;
+        }
+
+        if (totalCount <= 0)
+        {
+            ResultBadge.ClearValue(InfoBadge.ValueProperty);
+            ResultBadge.ClearValue(InfoBadge.ValueStringProperty);
+            ResultBadge.Visibility = Visibility.Collapsed;
+            AutomationProperties.SetName(ResultBadge, string.Empty);
+            return;
+        }
+
+        var safeVisible = Math.Max(0, visibleCount);
+        ResultBadge.Visibility = Visibility.Visible;
+
+        if (safeVisible != totalCount)
+        {
+            var valueString = string.Format(CultureInfo.CurrentCulture, "{0}/{1}", safeVisible, totalCount);
+            ResultBadge.Value = safeVisible;
+            ResultBadge.ValueString = valueString;
+            AutomationProperties.SetName(ResultBadge, string.Format(
+                CultureInfo.CurrentCulture,
+                Localize("ResultsBadgeFiltered", "Showing {0} of {1} empty folders after filters"),
+                safeVisible,
+                totalCount));
+        }
+        else
+        {
+            ResultBadge.Value = totalCount;
+            ResultBadge.ClearValue(InfoBadge.ValueStringProperty);
+            AutomationProperties.SetName(ResultBadge, string.Format(
+                CultureInfo.CurrentCulture,
+                Localize("ResultsBadgeAll", "{0} empty folders ready"),
+                totalCount));
+        }
+    }
+
+    private int GetActiveCandidateCount() => _allCandidateNodes.Count(node => !node.IsExcluded);
+
+    private void UpdateDeleteButtonState()
+    {
+        if (DeleteBtn is null)
+        {
+            return;
+        }
+
+        DeleteBtn.IsEnabled = !_isBusy && GetActiveCandidateCount() > 0;
+    }
+
+    private void UpdateSelectionControls()
+    {
+        if (SelectVisibleBtn is null)
+        {
+            return;
+        }
+
+        var anyVisible = _allCandidateNodes.Any(node => node.IsVisible);
+        var selectedNodes = _allCandidateNodes.Where(node => node.IsSelected).ToList();
+
+        SelectVisibleBtn.IsEnabled = anyVisible;
+        ClearSelectionBtn.IsEnabled = selectedNodes.Count > 0;
+        ExcludeSelectedBtn.IsEnabled = selectedNodes.Any(node => !node.IsExcluded);
+        IncludeSelectedBtn.IsEnabled = selectedNodes.Any(node => node.IsExcluded);
+    }
+
+    private void OnCandidateSelectionChanged()
+    {
+        if (_suppressSelectionChanged)
+        {
+            return;
+        }
+
+        UpdateSelectionControls();
+    }
+
+    private void OnCandidateExclusionChanged(EmptyFolderNode node)
+    {
+        if (node.IsExcluded)
+        {
+            _inlineExcludedPaths.Add(node.FullPath);
+        }
+        else
+        {
+            _inlineExcludedPaths.RemoveWhere(path => _pathComparer.Equals(path, node.FullPath));
+        }
+
+        if (_suppressCandidateRefresh)
+        {
+            return;
+        }
+
+        RefreshCandidateView();
+    }
+
+    private static string NormalizeCandidatePath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return string.Empty;
+        }
+
+        try
+        {
+            return Path.TrimEndingDirectorySeparator(Path.GetFullPath(path));
+        }
+        catch
+        {
+            return path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        }
+    }
+
+    private string GetRelativeCandidatePath(string fullPath)
+    {
+        if (string.IsNullOrEmpty(_normalizedRootPath))
+        {
+            return fullPath;
+        }
+
+        if (_pathComparer.Equals(fullPath, _normalizedRootPath))
+        {
+            return string.Empty;
+        }
+
+        var separator = _normalizedRootPath + Path.DirectorySeparatorChar;
+        if (fullPath.StartsWith(separator, _pathComparison))
+        {
+            return fullPath[separator.Length..];
+        }
+
+        var altSeparator = _normalizedRootPath + Path.AltDirectorySeparatorChar;
+        if (fullPath.StartsWith(altSeparator, _pathComparison))
+        {
+            return fullPath[altSeparator.Length..];
+        }
+
+        return fullPath;
+    }
+
+    private string GetRootDisplayName(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return Localize("CandidateRootDisplay", "Root");
+        }
+
+        var trimmed = path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        if (string.IsNullOrEmpty(trimmed))
+        {
+            return Localize("CandidateRootDisplay", "Root");
+        }
+
+        var name = Path.GetFileName(trimmed);
+        if (!string.IsNullOrEmpty(name))
+        {
+            return name;
+        }
+
+        return trimmed;
+    }
+
+    private static string[] SplitCandidateSegments(string relativePath)
+    {
+        if (string.IsNullOrEmpty(relativePath))
+        {
+            return Array.Empty<string>();
+        }
+
+        return relativePath.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+    }
+
+    private void CandidateSearchBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (_suppressFilterUpdates)
+        {
+            return;
+        }
+
+        _candidateSearchText = CandidateSearchBox.Text.Trim();
+        RefreshCandidateView();
+    }
+
+    private void PathFilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_suppressFilterUpdates)
+        {
+            return;
+        }
+
+        if (PathFilterBox.SelectedItem is ComboBoxItem item && item.Tag is string segment)
+        {
+            _selectedPathFilter = segment;
+        }
+        else
+        {
+            _selectedPathFilter = null;
+        }
+
+        RefreshCandidateView();
+    }
+
+    private void SortModeBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_suppressFilterUpdates)
+        {
+            return;
+        }
+
+        if (SortModeBox.SelectedItem is ComboBoxItem item && item.Tag is string tag)
+        {
+            _candidateSortMode = tag switch
+            {
+                "NameDescending" => CandidateSortMode.NameDescending,
+                "PathLength" => CandidateSortMode.PathLength,
+                _ => CandidateSortMode.NameAscending,
+            };
+        }
+        else
+        {
+            _candidateSortMode = CandidateSortMode.NameAscending;
+        }
+
+        RefreshCandidateView();
+    }
+
+    private void OnHideExcludedChanged(object sender, RoutedEventArgs e)
+    {
+        if (_suppressFilterUpdates)
+        {
+            return;
+        }
+
+        _hideExcluded = HideExcludedCheck.IsChecked == true;
+        RefreshCandidateView();
+    }
+
+    private void OnSelectVisibleCandidates(object sender, RoutedEventArgs e)
+    {
+        _suppressSelectionChanged = true;
+        try
+        {
+            foreach (var node in _allCandidateNodes)
+            {
+                node.IsSelected = node.IsVisible;
+            }
+        }
+        finally
+        {
+            _suppressSelectionChanged = false;
+        }
+
+        UpdateSelectionControls();
+    }
+
+    private void OnClearCandidateSelection(object sender, RoutedEventArgs e)
+    {
+        _suppressSelectionChanged = true;
+        try
+        {
+            foreach (var node in _allCandidateNodes.Where(node => node.IsSelected))
+            {
+                node.IsSelected = false;
+            }
+        }
+        finally
+        {
+            _suppressSelectionChanged = false;
+        }
+
+        UpdateSelectionControls();
+    }
+
+    private void OnExcludeSelectedCandidates(object sender, RoutedEventArgs e)
+    {
+        _suppressCandidateRefresh = true;
+        _suppressSelectionChanged = true;
+        try
+        {
+            foreach (var node in _allCandidateNodes.Where(node => node.IsSelected && !node.IsExcluded))
+            {
+                node.IsExcluded = true;
+                node.IsSelected = false;
+            }
+        }
+        finally
+        {
+            _suppressSelectionChanged = false;
+            _suppressCandidateRefresh = false;
+        }
+
+        RefreshCandidateView();
+    }
+
+    private void OnIncludeSelectedCandidates(object sender, RoutedEventArgs e)
+    {
+        _suppressCandidateRefresh = true;
+        try
+        {
+            foreach (var node in _allCandidateNodes.Where(node => node.IsSelected && node.IsExcluded))
+            {
+                node.IsExcluded = false;
+            }
+        }
+        finally
+        {
+            _suppressCandidateRefresh = false;
+        }
+
+        RefreshCandidateView();
     }
 
     private bool TryInitializeLegacyMicaController()
@@ -782,7 +1469,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         if (folder is not null)
         {
             RootPathBox.Text = folder.Path;
-            DeleteBtn.IsEnabled = !_isBusy && _previewCandidates.Count > 0;
+            UpdateDeleteButtonState();
             SetStatus(
                 Symbol.Folder,
                 Localize("StatusFolderSelectedTitle", "Folder selected"),
@@ -800,8 +1487,10 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         }
 
         _previewCandidates.Clear();
-        Candidates.ItemsSource = null;
-        DeleteBtn.IsEnabled = false;
+        _currentRootPath = null;
+        _normalizedRootPath = null;
+        _rootDisplayName = "Root";
+        ClearCandidateView(resetFilters: true);
         UpdateResultsSummary(0, Localize("ResultsPlaceholder", "Preview results will appear here once you run a scan."));
     }
 
@@ -822,9 +1511,11 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
         CancelActiveOperation();
         _cts = new CancellationTokenSource();
+        _currentRootPath = root;
+        _normalizedRootPath = NormalizeCandidatePath(root);
+        _rootDisplayName = GetRootDisplayName(_normalizedRootPath ?? root);
         _previewCandidates = new List<string>();
-        Candidates.ItemsSource = null;
-        DeleteBtn.IsEnabled = false;
+        ClearCandidateView(resetFilters: false);
 
         SetBusy(true);
         SetActivity(Localize("ActivityScanning", "Scanning for empty folders…"));
@@ -840,8 +1531,8 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             var result = await _directoryCleaner.CleanAsync(root, options, _cts.Token);
 
             _previewCandidates = new List<string>(result.EmptyDirectories);
-            Candidates.ItemsSource = _previewCandidates;
-            DeleteBtn.IsEnabled = !_isBusy && _previewCandidates.Count > 0;
+            BuildCandidateTree(_previewCandidates);
+            RefreshCandidateView();
 
             var hasResults = result.EmptyFound > 0;
             var resultsMessage = result.HasFailures
@@ -942,7 +1633,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         _cts = new CancellationTokenSource();
         SetBusy(true);
         SetActivity(Localize("ActivityCleaning", "Cleaning empty folders…"));
-        var pendingCount = _previewCandidates.Count;
+        var pendingCount = GetActiveCandidateCount();
         int? pendingBadge = pendingCount > 0 ? pendingCount : null;
         SetStatus(
             Symbol.Delete,
@@ -959,8 +1650,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             var result = await _directoryCleaner.CleanAsync(root, options, _cts.Token);
 
             _previewCandidates.Clear();
-            Candidates.ItemsSource = null;
-            DeleteBtn.IsEnabled = false;
+            ClearCandidateView(resetFilters: false);
 
             var message = result.EmptyFound == 0
                 ? Localize("InfoNoEmptyFoldersDetected", "No empty folders detected.")
@@ -1108,6 +1798,9 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             DeleteRootWhenEmpty = false,
             MaxDepth = maxDepth,
             ExcludedNamePatterns = ParseExclusions(ExcludeBox.Text),
+            ExcludedFullPaths = _inlineExcludedPaths.Count > 0
+                ? _inlineExcludedPaths.ToArray()
+                : Array.Empty<string>(),
         };
     }
 
@@ -1897,13 +2590,11 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
         if (badgeValue.HasValue && badgeValue.Value > 0)
         {
-            ResultBadge.Value = badgeValue.Value;
-            ResultBadge.Visibility = Visibility.Visible;
+            UpdateResultBadge(badgeValue.Value, badgeValue.Value);
         }
         else
         {
-            ResultBadge.ClearValue(InfoBadge.ValueProperty);
-            ResultBadge.Visibility = Visibility.Collapsed;
+            UpdateResultBadge(0, 0);
         }
     }
 
@@ -1940,7 +2631,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         return new SolidColorBrush(Colors.Transparent);
     }
 
-    private void UpdateResultsSummary(int count, string? customMessage = null)
+    private void UpdateResultsSummary(int count, string? customMessage = null, int? visibleCount = null)
     {
         if (!string.IsNullOrWhiteSpace(customMessage))
         {
@@ -1948,9 +2639,29 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             return;
         }
 
-        ResultsCaption.Text = count > 0
-            ? Localize("ResultsAvailable", "Review the folders below before cleaning.")
-            : Localize("ResultsPlaceholder", "Preview results will appear here once you run a scan.");
+        if (count <= 0)
+        {
+            ResultsCaption.Text = Localize("ResultsPlaceholder", "Preview results will appear here once you run a scan.");
+            return;
+        }
+
+        if (visibleCount.HasValue && visibleCount.Value == 0)
+        {
+            ResultsCaption.Text = Localize("ResultsFilteredHidden", "No folders match your filters. Adjust them to continue.");
+            return;
+        }
+
+        if (visibleCount.HasValue && visibleCount.Value != count)
+        {
+            ResultsCaption.Text = string.Format(
+                CultureInfo.CurrentCulture,
+                Localize("ResultsFilteredSummary", "Showing {0} of {1} empty folders after filters."),
+                visibleCount.Value,
+                count);
+            return;
+        }
+
+        ResultsCaption.Text = Localize("ResultsAvailable", "Review the folders below before cleaning.");
     }
 
     private void SetActivity(string message)
@@ -1970,12 +2681,12 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         DiskCleanupCancelBtn.Visibility = showDiskCleanupCancel ? Visibility.Visible : Visibility.Collapsed;
         DiskCleanupCancelBtn.IsEnabled = showDiskCleanupCancel;
         PreviewBtn.IsEnabled = !isBusy;
-        DeleteBtn.IsEnabled = !isBusy && _previewCandidates.Count > 0;
         BrowseBtn.IsEnabled = !isBusy;
         RootPathBox.IsEnabled = !isBusy;
         DepthBox.IsEnabled = !isBusy;
         ExcludeBox.IsEnabled = !isBusy;
         RecycleChk.IsEnabled = !isBusy;
+        UpdateDeleteButtonState();
         UpdateDiskCleanupActionState();
     }
 
@@ -2862,6 +3573,152 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         catch
         {
             return false;
+        }
+    }
+
+    private enum CandidateSortMode
+    {
+        NameAscending,
+        NameDescending,
+        PathLength,
+    }
+
+    private sealed class EmptyFolderNode : INotifyPropertyChanged
+    {
+        private readonly MainWindow _owner;
+        private bool _isSelected;
+        private bool _isExcluded;
+        private bool _isVisible = true;
+        private bool _isExpanded = true;
+
+        public EmptyFolderNode(
+            MainWindow owner,
+            string name,
+            string fullPath,
+            string relativePath,
+            int depth,
+            bool isVirtual,
+            string topLevelSegment,
+            EmptyFolderNode? parent)
+        {
+            _owner = owner;
+            Name = name;
+            FullPath = fullPath;
+            RelativePath = relativePath;
+            Depth = depth;
+            IsVirtual = isVirtual;
+            TopLevelSegment = topLevelSegment;
+            Parent = parent;
+            Children = new ObservableCollection<EmptyFolderNode>();
+        }
+
+        public string Name { get; }
+
+        public string DisplayName => string.IsNullOrEmpty(Name) ? FullPath : Name;
+
+        public string FullPath { get; }
+
+        public string RelativePath { get; }
+
+        public int Depth { get; }
+
+        public bool IsVirtual { get; }
+
+        public string TopLevelSegment { get; }
+
+        public EmptyFolderNode? Parent { get; }
+
+        public ObservableCollection<EmptyFolderNode> Children { get; }
+
+        public bool CanExclude => !IsVirtual;
+
+        public Visibility SelectionVisibility => CanExclude ? Visibility.Visible : Visibility.Collapsed;
+
+        public Visibility PathBadgeVisibility => CanExclude ? Visibility.Visible : Visibility.Collapsed;
+
+        public string RelativePathDisplay => string.IsNullOrEmpty(RelativePath) ? DisplayName : RelativePath;
+
+        public string PathLengthDisplay => string.Format(CultureInfo.CurrentCulture, "{0} chars", FullPath.Length);
+
+        public string ExclusionLabel => _owner.Localize(
+            IsExcluded ? "CandidateExcludedLabel" : "CandidateExcludeLabel",
+            IsExcluded ? "Excluded" : "Exclude");
+
+        public string ExclusionToolTip => _owner.Localize(
+            IsExcluded ? "CandidateIncludeTooltip" : "CandidateExcludeTooltip",
+            IsExcluded ? "Include this folder in cleanup" : "Exclude this folder from cleanup");
+
+        public Symbol ExclusionSymbol => IsExcluded ? Symbol.BlockContact : Symbol.Cancel;
+
+        public double VisualOpacity => IsExcluded ? 0.55 : 1.0;
+
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                if (_isSelected != value)
+                {
+                    _isSelected = value;
+                    OnPropertyChanged();
+                    _owner.OnCandidateSelectionChanged();
+                }
+            }
+        }
+
+        public bool IsExcluded
+        {
+            get => _isExcluded;
+            set
+            {
+                if (_isExcluded != value)
+                {
+                    _isExcluded = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(ExclusionLabel));
+                    OnPropertyChanged(nameof(ExclusionToolTip));
+                    OnPropertyChanged(nameof(ExclusionSymbol));
+                    OnPropertyChanged(nameof(VisualOpacity));
+                    OnPropertyChanged(nameof(PathBadgeVisibility));
+                    _owner.OnCandidateExclusionChanged(this);
+                }
+            }
+        }
+
+        public bool IsVisible
+        {
+            get => _isVisible;
+            set
+            {
+                if (_isVisible != value)
+                {
+                    _isVisible = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(Visibility));
+                }
+            }
+        }
+
+        public Visibility Visibility => _isVisible ? Visibility.Visible : Visibility.Collapsed;
+
+        public bool IsExpanded
+        {
+            get => _isExpanded;
+            set
+            {
+                if (_isExpanded != value)
+                {
+                    _isExpanded = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 
