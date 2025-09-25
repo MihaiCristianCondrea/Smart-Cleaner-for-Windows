@@ -6,12 +6,14 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:Smart_Cleaner_for_Windows"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:media="using:Microsoft.UI.Xaml.Media"
+    xmlns:winui="using:Microsoft.UI.Xaml"
     mc:Ignorable="d"
     Title="Smart Cleaner for Windows">
 
-    <Window.SystemBackdrop>
-        <MicaBackdrop />
-    </Window.SystemBackdrop>
+    <winui:Window.SystemBackdrop>
+        <media:MicaBackdrop />
+    </winui:Window.SystemBackdrop>
 
     <Grid>
         <Grid.RowDefinitions>
