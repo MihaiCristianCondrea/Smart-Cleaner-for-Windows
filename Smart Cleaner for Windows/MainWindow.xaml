@@ -711,7 +711,6 @@
                                     <TreeView
                                         x:Name="CandidatesTree"
                                         Grid.Row="2"
-                                        ItemsSource="{x:Bind CandidateRoots, Mode=OneWay}"
                                         SelectionMode="None">
                                         <TreeView.ItemTemplate>
                                             <TreeViewItemTemplate ItemsSource="{Binding Children}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">

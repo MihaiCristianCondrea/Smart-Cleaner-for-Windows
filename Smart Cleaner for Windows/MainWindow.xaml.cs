@@ -96,8 +96,6 @@ public sealed partial class MainWindow
     private int _historyRetentionDays = HistoryRetentionDefaultDays;
     private bool _isSystemTitleBarInitialized;
 
-    public ObservableCollection<EmptyFolderNode> CandidateRoots => _candidateRoots;
-
     private const string ThemePreferenceKey = "Settings.ThemePreference";
     private const string AccentPreferenceKey = "Settings.AccentPreference";
     private const string ThemePreferenceLight = "light";
@@ -186,6 +184,11 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         _diskCleanupVolume = _diskCleanupService.GetDefaultVolume();
 
         InitializeComponent();
+
+        if (CandidatesTree is not null)
+        {
+            CandidatesTree.ItemsSource = _candidateRoots;
+        }
 
         LargeFilesGroupList.ItemsSource = _largeFileGroups;
 
