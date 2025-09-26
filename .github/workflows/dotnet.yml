@@ -39,7 +39,85 @@ jobs:
             if ($reports) {
               foreach ($report in $reports) {
                 Write-Host "-- $($report.FullName)"
-                Get-Content -Path $report.FullName
+                $raw = Get-Content -Raw -Path $report.FullName -ErrorAction SilentlyContinue
+                $diagnostics = @()
+                if ($raw) {
+                  try {
+                    $json = $raw | ConvertFrom-Json -ErrorAction Stop
+                    if ($json.Diagnostics) {
+                      $diagnostics = @($json.Diagnostics)
+                    }
+                    elseif ($json.diagnostics) {
+                      $diagnostics = @($json.diagnostics)
+                    }
+                    elseif ($json.items) {
+                      $diagnostics = @($json.items)
+                    }
+                  }
+                  catch {
+                    $json = $null
+                  }
+                }
+
+                if ($diagnostics.Count -gt 0) {
+                  foreach ($diag in $diagnostics) {
+                    $severity = $diag.Severity
+                    if (-not $severity -and $diag.severity) { $severity = $diag.severity }
+                    if (-not $severity) { $severity = "Info" }
+
+                    $message = $diag.FormattedMessage
+                    if (-not $message -and $diag.message) { $message = $diag.message }
+                    if (-not $message -and $diag.Message) { $message = $diag.Message }
+                    if (-not $message) { $message = "(no message provided)" }
+
+                    $file = $diag.File
+                    if (-not $file -and $diag.file) { $file = $diag.file }
+                    if (-not $file -and $diag.Source) { $file = $diag.Source }
+                    if (-not $file -and $diag.SourceFile) { $file = $diag.SourceFile }
+
+                    $span = $diag.Span
+                    if (-not $span -and $diag.span) { $span = $diag.span }
+                    $line = $null
+                    if ($span) {
+                      $line = $span.StartLine
+                      if (-not $line -and $span.startLine) { $line = $span.startLine }
+                      if (-not $line -and $span.Line) { $line = $span.Line }
+                    }
+                    if (-not $line -and $diag.StartLine) { $line = $diag.StartLine }
+                    if (-not $line -and $diag.line) { $line = $diag.line }
+                    if (-not $line) { $line = 0 }
+
+                    $severityUpper = $severity.ToString()
+                    $annotation = "::notice"
+                    if ($severityUpper.Equals("Error", [System.StringComparison]::OrdinalIgnoreCase)) {
+                      $annotation = "::error"
+                    }
+                    elseif ($severityUpper.Equals("Warning", [System.StringComparison]::OrdinalIgnoreCase)) {
+                      $annotation = "::warning"
+                    }
+
+                    $relativePath = $null
+                    if ($file) {
+                      try {
+                        $relativePath = [System.IO.Path]::GetRelativePath((Get-Location), $file)
+                      }
+                      catch {
+                        $relativePath = $file
+                      }
+                    }
+
+                    $annotationMessage = "[$severityUpper] $message".Trim()
+                    if ($relativePath) {
+                      Write-Host "$annotation file=$relativePath,line=$line::$annotationMessage"
+                    }
+                    else {
+                      Write-Host "$annotation::$annotationMessage"
+                    }
+                  }
+                }
+                else {
+                  (Get-Content -Path $report.FullName | Select-Object -First 200) | ForEach-Object { Write-Host $_ }
+                }
               }
             }
             else {

@@ -512,6 +512,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                     else
                     {
                         parent.Children.Add(node);
+                        parent.RegisterChildAdded();
                     }
 
                     nodeLookup[currentFull] = node;
@@ -3606,6 +3607,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         private bool _isExcluded;
         private bool _isVisible = true;
         private bool _isExpanded;
+        private bool _hasChildren;
 
         public EmptyFolderNode(
             MainWindow owner,
@@ -3652,6 +3654,18 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         public Visibility SelectionVisibility => CanExclude ? Visibility.Visible : Visibility.Collapsed;
 
         public Visibility PathBadgeVisibility => CanExclude ? Visibility.Visible : Visibility.Collapsed;
+
+        public bool HasChildren => _hasChildren;
+
+        public Visibility ExpanderVisibility => HasChildren ? Visibility.Visible : Visibility.Collapsed;
+
+        public Visibility ChildrenVisibility => HasChildren && IsExpanded ? Visibility.Visible : Visibility.Collapsed;
+
+        public Symbol ExpansionSymbol => HasChildren
+            ? (IsExpanded ? Symbol.ChevronDown : Symbol.ChevronRight)
+            : Symbol.Forward;
+
+        public Thickness IndentMargin => new Thickness(Math.Max(0, Depth) * 24, 0, 0, 0);
 
         public string RelativePathDisplay => string.IsNullOrEmpty(RelativePath) ? DisplayName : RelativePath;
 
@@ -3727,11 +3741,34 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 {
                     _isExpanded = value;
                     OnPropertyChanged();
+                    OnPropertyChanged(nameof(ExpansionSymbol));
+                    OnPropertyChanged(nameof(ChildrenVisibility));
                 }
             }
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
+
+        public void RegisterChildAdded()
+        {
+            if (_hasChildren)
+            {
+                return;
+            }
+
+            _hasChildren = true;
+
+            if (IsVirtual && !_isExpanded)
+            {
+                _isExpanded = true;
+                OnPropertyChanged(nameof(IsExpanded));
+            }
+
+            OnPropertyChanged(nameof(HasChildren));
+            OnPropertyChanged(nameof(ExpanderVisibility));
+            OnPropertyChanged(nameof(ChildrenVisibility));
+            OnPropertyChanged(nameof(ExpansionSymbol));
+        }
 
         private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {

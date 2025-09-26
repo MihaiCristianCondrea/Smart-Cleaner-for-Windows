@@ -629,6 +629,87 @@
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 
                                 <Grid Grid.Row="2" RowSpacing="{StaticResource Spacing.Size120}">
+                                    <Grid.Resources>
+                                        <DataTemplate x:Key="CandidateNodeTemplate">
+                                            <StackPanel>
+                                                <Border
+                                                    Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                                    CornerRadius="12"
+                                                    Margin="{Binding IndentMargin}"
+                                                    Padding="12"
+                                                    Visibility="{Binding NodeVisibility}">
+                                                    <Grid ColumnSpacing="{StaticResource Spacing.Size120}" Opacity="{Binding VisualOpacity}">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <ToggleButton
+                                                            Grid.Column="0"
+                                                            Width="32"
+                                                            Height="32"
+                                                            Margin="0"
+                                                            Padding="0"
+                                                            Background="Transparent"
+                                                            BorderBrush="Transparent"
+                                                            Visibility="{Binding ExpanderVisibility}"
+                                                            IsChecked="{Binding IsExpanded, Mode=TwoWay}"
+                                                            VerticalAlignment="Center"
+                                                            HorizontalAlignment="Center">
+                                                            <SymbolIcon Symbol="{Binding ExpansionSymbol}" />
+                                                        </ToggleButton>
+                                                        <CheckBox
+                                                            Grid.Column="1"
+                                                            VerticalAlignment="Center"
+                                                            IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                            Visibility="{Binding SelectionVisibility}" />
+                                                        <StackPanel Grid.Column="2" Spacing="{StaticResource Spacing.Size40}">
+                                                            <TextBlock
+                                                                Text="{Binding DisplayName}"
+                                                                FontWeight="SemiBold" />
+                                                            <TextBlock
+                                                                Text="{Binding RelativePathDisplay}"
+                                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                TextTrimming="CharacterEllipsis"
+                                                                ToolTipService.ToolTip="{Binding FullPath}" />
+                                                        </StackPanel>
+                                                        <StackPanel
+                                                            Grid.Column="3"
+                                                            Orientation="Horizontal"
+                                                            Spacing="{StaticResource Spacing.Size40}"
+                                                            VerticalAlignment="Center">
+                                                            <InfoBadge
+                                                                Visibility="{Binding PathBadgeVisibility}"
+                                                                ValueString="{Binding PathLengthDisplay}" />
+                                                            <ToggleButton
+                                                                MinWidth="140"
+                                                                IsChecked="{Binding IsExcluded, Mode=TwoWay}"
+                                                                IsEnabled="{Binding CanExclude}"
+                                                                ToolTipService.ToolTip="{Binding ExclusionToolTip}">
+                                                                <ToggleButton.ContentTemplate>
+                                                                    <DataTemplate>
+                                                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size40}">
+                                                                            <SymbolIcon Symbol="{Binding ExclusionSymbol}" />
+                                                                            <TextBlock Text="{Binding ExclusionLabel}" />
+                                                                        </StackPanel>
+                                                                    </DataTemplate>
+                                                                </ToggleButton.ContentTemplate>
+                                                            </ToggleButton>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                                <ItemsControl
+                                                    ItemsSource="{Binding Children}"
+                                                    Visibility="{Binding ChildrenVisibility}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <StaticResource ResourceKey="CandidateNodeTemplate" />
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </Grid.Resources>
+
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
@@ -705,85 +786,13 @@
                                         </Button>
                                     </StackPanel>
 
-                                    <TreeView
+                                    <ItemsControl
                                         x:Name="CandidatesTree"
-                                        Grid.Row="2"
-                                        SelectionMode="None">
-                                        <TreeView.Resources>
-                                            <Style TargetType="TreeViewItem">
-                                                <Setter Property="Visibility">
-                                                    <Setter.Value>
-                                                        <Binding Path="NodeVisibility" />
-                                                    </Setter.Value>
-                                                </Setter>
-                                                <Setter Property="IsExpanded">
-                                                    <Setter.Value>
-                                                        <Binding Path="IsExpanded" Mode="TwoWay" />
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </Style>
-                                        </TreeView.Resources>
-                                        <TreeView.ItemTemplate>
-                                            <DataTemplate>
-                                                <TreeViewItem ItemsSource="{Binding Children}">
-                                                    <TreeViewItem.Header>
-                                                        <Border
-                                                            Background="{ThemeResource LayerFillColorDefaultBrush}"
-                                                            CornerRadius="12"
-                                                            Margin="0,2"
-                                                            Padding="12"
-                                                            Visibility="{Binding NodeVisibility}">
-                                                            <Grid ColumnSpacing="{StaticResource Spacing.Size120}" Opacity="{Binding VisualOpacity}">
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition Width="Auto" />
-                                                                    <ColumnDefinition Width="*" />
-                                                                    <ColumnDefinition Width="Auto" />
-                                                                </Grid.ColumnDefinitions>
-                                                                <CheckBox
-                                                                    Grid.Column="0"
-                                                                    VerticalAlignment="Center"
-                                                                    IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                                                    Visibility="{Binding SelectionVisibility}" />
-                                                                <StackPanel Grid.Column="1" Spacing="{StaticResource Spacing.Size40}">
-                                                                    <TextBlock
-                                                                        Text="{Binding DisplayName}"
-                                                                        FontWeight="SemiBold" />
-                                                                    <TextBlock
-                                                                        Text="{Binding RelativePathDisplay}"
-                                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                                        TextTrimming="CharacterEllipsis"
-                                                                        ToolTipService.ToolTip="{Binding FullPath}" />
-                                                                </StackPanel>
-                                                                <StackPanel
-                                                                    Grid.Column="2"
-                                                                    Orientation="Horizontal"
-                                                                    Spacing="{StaticResource Spacing.Size40}"
-                                                                    VerticalAlignment="Center">
-                                                                    <InfoBadge
-                                                                        Visibility="{Binding PathBadgeVisibility}"
-                                                                        ValueString="{Binding PathLengthDisplay}" />
-                                                                    <ToggleButton
-                                                                        MinWidth="140"
-                                                                        IsChecked="{Binding IsExcluded, Mode=TwoWay}"
-                                                                        IsEnabled="{Binding CanExclude}"
-                                                                        ToolTipService.ToolTip="{Binding ExclusionToolTip}">
-                                                                        <ToggleButton.ContentTemplate>
-                                                                            <DataTemplate>
-                                                                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size40}">
-                                                                                    <SymbolIcon Symbol="{Binding ExclusionSymbol}" />
-                                                                                    <TextBlock Text="{Binding ExclusionLabel}" />
-                                                                                </StackPanel>
-                                                                            </DataTemplate>
-                                                                        </ToggleButton.ContentTemplate>
-                                                                    </ToggleButton>
-                                                                </StackPanel>
-                                                            </Grid>
-                                                        </Border>
-                                                    </TreeViewItem.Header>
-                                                </TreeViewItem>
-                                            </DataTemplate>
-                                        </TreeView.ItemTemplate>
-                                    </TreeView>
+                                        Grid.Row="2">
+                                        <ItemsControl.ItemTemplate>
+                                            <StaticResource ResourceKey="CandidateNodeTemplate" />
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
                                 </Grid>
                             </Grid>
                         </Border>
