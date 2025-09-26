@@ -716,7 +716,7 @@
                                                     CornerRadius="12"
                                                     Margin="0,2"
                                                     Padding="12"
-                                                    Visibility="{Binding Visibility}">
+                                                    Visibility="{Binding NodeVisibility}">
                                                     <Grid ColumnSpacing="{StaticResource Spacing.Size120}" Opacity="{Binding VisualOpacity}">
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="Auto" />

@@ -3694,12 +3694,12 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 {
                     _isVisible = value;
                     OnPropertyChanged();
-                    OnPropertyChanged(nameof(Visibility));
+                    OnPropertyChanged(nameof(NodeVisibility));
                 }
             }
         }
 
-        public Visibility Visibility => _isVisible ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility NodeVisibility => _isVisible ? Visibility.Visible : Visibility.Collapsed;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
