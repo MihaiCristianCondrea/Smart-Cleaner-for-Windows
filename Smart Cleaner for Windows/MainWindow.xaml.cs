@@ -51,6 +51,7 @@ public sealed partial class MainWindow : Window
     private SystemBackdropConfiguration? _backdropConfig;
     private List<string> _previewCandidates = new();
     private readonly ObservableCollection<EmptyFolderNode> _candidateRoots = new();
+    private readonly ObservableCollection<EmptyFolderNode> _visibleCandidateNodes = new();
     private readonly List<EmptyFolderNode> _allCandidateNodes = new();
     private readonly HashSet<string> _inlineExcludedPaths = new(OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
     private readonly StringComparer _pathComparer = OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
@@ -184,9 +185,9 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
         InitializeComponent();
 
-        if (CandidatesTree is not null)
+        if (CandidatesList is not null)
         {
-            CandidatesTree.ItemsSource = _candidateRoots;
+            CandidatesList.ItemsSource = _visibleCandidateNodes;
         }
 
         LargeFilesGroupList.ItemsSource = _largeFileGroups;
@@ -317,6 +318,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     {
         _candidateRoots.Clear();
         _allCandidateNodes.Clear();
+        _visibleCandidateNodes.Clear();
         _inlineExcludedPaths.Clear();
         _candidateTotalCount = 0;
         _candidateVisibleCount = 0;
@@ -535,10 +537,41 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         var (visibleCount, totalCount) = ApplyCandidateFilters();
         _candidateVisibleCount = visibleCount;
         _candidateTotalCount = totalCount;
+        RebuildVisibleCandidateList();
         UpdateResultBadge(totalCount, visibleCount);
         UpdateResultsSummary(totalCount, null, visibleCount);
         UpdateDeleteButtonState();
         UpdateSelectionControls();
+    }
+
+    private void RebuildVisibleCandidateList()
+    {
+        _visibleCandidateNodes.Clear();
+
+        foreach (var root in _candidateRoots)
+        {
+            AddVisibleCandidateRecursive(root);
+        }
+    }
+
+    private void AddVisibleCandidateRecursive(EmptyFolderNode node)
+    {
+        if (!node.IsVisible)
+        {
+            return;
+        }
+
+        _visibleCandidateNodes.Add(node);
+
+        if (!node.HasChildren || !node.IsExpanded)
+        {
+            return;
+        }
+
+        foreach (var child in node.Children)
+        {
+            AddVisibleCandidateRecursive(child);
+        }
     }
 
     private void ApplyCandidateOrdering()
@@ -638,21 +671,6 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             }
 
             node.IsVisible = matches || visibleLeaves > 0;
-
-            if (node.IsVirtual)
-            {
-                if (visibleLeaves > 0)
-                {
-                    if (!node.IsExpanded)
-                    {
-                        node.IsExpanded = true;
-                    }
-                }
-                else if (!matches && node.IsExpanded)
-                {
-                    node.IsExpanded = false;
-                }
-            }
         }
 
         return visibleLeaves;
@@ -735,7 +753,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             return;
         }
 
-        var anyVisible = _allCandidateNodes.Any(node => node.IsVisible);
+        var anyVisible = _allCandidateNodes.Any(node => node.IsVisible && !node.IsExcluded);
         var selectedNodes = _allCandidateNodes.Where(node => node.IsSelected).ToList();
 
         SelectVisibleBtn.IsEnabled = anyVisible;
@@ -771,6 +789,16 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         }
 
         RefreshCandidateView();
+    }
+
+    private void OnNodeExpansionChanged()
+    {
+        if (_suppressCandidateRefresh)
+        {
+            return;
+        }
+
+        RebuildVisibleCandidateList();
     }
 
     private static string NormalizeCandidatePath(string path)
@@ -921,7 +949,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         {
             foreach (var node in _allCandidateNodes)
             {
-                node.IsSelected = node.IsVisible;
+                node.IsSelected = node.IsVisible && !node.IsExcluded;
             }
         }
         finally
@@ -3658,13 +3686,11 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
         public Visibility ExpanderVisibility => HasChildren ? Visibility.Visible : Visibility.Collapsed;
 
-        public Visibility ChildrenVisibility => HasChildren && IsExpanded ? Visibility.Visible : Visibility.Collapsed;
-
         public Symbol ExpansionSymbol => HasChildren
             ? (IsExpanded ? Symbol.ChevronDown : Symbol.ChevronRight)
             : Symbol.Forward;
 
-        public Thickness IndentMargin => new Thickness(Math.Max(0, Depth) * 24, 0, 0, 0);
+        public Thickness IndentMargin => new Thickness(Math.Max(0, Depth) * 24, 0, 0, 12);
 
         public string RelativePathDisplay => string.IsNullOrEmpty(RelativePath) ? DisplayName : RelativePath;
 
@@ -3741,7 +3767,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                     _isExpanded = value;
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(ExpansionSymbol));
-                    OnPropertyChanged(nameof(ChildrenVisibility));
+                    _owner.OnNodeExpansionChanged();
                 }
             }
         }
@@ -3765,7 +3791,6 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
             OnPropertyChanged(nameof(HasChildren));
             OnPropertyChanged(nameof(ExpanderVisibility));
-            OnPropertyChanged(nameof(ChildrenVisibility));
             OnPropertyChanged(nameof(ExpansionSymbol));
         }
 
