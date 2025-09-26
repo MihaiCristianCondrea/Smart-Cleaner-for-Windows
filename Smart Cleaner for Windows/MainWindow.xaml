@@ -701,11 +701,8 @@
                                                 </Border>
                                                 <ItemsControl
                                                     ItemsSource="{Binding Children}"
-                                                    Visibility="{Binding ChildrenVisibility}">
-                                                    <ItemsControl.ItemTemplate>
-                                                        <StaticResource ResourceKey="CandidateNodeTemplate" />
-                                                    </ItemsControl.ItemTemplate>
-                                                </ItemsControl>
+                                                    Visibility="{Binding ChildrenVisibility}"
+                                                    ItemTemplate="{StaticResource CandidateNodeTemplate}" />
                                             </StackPanel>
                                         </DataTemplate>
                                     </Grid.Resources>
@@ -788,11 +785,8 @@
 
                                     <ItemsControl
                                         x:Name="CandidatesTree"
-                                        Grid.Row="2">
-                                        <ItemsControl.ItemTemplate>
-                                            <StaticResource ResourceKey="CandidateNodeTemplate" />
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
+                                        Grid.Row="2"
+                                        ItemTemplate="{StaticResource CandidateNodeTemplate}" />
                                 </Grid>
                             </Grid>
                         </Border>

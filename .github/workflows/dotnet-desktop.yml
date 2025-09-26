@@ -16,6 +16,7 @@ jobs:
 
     env:
       Solution_Path: Smart Cleaner for Windows.sln
+      Platform: x64
 
     steps:
       - name: Checkout
@@ -29,7 +30,7 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Restore
-        run: dotnet restore "$env:Solution_Path" -p:Configuration=$env:Configuration
+        run: dotnet restore "$env:Solution_Path" -p:Configuration=$env:Configuration -p:Platform=$env:Platform
         env:
           Configuration: ${{ matrix.configuration }}
 
@@ -37,12 +38,13 @@ jobs:
         shell: pwsh
         run: |
           $config = $env:Configuration
+          $platform = $env:Platform
           $logRoot = Join-Path $env:GITHUB_WORKSPACE "artifacts\logs\$config"
           New-Item -ItemType Directory -Path $logRoot -Force | Out-Null
           $binlog = Join-Path $logRoot "msbuild.binlog"
 
           try {
-            dotnet build "$env:Solution_Path" --configuration $config --no-restore -v:diag -bl:$binlog
+            dotnet build "$env:Solution_Path" --configuration $config --no-restore -v:diag -bl:$binlog /p:Platform=$platform
           }
           catch {
             Write-Host "::group::WinUI markup diagnostics"
