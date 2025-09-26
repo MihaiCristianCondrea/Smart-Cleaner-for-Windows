@@ -23,4 +23,23 @@ jobs:
       - name: Restore
         run: dotnet restore "$env:SOLUTION_PATH" -p:Configuration=Release
       - name: Build
-        run: dotnet build "$env:SOLUTION_PATH" --configuration Release --no-restore
+        shell: pwsh
+        run: |
+          try {
+            dotnet build "$env:SOLUTION_PATH" --configuration Release --no-restore
+          }
+          catch {
+            Write-Host "::group::WinUI markup diagnostics"
+            $reports = Get-ChildItem -Path "Smart Cleaner for Windows\obj" -Recurse -Filter output.json -ErrorAction SilentlyContinue
+            if ($reports) {
+              foreach ($report in $reports) {
+                Write-Host "-- $($report.FullName)"
+                Get-Content -Path $report.FullName
+              }
+            }
+            else {
+              Write-Host "No XAML compiler reports were produced."
+            }
+            Write-Host "::endgroup::"
+            throw
+          }

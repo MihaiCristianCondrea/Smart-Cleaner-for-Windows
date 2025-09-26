@@ -628,48 +628,145 @@
                                     Text="Preview results will appear here once you run a scan."
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 
-                                <ListView
-                                    x:Name="Candidates"
-                                    Grid.Row="2"
-                                    Margin="0"
-                                    SelectionMode="None"
-                                    IsItemClickEnabled="False">
-                                    <ListView.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border
-                                                Background="{ThemeResource LayerFillColorDefaultBrush}"
-                                                CornerRadius="12"
-                                                Padding="12">
-                                                <Grid ColumnSpacing="12">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="*" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <Border
-                                                        Width="32"
-                                                        Height="32"
-                                                        CornerRadius="12"
-                                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
-                                                        HorizontalAlignment="Center"
-                                                        VerticalAlignment="Center">
-                                                        <SymbolIcon
-                                                            Symbol="Folder"
-                                                            HorizontalAlignment="Center"
+                                <Grid Grid.Row="2" RowSpacing="{StaticResource Spacing.Size120}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+
+                                    <Grid
+                                        Grid.Row="0"
+                                        ColumnSpacing="{StaticResource Spacing.Size120}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBox
+                                            x:Name="CandidateSearchBox"
+                                            Grid.Column="0"
+                                            PlaceholderText="Search paths"
+                                            TextChanged="CandidateSearchBox_TextChanged" />
+
+                                        <ComboBox
+                                            x:Name="PathFilterBox"
+                                            Grid.Column="1"
+                                            Width="180"
+                                            PlaceholderText="All paths"
+                                            SelectionChanged="PathFilterBox_SelectionChanged" />
+
+                                        <ComboBox
+                                            x:Name="SortModeBox"
+                                            Grid.Column="2"
+                                            Width="180"
+                                            SelectionChanged="SortModeBox_SelectionChanged">
+                                            <ComboBoxItem Content="Path (A to Z)" Tag="NameAscending" IsSelected="True" />
+                                            <ComboBoxItem Content="Path (Z to A)" Tag="NameDescending" />
+                                            <ComboBoxItem Content="Path length (long first)" Tag="PathLength" />
+                                        </ComboBox>
+
+                                        <CheckBox
+                                            x:Name="HideExcludedCheck"
+                                            Grid.Column="3"
+                                            VerticalAlignment="Center"
+                                            Content="Hide excluded"
+                                            Checked="OnHideExcludedChanged"
+                                            Unchecked="OnHideExcludedChanged" />
+                                    </Grid>
+
+                                    <StackPanel
+                                        Grid.Row="1"
+                                        Orientation="Horizontal"
+                                        HorizontalAlignment="Right"
+                                        Spacing="{StaticResource Spacing.Size80}">
+                                        <Button x:Name="SelectVisibleBtn" Click="OnSelectVisibleCandidates">
+                                            <TextBlock Text="Select visible" />
+                                        </Button>
+                                        <Button x:Name="ClearSelectionBtn" Click="OnClearCandidateSelection">
+                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size40}">
+                                                <SymbolIcon Symbol="Clear" />
+                                                <TextBlock Text="Clear selection" />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button x:Name="ExcludeSelectedBtn" Click="OnExcludeSelectedCandidates">
+                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size40}">
+                                                <SymbolIcon Symbol="BlockContact" />
+                                                <TextBlock Text="Exclude selected" />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button x:Name="IncludeSelectedBtn" Click="OnIncludeSelectedCandidates">
+                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size40}">
+                                                <SymbolIcon Symbol="Accept" />
+                                                <TextBlock Text="Include selected" />
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+
+                                    <TreeView
+                                        x:Name="CandidatesTree"
+                                        Grid.Row="2"
+                                        SelectionMode="None">
+                                        <TreeView.ItemTemplate>
+                                            <TreeViewItemTemplate ItemsSource="{Binding Children}">
+                                                <Border
+                                                    Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                                    CornerRadius="12"
+                                                    Margin="0,2"
+                                                    Padding="12"
+                                                    Visibility="{Binding Visibility}">
+                                                    <Grid ColumnSpacing="{StaticResource Spacing.Size120}" Opacity="{Binding VisualOpacity}">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <CheckBox
+                                                            Grid.Column="0"
                                                             VerticalAlignment="Center"
-                                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
-                                                    </Border>
-                                                    <TextBlock
-                                                        Grid.Column="1"
-                                                        Text="{Binding}"
-                                                        TextTrimming="CharacterEllipsis"
-                                                        VerticalAlignment="Center"
-                                                        ToolTipService.ToolTip="{Binding}"
-                                                        Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                                </Grid>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ListView.ItemTemplate>
-                                </ListView>
+                                                            IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                            Visibility="{Binding SelectionVisibility}" />
+                                                        <StackPanel Grid.Column="1" Spacing="{StaticResource Spacing.Size40}">
+                                                            <TextBlock
+                                                                Text="{Binding DisplayName}"
+                                                                FontWeight="SemiBold" />
+                                                            <TextBlock
+                                                                Text="{Binding RelativePathDisplay}"
+                                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                TextTrimming="CharacterEllipsis"
+                                                                ToolTipService.ToolTip="{Binding FullPath}" />
+                                                        </StackPanel>
+                                                        <StackPanel
+                                                            Grid.Column="2"
+                                                            Orientation="Horizontal"
+                                                            Spacing="{StaticResource Spacing.Size40}"
+                                                            VerticalAlignment="Center">
+                                                            <InfoBadge
+                                                                Visibility="{Binding PathBadgeVisibility}"
+                                                                ValueString="{Binding PathLengthDisplay}" />
+                                                            <ToggleButton
+                                                                MinWidth="140"
+                                                                IsChecked="{Binding IsExcluded, Mode=TwoWay}"
+                                                                IsEnabled="{Binding CanExclude}"
+                                                                ToolTipService.ToolTip="{Binding ExclusionToolTip}">
+                                                                <ToggleButton.ContentTemplate>
+                                                                    <DataTemplate>
+                                                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size40}">
+                                                                            <SymbolIcon Symbol="{Binding ExclusionSymbol}" />
+                                                                            <TextBlock Text="{Binding ExclusionLabel}" />
+                                                                        </StackPanel>
+                                                                    </DataTemplate>
+                                                                </ToggleButton.ContentTemplate>
+                                                            </ToggleButton>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                            </TreeViewItemTemplate>
+                                        </TreeView.ItemTemplate>
+                                    </TreeView>
+                                </Grid>
                             </Grid>
                         </Border>
                     </Grid>
