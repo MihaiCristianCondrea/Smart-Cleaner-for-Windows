@@ -22,6 +22,11 @@
         <Thickness x:Key="Padding.Card">24</Thickness>
         <Thickness x:Key="Padding.Hero">24,20,24,20</Thickness>
 
+        <!-- Color fallbacks required by gradient resources -->
+        <Color x:Key="Color.BrandPrimary">#FF0067C0</Color>
+        <Color x:Key="Color.BrandSecondary">#FF004E95</Color>
+        <Color x:Key="Color.BrandOverlay">#33000000</Color>
+
         <!-- Brush fallbacks -->
         <SolidColorBrush x:Key="Brush.Hero.Neutral" Color="#11000000" />
         <SolidColorBrush x:Key="Brush.Hero.Warning" Color="#11FFA500" />
