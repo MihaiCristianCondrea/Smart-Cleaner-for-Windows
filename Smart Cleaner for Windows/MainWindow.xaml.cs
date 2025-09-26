@@ -41,7 +41,7 @@ using System.Security.Principal;
 
 namespace Smart_Cleaner_for_Windows;
 
-public sealed partial class MainWindow
+public sealed partial class MainWindow : Window
 {
     private readonly IDirectoryCleaner _directoryCleaner;
     private readonly IDiskCleanupService _diskCleanupService;
