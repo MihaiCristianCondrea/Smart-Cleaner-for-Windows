@@ -28,7 +28,6 @@ using Smart_Cleaner_for_Windows.Core.LargeFiles;
 using Windows.Graphics;
 using Windows.Storage;
 using Windows.Storage.Pickers;
-using Windows.UI;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
@@ -80,7 +79,7 @@ public sealed partial class MainWindow : Window
     private CancellationTokenSource? _storageOverviewCts;
     private bool _isDiskCleanupOperation;
     private bool _isLargeFilesBusy;
-    private readonly Dictionary<string, Color> _defaultAccentColors = new();
+    private readonly Dictionary<string, Microsoft.UI.Color> _defaultAccentColors = new();
     private readonly ResourceLoader? _resources = TryCreateResourceLoader();
     private readonly ApplicationDataContainer? _settings = TryGetLocalSettings();
     private bool _isInitializingSettings;
@@ -2645,7 +2644,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             return fallbackBrush;
         }
 
-        return new SolidColorBrush(Colors.Transparent);
+        return new SolidColorBrush(Microsoft.UI.Colors.Transparent);
     }
 
     private void UpdateResultsSummary(int count, string? customMessage = null, int? visibleCount = null)
