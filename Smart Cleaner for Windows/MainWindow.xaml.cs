@@ -638,6 +638,21 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             }
 
             node.IsVisible = matches || visibleLeaves > 0;
+
+            if (node.IsVirtual)
+            {
+                if (visibleLeaves > 0)
+                {
+                    if (!node.IsExpanded)
+                    {
+                        node.IsExpanded = true;
+                    }
+                }
+                else if (!matches && node.IsExpanded)
+                {
+                    node.IsExpanded = false;
+                }
+            }
         }
 
         return visibleLeaves;
@@ -3590,6 +3605,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         private bool _isSelected;
         private bool _isExcluded;
         private bool _isVisible = true;
+        private bool _isExpanded;
 
         public EmptyFolderNode(
             MainWindow owner,
@@ -3610,6 +3626,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             TopLevelSegment = topLevelSegment;
             Parent = parent;
             Children = new ObservableCollection<EmptyFolderNode>();
+            _isExpanded = isVirtual;
         }
 
         public string Name { get; }
@@ -3700,6 +3717,19 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         }
 
         public Visibility NodeVisibility => _isVisible ? Visibility.Visible : Visibility.Collapsed;
+
+        public bool IsExpanded
+        {
+            get => _isExpanded;
+            set
+            {
+                if (_isExpanded != value)
+                {
+                    _isExpanded = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
