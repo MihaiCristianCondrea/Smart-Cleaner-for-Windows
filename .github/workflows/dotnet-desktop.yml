@@ -36,8 +36,13 @@ jobs:
       - name: Build
         shell: pwsh
         run: |
+          $config = $env:Configuration
+          $logRoot = Join-Path $env:GITHUB_WORKSPACE "artifacts\logs\$config"
+          New-Item -ItemType Directory -Path $logRoot -Force | Out-Null
+          $binlog = Join-Path $logRoot "msbuild.binlog"
+
           try {
-            dotnet build "$env:Solution_Path" --configuration $env:Configuration --no-restore
+            dotnet build "$env:Solution_Path" --configuration $config --no-restore -v:diag -bl:$binlog
           }
           catch {
             Write-Host "::group::WinUI markup diagnostics"
@@ -52,7 +57,29 @@ jobs:
               Write-Host "No XAML compiler reports were produced."
             }
             Write-Host "::endgroup::"
+            if (Test-Path $binlog) {
+              Write-Host "::notice::MSBuild binlog captured at $binlog"
+            }
             throw
+          }
+          finally {
+            if (Test-Path $binlog) {
+              Write-Host "::notice::MSBuild binlog saved to $binlog"
+            }
           }
         env:
           Configuration: ${{ matrix.configuration }}
+      - name: Upload MSBuild binlog
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: msbuild-binlog-${{ matrix.configuration }}
+          path: artifacts\logs\${{ matrix.configuration }}\*.binlog
+          if-no-files-found: ignore
+      - name: Upload WinUI diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: winui-diagnostics-${{ matrix.configuration }}
+          path: Smart Cleaner for Windows\obj\**\output.json
+          if-no-files-found: warn
