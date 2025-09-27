@@ -8,6 +8,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.VisualBasic.FileIO;
 using Smart_Cleaner_for_Windows.Core.LargeFiles;
+using Smart_Cleaner_for_Windows.Utilities;
+using Smart_Cleaner_for_Windows.ViewModels;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
 
@@ -336,7 +338,7 @@ public sealed partial class MainWindow
                 continue;
             }
 
-            var viewModel = new LargeFileGroupViewModel(this, group.Name);
+            var viewModel = new LargeFileGroupViewModel(group.Name, FormatFileCount, ValueFormatting.FormatBytes);
             foreach (var entry in group.Entries)
             {
                 var extensionLabel = string.IsNullOrEmpty(entry.Extension)
@@ -392,7 +394,7 @@ public sealed partial class MainWindow
             CultureInfo.CurrentCulture,
             Localize("LargeFilesSummaryDetails", "{0} • {1}"),
             FormatFileCount(totalCount),
-            FormatBytes((ulong)Math.Max(0L, totalBytes)));
+            ValueFormatting.FormatBytes((ulong)Math.Max(0L, totalBytes)));
         LargeFilesResultBadge.Value = totalCount;
         LargeFilesResultBadge.Visibility = Visibility.Visible;
     }

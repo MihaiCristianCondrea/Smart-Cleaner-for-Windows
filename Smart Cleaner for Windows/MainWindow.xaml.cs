@@ -25,6 +25,8 @@ using Smart_Cleaner_for_Windows.Core.DiskCleanup;
 using Smart_Cleaner_for_Windows.Core.Storage;
 using Smart_Cleaner_for_Windows.Core.LargeFiles;
 using Smart_Cleaner_for_Windows.Features.EmptyFolders;
+using Smart_Cleaner_for_Windows.Utilities;
+using Smart_Cleaner_for_Windows.ViewModels;
 using Windows.Graphics;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -36,7 +38,6 @@ using GdiImageType = Windows.Win32.UI.WindowsAndMessaging.GDI_IMAGE_TYPE;
 using LoadImageFlags = Windows.Win32.UI.WindowsAndMessaging.IMAGE_FLAGS;
 using WinRT;
 using WinRT.Interop;
-using System.Runtime.CompilerServices;
 using System.Security.Principal;
 
 namespace Smart_Cleaner_for_Windows;
@@ -424,13 +425,13 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 var details = string.Format(
                     CultureInfo.CurrentCulture,
                     "{0} free of {1}",
-                    FormatBytes(freeValue),
-                    FormatBytes(capacityValue));
+                    ValueFormatting.FormatBytes(freeValue),
+                    ValueFormatting.FormatBytes(capacityValue));
                 var usageSummary = string.Format(
                     CultureInfo.CurrentCulture,
                     "{0:0}% used ({1})",
                     usedPercentage,
-                    FormatBytes(usedValue));
+                    ValueFormatting.FormatBytes(usedValue));
 
                 var viewModel = new DriveUsageViewModel(displayName, details, usedPercentage, usageSummary);
                 _driveUsage.Add(viewModel);
@@ -447,8 +448,8 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 "Monitoring {0} {1}. {2} free of {3}.",
                 _driveUsage.Count,
                 driveLabel,
-                FormatBytes(totalFree),
-                FormatBytes(totalCapacity));
+                ValueFormatting.FormatBytes(totalFree),
+                ValueFormatting.FormatBytes(totalCapacity));
 
             if (busiestDrive is not null)
             {
@@ -798,26 +799,6 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         Info.Message = message;
         Info.Severity = severity;
         Info.IsOpen = true;
-    }
-
-    private static string FormatBytes(ulong value)
-    {
-        if (value == 0)
-        {
-            return "0 B";
-        }
-
-        string[] suffixes = new[] { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
-        double size = value;
-        var index = 0;
-
-        while (size >= 1024 && index < suffixes.Length - 1)
-        {
-            size /= 1024;
-            index++;
-        }
-
-        return string.Format(CultureInfo.CurrentCulture, "{0:0.##} {1}", size, suffixes[index]);
     }
 
     private static bool IsAdministrator()
