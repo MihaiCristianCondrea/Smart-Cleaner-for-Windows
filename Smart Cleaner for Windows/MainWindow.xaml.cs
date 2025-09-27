@@ -816,9 +816,6 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         return string.Format(CultureInfo.CurrentCulture, "{0:0.##} {1}", size, suffixes[index]);
     }
 
-
-    }
-
     private static bool IsAdministrator()
     {
         if (!OperatingSystem.IsWindows())
