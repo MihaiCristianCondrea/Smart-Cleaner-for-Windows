@@ -7,6 +7,8 @@ using System.Threading;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Smart_Cleaner_for_Windows.Core.DiskCleanup;
+using Smart_Cleaner_for_Windows.Utilities;
+using Smart_Cleaner_for_Windows.ViewModels;
 
 namespace Smart_Cleaner_for_Windows;
 
@@ -118,7 +120,7 @@ public sealed partial class MainWindow
                     "InfoDiskCleanupCleaned",
                     "Cleaned {0} handler(s) and freed {1}.",
                     result.SuccessCount,
-                    FormatBytes(result.Freed))
+                    ValueFormatting.FormatBytes(result.Freed))
                 : Localize("InfoDiskCleanupNoChanges", "No disk cleanup handlers reported any changes.");
 
             if (result.HasFailures)
@@ -230,7 +232,7 @@ public sealed partial class MainWindow
                 Localize(
                     "DiskCleanupStatusPotential",
                     "Potential savings: {0} across {1} {2} on {3}."),
-                FormatBytes(totalBytes),
+                ValueFormatting.FormatBytes(totalBytes),
                 selectable.Count,
                 label,
                 _diskCleanupVolume);
