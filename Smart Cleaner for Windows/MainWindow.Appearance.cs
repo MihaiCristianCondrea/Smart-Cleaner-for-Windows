@@ -4,11 +4,16 @@ using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using Windows.Graphics;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
+using WinRT;
 using WinRT.Interop;
+using GdiImageType = Windows.Win32.UI.WindowsAndMessaging.GDI_IMAGE_TYPE;
+using LoadImageFlags = Windows.Win32.UI.WindowsAndMessaging.IMAGE_FLAGS;
+using XamlSystemBackdrop = Microsoft.UI.Xaml.Media.SystemBackdrop;
 
 namespace Smart_Cleaner_for_Windows;
 
@@ -46,7 +51,7 @@ public sealed partial class MainWindow
         _backdropConfig = null;
     }
 
-    private bool TrySetSystemBackdropSafe(SystemBackdrop backdrop)
+    private bool TrySetSystemBackdropSafe(XamlSystemBackdrop backdrop)
     {
         try
         {

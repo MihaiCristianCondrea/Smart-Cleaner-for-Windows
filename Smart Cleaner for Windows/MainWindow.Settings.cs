@@ -1,32 +1,25 @@
 using System;
 using System.Globalization;
+using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.Windows.ApplicationModel.Resources;
+using Windows.Storage;
 using Windows.UI;
 
 namespace Smart_Cleaner_for_Windows;
 
 public sealed partial class MainWindow
 {
+    private static readonly Color WhiteColor = Color.FromArgb(255, 255, 255, 255);
+    private static readonly Color BlackColor = Color.FromArgb(255, 0, 0, 0);
+
     private static bool ParseBoolSetting(string? value, bool defaultValue)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return defaultValue;
-        }
-
-        if (bool.TryParse(value, out var result))
-        {
-            return result;
-        }
-
-        if (int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var numeric))
-        {
-            return numeric != 0;
-        }
-
+        if (string.IsNullOrWhiteSpace(value)) return defaultValue;
+        if (bool.TryParse(value, out var result)) return result;
+        if (int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var numeric)) return numeric != 0;
         return defaultValue;
     }
 
@@ -123,15 +116,8 @@ public sealed partial class MainWindow
 
     private void OnThemeSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (_isInitializingSettings)
-        {
-            return;
-        }
-
-        if (sender is not RadioButtons radioButtons)
-        {
-            return;
-        }
+        if (_isInitializingSettings) return;
+        if (sender is not RadioButtons radioButtons) return;
 
         if (radioButtons.SelectedItem is RadioButton button && button.Tag is string tag)
         {
@@ -141,15 +127,8 @@ public sealed partial class MainWindow
 
     private void OnAccentPreferenceChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (_isInitializingSettings)
-        {
-            return;
-        }
-
-        if (sender is not RadioButtons radioButtons)
-        {
-            return;
-        }
+        if (_isInitializingSettings) return;
+        if (sender is not RadioButtons radioButtons) return;
 
         if (radioButtons.SelectedItem is RadioButton button && button.Tag is string tag)
         {
@@ -181,12 +160,15 @@ public sealed partial class MainWindow
             };
         }
 
-        ThemeSummaryText.Text = normalized switch
+        if (ThemeSummaryText is not null)
         {
-            ThemePreferenceLight => "Light",
-            ThemePreferenceDark => "Dark",
-            _ => "Use system setting"
-        };
+            ThemeSummaryText.Text = normalized switch
+            {
+                ThemePreferenceLight => "Light",
+                ThemePreferenceDark => "Dark",
+                _ => "Use system setting"
+            };
+        }
 
         if (save)
         {
@@ -196,10 +178,7 @@ public sealed partial class MainWindow
 
     private static string NormalizeThemePreference(string? preference)
     {
-        if (string.IsNullOrWhiteSpace(preference))
-        {
-            return ThemePreferenceDefault;
-        }
+        if (string.IsNullOrWhiteSpace(preference)) return ThemePreferenceDefault;
 
         return preference.Trim().ToLowerInvariant() switch
         {
@@ -213,10 +192,7 @@ public sealed partial class MainWindow
 
     private void SelectThemeOption(string preference)
     {
-        if (ThemeRadioButtons is null)
-        {
-            return;
-        }
+        if (ThemeRadioButtons is null) return;
 
         ThemeRadioButtons.SelectedIndex = preference switch
         {
@@ -249,7 +225,10 @@ public sealed partial class MainWindow
             _accentPreference = AccentPreferenceDefault;
         }
 
-        AccentSummaryText.Text = FormatAccentSummary(_accentPreference);
+        if (AccentSummaryText is not null)
+        {
+            AccentSummaryText.Text = FormatAccentSummary(_accentPreference);
+        }
 
         if (save)
         {
@@ -283,10 +262,7 @@ public sealed partial class MainWindow
 
     private void SelectAccentOption(string preference)
     {
-        if (AccentColorRadioButtons is null)
-        {
-            return;
-        }
+        if (AccentColorRadioButtons is null) return;
 
         AccentColorRadioButtons.SelectedIndex = preference switch
         {
@@ -318,10 +294,7 @@ public sealed partial class MainWindow
 
     private void OnCleanerRecyclePreferenceToggled(object sender, RoutedEventArgs e)
     {
-        if (_isInitializingSettings)
-        {
-            return;
-        }
+        if (_isInitializingSettings) return;
 
         if (sender is ToggleSwitch toggle)
         {
@@ -336,10 +309,7 @@ public sealed partial class MainWindow
 
     private void OnCleanerDepthPreferenceChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
     {
-        if (_isInitializingSettings)
-        {
-            return;
-        }
+        if (_isInitializingSettings) return;
 
         var value = sender.Value;
         if (double.IsNaN(value))
@@ -357,15 +327,13 @@ public sealed partial class MainWindow
 
     private void OnCleanerExclusionsPreferenceChanged(object sender, TextChangedEventArgs e)
     {
-        if (_isInitializingSettings)
-        {
-            return;
-        }
+        if (_isInitializingSettings) return;
 
         if (sender is TextBox textBox)
         {
             _cleanerExclusions = textBox.Text?.Trim() ?? string.Empty;
             SaveSetting(CleanerExclusionsPreferenceKey, _cleanerExclusions);
+            UpdateCleanerDefaultsSummary();
             ApplyCleanerDefaultsToSession();
         }
     }
@@ -380,19 +348,17 @@ public sealed partial class MainWindow
 
     private void OnAutomationPreferenceToggled(object sender, RoutedEventArgs e)
     {
-        if (_isInitializingSettings)
-        {
-            return;
-        }
+        if (_isInitializingSettings) return;
+        if (sender is not ToggleSwitch source) return;
 
-        if (AutomationAutoPreviewToggle is not null && sender == AutomationAutoPreviewToggle)
+        if (AutomationAutoPreviewToggle is not null && ReferenceEquals(source, AutomationAutoPreviewToggle))
         {
             _automationAutoPreview = AutomationAutoPreviewToggle.IsOn;
             SaveSetting(
                 AutomationAutoPreviewKey,
                 _automationAutoPreview.ToString(CultureInfo.InvariantCulture));
         }
-        else if (AutomationReminderToggle is not null && sender == AutomationReminderToggle)
+        else if (AutomationReminderToggle is not null && ReferenceEquals(source, AutomationReminderToggle))
         {
             _automationWeeklyReminder = AutomationReminderToggle.IsOn;
             SaveSetting(
@@ -405,19 +371,17 @@ public sealed partial class MainWindow
 
     private void OnNotificationPreferenceToggled(object sender, RoutedEventArgs e)
     {
-        if (_isInitializingSettings)
-        {
-            return;
-        }
+        if (_isInitializingSettings) return;
+        if (sender is not ToggleSwitch source) return;
 
-        if (NotificationCompletionToggle is not null && sender == NotificationCompletionToggle)
+        if (NotificationCompletionToggle is not null && ReferenceEquals(source, NotificationCompletionToggle))
         {
             _notificationShowCompletion = NotificationCompletionToggle.IsOn;
             SaveSetting(
                 NotificationShowCompletionKey,
                 _notificationShowCompletion.ToString(CultureInfo.InvariantCulture));
         }
-        else if (NotificationDesktopToggle is not null && sender == NotificationDesktopToggle)
+        else if (NotificationDesktopToggle is not null && ReferenceEquals(source, NotificationDesktopToggle))
         {
             _notificationDesktopAlerts = NotificationDesktopToggle.IsOn;
             SaveSetting(
@@ -430,10 +394,7 @@ public sealed partial class MainWindow
 
     private void OnHistoryRetentionChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
     {
-        if (_isInitializingSettings)
-        {
-            return;
-        }
+        if (_isInitializingSettings) return;
 
         var value = sender.Value;
         if (double.IsNaN(value))
@@ -450,10 +411,7 @@ public sealed partial class MainWindow
 
     private static ResourceLoader? TryCreateResourceLoader()
     {
-        if (!OperatingSystem.IsWindows())
-        {
-            return null;
-        }
+        if (!OperatingSystem.IsWindows()) return null;
 
         try
         {
@@ -467,10 +425,7 @@ public sealed partial class MainWindow
 
     private static ApplicationDataContainer? TryGetLocalSettings()
     {
-        if (!OperatingSystem.IsWindows())
-        {
-            return null;
-        }
+        if (!OperatingSystem.IsWindows()) return null;
 
         try
         {
@@ -485,10 +440,7 @@ public sealed partial class MainWindow
     private string? ReadSetting(string key)
     {
         var settings = _settings;
-        if (settings is null)
-        {
-            return null;
-        }
+        if (settings is null) return null;
 
         try
         {
@@ -513,10 +465,7 @@ public sealed partial class MainWindow
     private void SaveSetting(string key, string value)
     {
         var settings = _settings;
-        if (settings is null)
-        {
-            return;
-        }
+        if (settings is null) return;
 
         try
         {
@@ -581,9 +530,9 @@ public sealed partial class MainWindow
         }
     }
 
-    private static Color Lighten(Color color, double amount) => Lerp(color, Colors.White, amount);
+    private static Color Lighten(Color color, double amount) => Lerp(color, WhiteColor, amount);
 
-    private static Color Darken(Color color, double amount) => Lerp(color, Colors.Black, amount);
+    private static Color Darken(Color color, double amount) => Lerp(color, BlackColor, amount);
 
     private static Color Lerp(Color from, Color to, double amount)
     {
@@ -604,10 +553,7 @@ public sealed partial class MainWindow
         }
 
         var span = value.AsSpan();
-        if (span[0] == '#')
-        {
-            span = span[1..];
-        }
+        if (span[0] == '#') span = span[1..];
 
         if (span.Length == 6)
         {

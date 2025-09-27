@@ -1,17 +1,13 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.VisualBasic.FileIO;
 using Smart_Cleaner_for_Windows.Core.LargeFiles;
-using Windows.Storage;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
 
@@ -529,7 +525,7 @@ public sealed partial class MainWindow
             normalized = path;
         }
 
-        var comparer = _largeFileExclusionLookup.Comparer ?? (OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+        var comparer = _largeFileExclusionLookup.Comparer ?? StringComparer.Ordinal;
 
         for (var i = _largeFileExclusions.Count - 1; i >= 0; i--)
         {
@@ -567,7 +563,7 @@ public sealed partial class MainWindow
         ? LocalizeFormat("LargeFilesSingleFileLabel", "{0} file", count)
         : LocalizeFormat("LargeFilesMultipleFileLabel", "{0} files", count);
 
-    private void RemoveLargeFileItem(LargeFileItemViewModel item)
+    private void RemoveLargeFileItem(LargeFileItemViewModel? item)
     {
         if (item is null)
         {
