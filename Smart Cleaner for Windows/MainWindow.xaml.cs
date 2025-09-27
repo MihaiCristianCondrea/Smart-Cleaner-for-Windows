@@ -24,6 +24,7 @@ using Smart_Cleaner_for_Windows.Core;
 using Smart_Cleaner_for_Windows.Core.DiskCleanup;
 using Smart_Cleaner_for_Windows.Core.Storage;
 using Smart_Cleaner_for_Windows.Core.LargeFiles;
+using Smart_Cleaner_for_Windows.Features.EmptyFolders;
 using Windows.Graphics;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -40,7 +41,7 @@ using System.Security.Principal;
 
 namespace Smart_Cleaner_for_Windows;
 
-public sealed partial class MainWindow
+public sealed partial class MainWindow : IEmptyFolderCleanupView
 {
     private readonly IDirectoryCleaner _directoryCleaner;
     private readonly IDiskCleanupService _diskCleanupService;
@@ -49,6 +50,7 @@ public sealed partial class MainWindow
     private CancellationTokenSource? _cts;
     private MicaController? _mica;
     private SystemBackdropConfiguration? _backdropConfig;
+    private readonly EmptyFolderCleanupController _emptyFolderController;
     private List<string> _previewCandidates = new();
     private bool _isBusy;
     private readonly ObservableCollection<DriveUsageViewModel> _driveUsage = new();
@@ -166,6 +168,8 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         _diskCleanupVolume = _diskCleanupService.GetDefaultVolume();
 
         InitializeComponent();
+
+        _emptyFolderController = new EmptyFolderCleanupController(_directoryCleaner, this);
 
         LargeFilesGroupList.ItemsSource = _largeFileGroups;
 

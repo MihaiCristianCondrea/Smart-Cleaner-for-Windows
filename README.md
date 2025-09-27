@@ -20,6 +20,7 @@ Smart Cleaner for Windows is a modern WinUI 3 desktop utility that helps you tid
 | `Smart Cleaner for Windows/Core/` | Cross-platform logic for scanning directories and integrating with the Windows Disk Cleanup COM handlers. |
 | `Smart Cleaner for Windows/Strings/` | Localized resources (`en-US` and `es-ES`). |
 | `Smart Cleaner for Windows/Properties/PublishProfiles/` | Publish profiles for x86, x64, and ARM64 self-contained builds. |
+| `docs/SOLID-refactoring-guide.md` | Architecture roadmap for breaking the monolithic window into SOLID-aligned modules. |
 
 ## Getting started
 ### 1. Clone the repository
