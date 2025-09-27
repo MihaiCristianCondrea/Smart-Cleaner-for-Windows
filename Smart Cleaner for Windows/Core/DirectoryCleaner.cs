@@ -1,27 +1,40 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Enumeration;
 using System.Threading;
 using System.Threading.Tasks;
+using Smart_Cleaner_for_Windows.Core.FileSystem;
 
 namespace Smart_Cleaner_for_Windows.Core;
 
 /// <summary>
 /// Provides helpers to identify and remove empty directories.
 /// </summary>
-public sealed class DirectoryCleaner(IDirectorySystem directorySystem, IDirectoryDeleter directoryDeleter) : IDirectoryCleaner
+public sealed class DirectoryCleaner : IDirectoryCleaner
 {
-    private static readonly bool IgnoreCase = OperatingSystem.IsWindows();
-    private static readonly StringComparer PathComparer = IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
-    private readonly IDirectorySystem _directorySystem = directorySystem ?? throw new ArgumentNullException(nameof(directorySystem));
-    private readonly IDirectoryDeleter _directoryDeleter = directoryDeleter ?? throw new ArgumentNullException(nameof(directoryDeleter));
+    private readonly IDirectorySystem _directorySystem;
+    private readonly IDirectoryTraversalService _traversalService;
+    private readonly IEmptyDirectoryDetector _emptyDirectoryDetector;
+    private readonly IDirectoryDeletionService _directoryDeletionService;
 
     public static IDirectoryCleaner Default { get; } = new DirectoryCleaner();
 
     private DirectoryCleaner()
         : this(new FileSystemDirectorySystem(), new FileSystemDirectoryDeleter())
     {
+    }
+
+    public DirectoryCleaner(
+        IDirectorySystem directorySystem,
+        IDirectoryDeleter directoryDeleter,
+        IDirectoryTraversalService? traversalService = null,
+        IEmptyDirectoryDetector? emptyDirectoryDetector = null,
+        IDirectoryDeletionService? directoryDeletionService = null)
+    {
+        _directorySystem = directorySystem ?? throw new ArgumentNullException(nameof(directorySystem));
+        _traversalService = traversalService ?? new DirectoryTraversalService(_directorySystem);
+        _emptyDirectoryDetector = emptyDirectoryDetector ?? new EmptyDirectoryDetector(_directorySystem);
+        _directoryDeletionService = directoryDeletionService ?? new DirectoryDeletionService(directoryDeleter ?? throw new ArgumentNullException(nameof(directoryDeleter)));
     }
 
     public static DirectoryCleanResult Clean(string root, DirectoryCleanOptions? options = null, CancellationToken cancellationToken = default)
@@ -67,14 +80,15 @@ public sealed class DirectoryCleaner(IDirectorySystem directorySystem, IDirector
             throw new DirectoryNotFoundException($"The directory '{root}' does not exist.");
         }
 
-        root = NormalizePath(root);
+        root = PathUtilities.NormalizeDirectoryPath(root);
 
         var empty = new List<string>();
         var deleted = new List<string>();
         var failures = new List<DirectoryCleanFailure>();
-        var exclusions = new DirectoryExclusionFilter(root, options, failures);
+        var exclusions = new DirectoryExclusionEvaluator(root, options, failures);
+        var traversalRequest = new DirectoryTraversalRequest(root, options, exclusions, failures);
 
-        foreach (var directory in EnumerateBottomUp(root, options, exclusions, failures, cancellationToken))
+        foreach (var directory in _traversalService.Enumerate(traversalRequest, cancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -83,12 +97,12 @@ public sealed class DirectoryCleaner(IDirectorySystem directorySystem, IDirector
                 continue;
             }
 
-            if (!options.DeleteRootWhenEmpty && PathComparer.Equals(directory, root))
+            if (!options.DeleteRootWhenEmpty && FileSystemPathComparer.PathComparer.Equals(directory, root))
             {
                 continue;
             }
 
-            if (!IsDirectoryEmpty(directory, failures))
+            if (!_emptyDirectoryDetector.IsEmpty(directory, failures))
             {
                 continue;
             }
@@ -100,250 +114,16 @@ public sealed class DirectoryCleaner(IDirectorySystem directorySystem, IDirector
                 continue;
             }
 
-            try
+            var mode = options.SendToRecycleBin
+                ? DirectoryDeletionMode.RecycleBin
+                : DirectoryDeletionMode.Permanent;
+
+            if (_directoryDeletionService.TryDelete(directory, mode, failures))
             {
-                var mode = options.SendToRecycleBin
-                    ? DirectoryDeletionMode.RecycleBin
-                    : DirectoryDeletionMode.Permanent;
-                _directoryDeleter.Delete(directory, mode);
                 deleted.Add(directory);
-            }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-            {
-                failures.Add(new DirectoryCleanFailure(directory, ex));
-            }
-            catch (Exception ex)
-            {
-                failures.Add(new DirectoryCleanFailure(directory, ex));
             }
         }
 
         return new DirectoryCleanResult(empty, deleted, failures);
-    }
-
-    private IEnumerable<string> EnumerateBottomUp(
-        string root,
-        DirectoryCleanOptions options,
-        DirectoryExclusionFilter exclusions,
-        ICollection<DirectoryCleanFailure> failures,
-        CancellationToken cancellationToken)
-    {
-        var pending = new Stack<(string Path, int Depth)>();
-        var ordered = new Stack<string>();
-        pending.Push((root, 0));
-
-        while (pending.Count > 0)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var (current, depth) = pending.Pop();
-            ordered.Push(current);
-
-            if (options.MaxDepth is { } maxDepth && depth >= maxDepth)
-            {
-                continue;
-            }
-
-            IEnumerable<string> children;
-            try
-            {
-                children = _directorySystem.EnumerateDirectories(current);
-            }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-            {
-                failures.Add(new DirectoryCleanFailure(current, ex));
-                continue;
-            }
-
-            foreach (var child in children)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                var normalized = NormalizePath(child);
-
-                if (exclusions.ShouldExclude(normalized))
-                {
-                    continue;
-                }
-
-                if (options.SkipReparsePoints && IsReparsePoint(normalized, failures))
-                {
-                    continue;
-                }
-
-                pending.Push((normalized, depth + 1));
-            }
-        }
-
-        while (ordered.Count > 0)
-        {
-            yield return ordered.Pop();
-        }
-    }
-
-    private bool IsDirectoryEmpty(string directory, ICollection<DirectoryCleanFailure> failures)
-    {
-        try
-        {
-            using var enumerator = _directorySystem.EnumerateFileSystemEntries(directory).GetEnumerator();
-            return !enumerator.MoveNext();
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            failures.Add(new DirectoryCleanFailure(directory, ex));
-            return false;
-        }
-    }
-
-    private bool IsReparsePoint(string path, ICollection<DirectoryCleanFailure> failures)
-    {
-        try
-        {
-            var attributes = _directorySystem.GetAttributes(path);
-            return (attributes & FileAttributes.ReparsePoint) != 0;
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            failures.Add(new DirectoryCleanFailure(path, ex));
-            return true;
-        }
-    }
-
-    private static string NormalizePath(string path)
-    {
-        var full = Path.GetFullPath(path);
-        return Path.TrimEndingDirectorySeparator(full);
-    }
-
-    private sealed class DirectoryExclusionFilter
-    {
-        private readonly HashSet<string> _fullPathExclusions;
-        private readonly string[] _patterns;
-        private readonly string _root;
-
-        public DirectoryExclusionFilter(string root, DirectoryCleanOptions options, ICollection<DirectoryCleanFailure> failures)
-        {
-            _root = root;
-            _fullPathExclusions = new HashSet<string>(PathComparer);
-
-            if (options.ExcludedFullPaths is { Count: > 0 })
-            {
-                foreach (var path in options.ExcludedFullPaths)
-                {
-                    if (string.IsNullOrWhiteSpace(path))
-                    {
-                        continue;
-                    }
-
-                    try
-                    {
-                        var resolved = Path.IsPathRooted(path)
-                            ? NormalizePath(path)
-                            : NormalizePath(Path.Combine(root, path));
-                        _fullPathExclusions.Add(resolved);
-                    }
-                    catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException or System.Security.SecurityException)
-                    {
-                        failures.Add(new DirectoryCleanFailure(path, ex));
-                    }
-                }
-            }
-
-            if (options.ExcludedNamePatterns is { Count: > 0 })
-            {
-                var validPatterns = new List<string>();
-
-                foreach (var pattern in options.ExcludedNamePatterns)
-                {
-                    if (string.IsNullOrWhiteSpace(pattern))
-                    {
-                        continue;
-                    }
-
-                    if (TryNormalizePattern(pattern, out var normalized, out var error))
-                    {
-                        validPatterns.Add(normalized);
-                    }
-                    else if (error is not null)
-                    {
-                        failures.Add(new DirectoryCleanFailure(pattern, error));
-                    }
-                }
-
-                _patterns = validPatterns.Count > 0
-                    ? validPatterns.ToArray()
-                    : [];
-            }
-            else
-            {
-                _patterns = [];
-            }
-        }
-
-        public bool ShouldExclude(string path)
-        {
-            if (_fullPathExclusions.Contains(path))
-            {
-                return true;
-            }
-
-            if (_patterns.Length == 0)
-            {
-                return false;
-            }
-
-            var name = Path.GetFileName(path);
-            if (!string.IsNullOrEmpty(name) && MatchesAny(_patterns, name))
-            {
-                return true;
-            }
-
-            var relative = Path.GetRelativePath(_root, path);
-            if (!string.IsNullOrEmpty(relative) && relative is not ".")
-            {
-                var normalized = relative.Replace('\\', '/');
-                if (MatchesAny(_patterns, normalized))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private static bool TryNormalizePattern(string pattern, out string normalized, out Exception? error)
-        {
-            normalized = pattern.Replace('\\', '/');
-
-            try
-            {
-                _ = FileSystemName.MatchesSimpleExpression(normalized, string.Empty, IgnoreCase);
-                error = null;
-                return true;
-            }
-            catch (ArgumentException ex)
-            {
-                error = new ArgumentException($"Invalid exclusion pattern '{pattern}'.", ex);
-                normalized = string.Empty;
-                return false;
-            }
-        }
-
-        private static bool MatchesAny(string[] patterns, string candidate)
-        {
-            foreach (var pattern in patterns)
-            {
-                if (FileSystemName.MatchesSimpleExpression(pattern, candidate, IgnoreCase))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
     }
 }

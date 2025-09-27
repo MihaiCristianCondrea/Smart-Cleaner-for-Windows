@@ -1,0 +1,30 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using Smart_Cleaner_for_Windows.Core;
+
+namespace Smart_Cleaner_for_Windows.Core.FileSystem;
+
+internal sealed class EmptyDirectoryDetector : IEmptyDirectoryDetector
+{
+    private readonly IDirectorySystem _directorySystem;
+
+    public EmptyDirectoryDetector(IDirectorySystem directorySystem)
+    {
+        _directorySystem = directorySystem ?? throw new ArgumentNullException(nameof(directorySystem));
+    }
+
+    public bool IsEmpty(string directory, ICollection<DirectoryCleanFailure> failures)
+    {
+        try
+        {
+            using var enumerator = _directorySystem.EnumerateFileSystemEntries(directory).GetEnumerator();
+            return !enumerator.MoveNext();
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            failures.Add(new DirectoryCleanFailure(directory, ex));
+            return false;
+        }
+    }
+}
