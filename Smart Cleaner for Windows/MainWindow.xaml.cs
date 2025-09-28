@@ -18,6 +18,7 @@ using Smart_Cleaner_for_Windows.Core.DiskCleanup;
 using Smart_Cleaner_for_Windows.Core.Storage;
 using Smart_Cleaner_for_Windows.Core.LargeFiles;
 using Smart_Cleaner_for_Windows.Features.EmptyFolders;
+using Windows.Graphics;
 using Smart_Cleaner_for_Windows.Utilities;
 using Smart_Cleaner_for_Windows.ViewModels;
 using Windows.Storage;
