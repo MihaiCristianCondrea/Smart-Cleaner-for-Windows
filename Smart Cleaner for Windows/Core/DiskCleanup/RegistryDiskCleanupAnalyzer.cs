@@ -8,6 +8,18 @@ namespace Smart_Cleaner_for_Windows.Core.DiskCleanup;
 
 public sealed class RegistryDiskCleanupAnalyzer : IDiskCleanupAnalyzer
 {
+    private readonly IRegistryDiskCleanupInterop _interop;
+
+    public RegistryDiskCleanupAnalyzer()
+        : this(RegistryDiskCleanupInteropFacade.Instance)
+    {
+    }
+
+    internal RegistryDiskCleanupAnalyzer(IRegistryDiskCleanupInterop interop)
+    {
+        _interop = interop ?? throw new ArgumentNullException(nameof(interop));
+    }
+
     public IReadOnlyList<DiskCleanupItem> Analyze(string drive, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -17,7 +29,7 @@ public sealed class RegistryDiskCleanupAnalyzer : IDiskCleanupAnalyzer
 
         foreach (var view in new[] { RegistryView.Registry64, RegistryView.Registry32 })
         {
-            using var root = RegistryDiskCleanupInterop.TryOpenVolumeCaches(view);
+            using var root = _interop.TryOpenVolumeCaches(view);
             if (root is null)
             {
                 continue;
@@ -61,7 +73,7 @@ public sealed class RegistryDiskCleanupAnalyzer : IDiskCleanupAnalyzer
         return results;
     }
 
-    private static DiskCleanupItem? AnalyzeHandler(
+    private DiskCleanupItem? AnalyzeHandler(
         RegistryKey handlerKey,
         string subKeyName,
         RegistryView view,
@@ -76,12 +88,12 @@ public sealed class RegistryDiskCleanupAnalyzer : IDiskCleanupAnalyzer
 
         var descriptor = new DiskCleanupHandlerDescriptor(clsid, subKeyName, view);
 
-        var display = RegistryDiskCleanupInterop.ReadDisplayString(handlerKey, "Display");
-        var description = RegistryDiskCleanupInterop.ReadDisplayString(handlerKey, "Description");
+        var display = _interop.ReadDisplayString(handlerKey, "Display");
+        var description = _interop.ReadDisplayString(handlerKey, "Description");
 
         try
         {
-            using var handler = RegistryDiskCleanupInterop.TryCreateHandler(clsid);
+            using var handler = _interop.TryCreateHandler(clsid);
             if (handler is null)
             {
                 return null;
@@ -97,23 +109,16 @@ public sealed class RegistryDiskCleanupAnalyzer : IDiskCleanupAnalyzer
 
             try
             {
-                var handlerDisplay = RegistryDiskCleanupInterop.PtrToString(rawDisplay);
-                var handlerDescription = RegistryDiskCleanupInterop.PtrToString(rawDescription);
+                var handlerDisplay = _interop.PtrToString(rawDisplay);
+                var handlerDescription = _interop.PtrToString(rawDescription);
 
                 display ??= handlerDisplay;
                 description ??= handlerDescription;
             }
             finally
             {
-                if (rawDisplay != IntPtr.Zero)
-                {
-                    Marshal.FreeCoTaskMem(rawDisplay);
-                }
-
-                if (rawDescription != IntPtr.Zero)
-                {
-                    Marshal.FreeCoTaskMem(rawDescription);
-                }
+                _interop.FreeCoTaskMem(rawDisplay);
+                _interop.FreeCoTaskMem(rawDescription);
             }
 
             var flags = (DiskCleanupFlags)flagsValue;
@@ -129,7 +134,7 @@ public sealed class RegistryDiskCleanupAnalyzer : IDiskCleanupAnalyzer
 
             if (status >= 0)
             {
-                var callback = new RegistryDiskCleanupInterop.DiskCleanupCallback(cancellationToken);
+                var callback = _interop.CreateCallback(cancellationToken);
                 var spaceStatus = cache.GetSpaceUsed(out size, callback);
 
                 if (spaceStatus == RegistryDiskCleanupInterop.HResults.OperationAborted && cancellationToken.IsCancellationRequested)
@@ -139,14 +144,14 @@ public sealed class RegistryDiskCleanupAnalyzer : IDiskCleanupAnalyzer
 
                 if (spaceStatus < 0)
                 {
-                    error = RegistryDiskCleanupInterop.CreateErrorMessage(spaceStatus);
+                    error = _interop.CreateErrorMessage(spaceStatus);
                     requiresElevation = spaceStatus == RegistryDiskCleanupInterop.HResults.AccessDenied;
                     size = 0;
                 }
             }
             else
             {
-                error = RegistryDiskCleanupInterop.CreateErrorMessage(status);
+                error = _interop.CreateErrorMessage(status);
                 requiresElevation = status == RegistryDiskCleanupInterop.HResults.AccessDenied;
             }
 
