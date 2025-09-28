@@ -7,26 +7,18 @@ using Smart_Cleaner_for_Windows.Core.Storage;
 
 namespace Smart_Cleaner_for_Windows.Modules.LargeFiles.ViewModels;
 
-public sealed class LargeFileGroupViewModel : INotifyPropertyChanged
+public sealed class LargeFileGroupViewModel(
+    string displayName,
+    Func<int, string> formatFileCount,
+    Func<long, string>? formatBytes = null)
+    : INotifyPropertyChanged
 {
-    private readonly Func<int, string> _formatFileCount;
-    private readonly Func<long, string> _formatBytes;
+    public string DisplayName { get; } = displayName;
+    private readonly Func<int, string> _formatFileCount = formatFileCount ?? throw new ArgumentNullException(nameof(formatFileCount));
+    private readonly Func<long, string> _formatBytes = formatBytes ?? ValueFormatting.FormatBytes;
     private long _totalBytes;
 
-    public LargeFileGroupViewModel(
-        string displayName,
-        Func<int, string> formatFileCount,
-        Func<long, string>? formatBytes = null)
-    {
-        DisplayName = displayName;
-        _formatFileCount = formatFileCount ?? throw new ArgumentNullException(nameof(formatFileCount));
-        _formatBytes = formatBytes ?? ValueFormatting.FormatBytes;
-        Items = new ObservableCollection<LargeFileItemViewModel>();
-    }
-
-    public string DisplayName { get; }
-
-    public ObservableCollection<LargeFileItemViewModel> Items { get; }
+    private ObservableCollection<LargeFileItemViewModel> Items { get; } = new();
 
     public long TotalBytes => _totalBytes;
 

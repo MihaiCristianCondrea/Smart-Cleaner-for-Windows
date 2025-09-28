@@ -8,27 +8,20 @@ namespace Smart_Cleaner_for_Windows.Core.FileSystem;
 /// <summary>
 /// Provides helpers to identify and remove empty directories.
 /// </summary>
-public sealed class DirectoryCleaner : IDirectoryCleaner
+public sealed class DirectoryCleaner(
+    IDirectorySystem directorySystem,
+    IDirectoryTraversalService traversalService,
+    IEmptyDirectoryDetector emptyDirectoryDetector,
+    IDirectoryDeletionService directoryDeletionService)
+    : IDirectoryCleaner
 {
-    private readonly IDirectorySystem _directorySystem;
-    private readonly IDirectoryTraversalService _traversalService;
-    private readonly IEmptyDirectoryDetector _emptyDirectoryDetector;
-    private readonly IDirectoryDeletionService _directoryDeletionService;
+    private readonly IDirectorySystem _directorySystem = directorySystem ?? throw new ArgumentNullException(nameof(directorySystem));
+    private readonly IDirectoryTraversalService _traversalService = traversalService ?? throw new ArgumentNullException(nameof(traversalService));
+    private readonly IEmptyDirectoryDetector _emptyDirectoryDetector = emptyDirectoryDetector ?? throw new ArgumentNullException(nameof(emptyDirectoryDetector));
+    private readonly IDirectoryDeletionService _directoryDeletionService = directoryDeletionService
+                                                                           ?? throw new ArgumentNullException(nameof(directoryDeletionService));
 
-    public static IDirectoryCleaner Default { get; } = DirectoryCleanerFactory.CreateDefault();
-
-    public DirectoryCleaner(
-        IDirectorySystem directorySystem,
-        IDirectoryTraversalService traversalService,
-        IEmptyDirectoryDetector emptyDirectoryDetector,
-        IDirectoryDeletionService directoryDeletionService)
-    {
-        _directorySystem = directorySystem ?? throw new ArgumentNullException(nameof(directorySystem));
-        _traversalService = traversalService ?? throw new ArgumentNullException(nameof(traversalService));
-        _emptyDirectoryDetector = emptyDirectoryDetector ?? throw new ArgumentNullException(nameof(emptyDirectoryDetector));
-        _directoryDeletionService = directoryDeletionService
-            ?? throw new ArgumentNullException(nameof(directoryDeletionService));
-    }
+    private static IDirectoryCleaner Default { get; } = DirectoryCleanerFactory.CreateDefault();
 
     public static DirectoryCleanResult Clean(string root, DirectoryCleanOptions? options = null, CancellationToken cancellationToken = default)
         => Default.Clean(root, options, cancellationToken);

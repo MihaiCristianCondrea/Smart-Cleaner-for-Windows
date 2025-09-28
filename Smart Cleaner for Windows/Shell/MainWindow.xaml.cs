@@ -22,7 +22,6 @@ using Smart_Cleaner_for_Windows.Modules.DiskCleanup.ViewModels;
 using Smart_Cleaner_for_Windows.Modules.EmptyFolders;
 using Smart_Cleaner_for_Windows.Modules.EmptyFolders.Contracts;
 using Smart_Cleaner_for_Windows.Modules.LargeFiles.ViewModels;
-using Windows.Graphics;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.UI;
@@ -33,7 +32,6 @@ namespace Smart_Cleaner_for_Windows.Shell;
 
 public sealed partial class MainWindow : IEmptyFolderCleanupView
 {
-    private readonly IDirectoryCleaner _directoryCleaner;
     private readonly IDiskCleanupService _diskCleanupService;
     private readonly IStorageOverviewService _storageOverviewService;
     private readonly ILargeFileExplorer _largeFileExplorer;
@@ -103,16 +101,16 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4
 AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4
 AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
 """;
-    private static readonly string[] AccentResourceKeys = new[]
-    {
+    private static readonly string[] AccentResourceKeys =
+    [
         "SystemAccentColor",
         "SystemAccentColorLight1",
         "SystemAccentColorLight2",
         "SystemAccentColorLight3",
         "SystemAccentColorDark1",
         "SystemAccentColorDark2",
-        "SystemAccentColorDark3",
-    };
+        "SystemAccentColorDark3"
+    ];
 
     public MainWindow()
         : this(
@@ -145,13 +143,13 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     {
     }
 
-    public MainWindow(
+    private MainWindow(
         IDirectoryCleaner directoryCleaner,
         IDiskCleanupService diskCleanupService,
         IStorageOverviewService storageOverviewService,
         ILargeFileExplorer largeFileExplorer)
     {
-        _directoryCleaner = directoryCleaner ?? throw new ArgumentNullException(nameof(directoryCleaner));
+        var directoryCleaner1 = directoryCleaner ?? throw new ArgumentNullException(nameof(directoryCleaner));
         _diskCleanupService = diskCleanupService ?? throw new ArgumentNullException(nameof(diskCleanupService));
         _storageOverviewService = storageOverviewService ?? throw new ArgumentNullException(nameof(storageOverviewService));
         _largeFileExplorer = largeFileExplorer ?? throw new ArgumentNullException(nameof(largeFileExplorer));
@@ -159,7 +157,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
         InitializeComponent();
 
-        _emptyFolderController = new EmptyFolderCleanupController(_directoryCleaner, this);
+        _emptyFolderController = new EmptyFolderCleanupController(directoryCleaner1, this);
 
         LargeFilesGroupList.ItemsSource = _largeFileGroups;
 
@@ -359,7 +357,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
     private async Task UpdateStorageOverviewAsync()
     {
-        _storageOverviewCts?.Cancel();
+        await _storageOverviewCts?.CancelAsync()!;
         _storageOverviewCts?.Dispose();
 
         var cts = new CancellationTokenSource();
@@ -440,14 +438,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 ValueFormatting.FormatBytes(totalFree),
                 ValueFormatting.FormatBytes(totalCapacity));
 
-            if (busiestDrive is not null)
-            {
-                StorageTipText.Text = GetStorageTip(busiestDrive);
-            }
-            else
-            {
-                StorageTipText.Text = "Storage tips will appear once drives are detected.";
-            }
+            StorageTipText.Text = busiestDrive is not null ? GetStorageTip(busiestDrive) : "Storage tips will appear once drives are detected.";
         }
         catch (OperationCanceledException)
         {
@@ -518,17 +509,15 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         picker.FileTypeFilter.Add("*");
         InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
         var folder = await picker.PickSingleFolderAsync();
-        if (folder is not null)
-        {
-            RootPathBox.Text = folder.Path;
-            DeleteBtn.IsEnabled = !_isBusy && _previewCandidates.Count > 0;
-            SetStatus(
-                Symbol.Folder,
-                Localize("StatusFolderSelectedTitle", "Folder selected"),
-                Localize("StatusFolderSelectedDescription", "Run Preview to identify empty directories."));
-            SetActivity(Localize("ActivityReadyToScan", "Ready to scan the selected folder."));
-            UpdateResultsSummary(0, Localize("ResultsPlaceholder", "Preview results will appear here once you run a scan."));
-        }
+        if (folder is null) return;
+        RootPathBox.Text = folder.Path;
+        DeleteBtn.IsEnabled = !_isBusy && _previewCandidates.Count > 0;
+        SetStatus(
+            Symbol.Folder,
+            Localize("StatusFolderSelectedTitle", "Folder selected"),
+            Localize("StatusFolderSelectedDescription", "Run Preview to identify empty directories."));
+        SetActivity(Localize("ActivityReadyToScan", "Ready to scan the selected folder."));
+        UpdateResultsSummary(0, Localize("ResultsPlaceholder", "Preview results will appear here once you run a scan."));
     }
 
     private void RootPathBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -699,7 +688,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         StatusHero.Background = GetStatusHeroBrush(symbol);
         StatusGlyph.Foreground = GetStatusGlyphBrush(symbol);
 
-        if (badgeValue.HasValue && badgeValue.Value > 0)
+        if (badgeValue is > 0)
         {
             ResultBadge.Value = badgeValue.Value;
             ResultBadge.Visibility = Visibility.Visible;
@@ -800,7 +789,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         try
         {
             using var identity = WindowsIdentity.GetCurrent();
-            return identity is not null && new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator);
+            return new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator);
         }
         catch
         {

@@ -42,12 +42,12 @@ namespace Smart_Cleaner_for_Windows.Core.FileSystem
                 ? path + "\0"           // ensure double-null
                 : path + "\0\0";
 
-            var op = new SHFILEOPSTRUCT
+            var op = new Shfileopstruct
             {
-                wFunc = FO_DELETE,
+                wFunc = FoDelete,
                 pFrom = from,
                 // Send to Recycle Bin, suppress confirmation/UI (keep error dialogs off)
-                fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT
+                fFlags = FofAllowundo | FofNoconfirmation | FofNoerrorui | FofSilent
             };
 
             int result = SHFileOperation(ref op);
@@ -62,15 +62,15 @@ namespace Smart_Cleaner_for_Windows.Core.FileSystem
 
         #region P/Invoke for SHFileOperation
 
-        private const uint FO_DELETE = 0x0003;
+        private const uint FoDelete = 0x0003;
 
-        private const ushort FOF_SILENT = 0x0004;             // No progress UI
-        private const ushort FOF_NOCONFIRMATION = 0x0010;     // Don't prompt the user
-        private const ushort FOF_ALLOWUNDO = 0x0040;          // Send to Recycle Bin (not permanent)
-        private const ushort FOF_NOERRORUI = 0x0400;          // No error UI
+        private const ushort FofSilent = 0x0004;             // No progress UI
+        private const ushort FofNoconfirmation = 0x0010;     // Don't prompt the user
+        private const ushort FofAllowundo = 0x0040;          // Send to Recycle Bin (not permanent)
+        private const ushort FofNoerrorui = 0x0400;          // No error UI
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        private struct SHFILEOPSTRUCT
+        private struct Shfileopstruct
         {
             public IntPtr hwnd;
             public uint wFunc;
@@ -83,7 +83,7 @@ namespace Smart_Cleaner_for_Windows.Core.FileSystem
         }
 
         [DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = false)]
-        private static extern int SHFileOperation(ref SHFILEOPSTRUCT lpFileOp);
+        private static extern int SHFileOperation(ref Shfileopstruct lpFileOp);
 
         #endregion
     }

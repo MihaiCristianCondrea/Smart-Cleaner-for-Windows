@@ -15,7 +15,7 @@ public sealed record DirectoryCleanResult(
     IReadOnlyList<DirectoryCleanFailure> Failures)
 {
     public DirectoryCleanResult()
-        : this(Array.Empty<string>(), Array.Empty<string>(), Array.Empty<DirectoryCleanFailure>())
+        : this([], [], [])
     {
     }
 

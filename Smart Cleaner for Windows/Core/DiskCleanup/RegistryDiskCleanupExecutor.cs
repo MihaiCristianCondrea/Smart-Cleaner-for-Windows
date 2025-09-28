@@ -15,7 +15,7 @@ public sealed class RegistryDiskCleanupExecutor : IDiskCleanupExecutor
     {
     }
 
-    internal RegistryDiskCleanupExecutor(IRegistryDiskCleanupInterop interop)
+    private RegistryDiskCleanupExecutor(IRegistryDiskCleanupInterop interop)
     {
         _interop = interop ?? throw new ArgumentNullException(nameof(interop));
     }

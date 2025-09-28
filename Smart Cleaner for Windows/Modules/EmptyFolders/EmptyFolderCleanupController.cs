@@ -10,16 +10,10 @@ namespace Smart_Cleaner_for_Windows.Modules.EmptyFolders;
 /// Coordinates the empty folder preview and cleanup workflows, keeping the UI logic isolated
 /// behind <see cref="IEmptyFolderCleanupView"/>.
 /// </summary>
-public sealed class EmptyFolderCleanupController
+public sealed class EmptyFolderCleanupController(IDirectoryCleaner directoryCleaner, IEmptyFolderCleanupView view)
 {
-    private readonly IDirectoryCleaner _directoryCleaner;
-    private readonly IEmptyFolderCleanupView _view;
-
-    public EmptyFolderCleanupController(IDirectoryCleaner directoryCleaner, IEmptyFolderCleanupView view)
-    {
-        _directoryCleaner = directoryCleaner ?? throw new ArgumentNullException(nameof(directoryCleaner));
-        _view = view ?? throw new ArgumentNullException(nameof(view));
-    }
+    private readonly IDirectoryCleaner _directoryCleaner = directoryCleaner ?? throw new ArgumentNullException(nameof(directoryCleaner));
+    private readonly IEmptyFolderCleanupView _view = view ?? throw new ArgumentNullException(nameof(view));
 
     public void HandleInvalidRoot()
     {

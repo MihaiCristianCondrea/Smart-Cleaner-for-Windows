@@ -10,7 +10,6 @@ internal sealed class DirectoryExclusionEvaluator : IDirectoryExclusionEvaluator
     private readonly HashSet<string> _fullPathExclusions;
     private readonly string[] _patterns;
     private readonly string _root;
-    private readonly ICollection<DirectoryCleanFailure> _failures;
 
     public DirectoryExclusionEvaluator(
         string root,
@@ -23,7 +22,6 @@ internal sealed class DirectoryExclusionEvaluator : IDirectoryExclusionEvaluator
         }
 
         _root = root;
-        _failures = failures;
         _fullPathExclusions = new HashSet<string>(FileSystemPathComparer.PathComparer);
 
         if (options.ExcludedFullPaths is { Count: > 0 })
@@ -44,7 +42,7 @@ internal sealed class DirectoryExclusionEvaluator : IDirectoryExclusionEvaluator
                 }
                 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException or System.Security.SecurityException)
                 {
-                    _failures.Add(new DirectoryCleanFailure(path, ex));
+                    failures.Add(new DirectoryCleanFailure(path, ex));
                 }
             }
         }
@@ -66,17 +64,17 @@ internal sealed class DirectoryExclusionEvaluator : IDirectoryExclusionEvaluator
                 }
                 else if (error is not null)
                 {
-                    _failures.Add(new DirectoryCleanFailure(pattern, error));
+                    failures.Add(new DirectoryCleanFailure(pattern, error));
                 }
             }
 
             _patterns = validPatterns.Count > 0
                 ? validPatterns.ToArray()
-                : Array.Empty<string>();
+                : [];
         }
         else
         {
-            _patterns = Array.Empty<string>();
+            _patterns = [];
         }
     }
 

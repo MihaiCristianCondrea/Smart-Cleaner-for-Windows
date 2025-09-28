@@ -119,7 +119,7 @@ public sealed partial class MainWindow
         if (_isInitializingSettings) return;
         if (sender is not RadioButtons radioButtons) return;
 
-        if (radioButtons.SelectedItem is RadioButton button && button.Tag is string tag)
+        if (radioButtons.SelectedItem is RadioButton { Tag: string tag })
         {
             ApplyThemePreference(tag, save: true);
         }
@@ -130,7 +130,7 @@ public sealed partial class MainWindow
         if (_isInitializingSettings) return;
         if (sender is not RadioButtons radioButtons) return;
 
-        if (radioButtons.SelectedItem is RadioButton button && button.Tag is string tag)
+        if (radioButtons.SelectedItem is RadioButton { Tag: string tag })
         {
             ApplyAccentPreference(tag, save: true);
         }

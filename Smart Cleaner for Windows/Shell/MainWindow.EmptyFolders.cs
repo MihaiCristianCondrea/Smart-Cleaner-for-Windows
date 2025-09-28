@@ -6,8 +6,6 @@ using System.Threading;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Smart_Cleaner_for_Windows.Core.FileSystem;
-using Smart_Cleaner_for_Windows.Modules.EmptyFolders.Contracts;
-using Smart_Cleaner_for_Windows.Modules.EmptyFolders;
 
 namespace Smart_Cleaner_for_Windows.Shell;
 
@@ -309,7 +307,7 @@ public sealed partial class MainWindow
     {
         if (string.IsNullOrWhiteSpace(text))
         {
-            return Array.Empty<string>();
+            return [];
         }
 
         return text.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);

@@ -4,14 +4,9 @@ using System.IO;
 
 namespace Smart_Cleaner_for_Windows.Core.FileSystem;
 
-internal sealed class EmptyDirectoryDetector : IEmptyDirectoryDetector
+internal sealed class EmptyDirectoryDetector(IDirectorySystem directorySystem) : IEmptyDirectoryDetector
 {
-    private readonly IDirectorySystem _directorySystem;
-
-    public EmptyDirectoryDetector(IDirectorySystem directorySystem)
-    {
-        _directorySystem = directorySystem ?? throw new ArgumentNullException(nameof(directorySystem));
-    }
+    private readonly IDirectorySystem _directorySystem = directorySystem ?? throw new ArgumentNullException(nameof(directorySystem));
 
     public bool IsEmpty(string directory, ICollection<DirectoryCleanFailure> failures)
     {

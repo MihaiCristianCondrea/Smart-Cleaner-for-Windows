@@ -21,12 +21,12 @@ public sealed class StaTaskScheduler : IStaTaskScheduler
         {
             try
             {
-                var hr = NativeMethods.CoInitializeEx(IntPtr.Zero, CoInit.APARTMENTTHREADED);
+                var hr = NativeMethods.CoInitializeEx(IntPtr.Zero, CoInit.Apartmentthreaded);
                 var initialized = hr >= 0;
 
-                if (hr == HResults.RPC_E_CHANGED_MODE)
+                if (hr == HResults.RpcEChangedMode)
                 {
-                    hr = NativeMethods.CoInitializeEx(IntPtr.Zero, CoInit.MULTITHREADED);
+                    hr = NativeMethods.CoInitializeEx(IntPtr.Zero, CoInit.Multithreaded);
                     initialized = hr >= 0;
                 }
 
@@ -85,13 +85,13 @@ public sealed class StaTaskScheduler : IStaTaskScheduler
 
     private static class HResults
     {
-        public const int RPC_E_CHANGED_MODE = unchecked((int)0x80010106);
+        public const int RpcEChangedMode = unchecked((int)0x80010106);
     }
 
     [Flags]
     private enum CoInit : uint
     {
-        MULTITHREADED = 0x0,
-        APARTMENTTHREADED = 0x2,
+        Multithreaded = 0x0,
+        Apartmentthreaded = 0x2,
     }
 }

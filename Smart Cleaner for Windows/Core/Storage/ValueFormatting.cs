@@ -4,16 +4,16 @@ namespace Smart_Cleaner_for_Windows.Core.Storage;
 
 public static class ValueFormatting
 {
-    private static readonly string[] s_suffixes =
-    {
+    private static readonly string[] SSuffixes =
+    [
         "B",
         "KB",
         "MB",
         "GB",
         "TB",
         "PB",
-        "EB",
-    };
+        "EB"
+    ];
 
     public static string FormatBytes(long value)
     {
@@ -35,12 +35,12 @@ public static class ValueFormatting
         double size = value;
         var index = 0;
 
-        while (size >= 1024 && index < s_suffixes.Length - 1)
+        while (size >= 1024 && index < SSuffixes.Length - 1)
         {
             size /= 1024;
             index++;
         }
 
-        return string.Format(CultureInfo.CurrentCulture, "{0:0.##} {1}", size, s_suffixes[index]);
+        return string.Format(CultureInfo.CurrentCulture, "{0:0.##} {1}", size, SSuffixes[index]);
     }
 }

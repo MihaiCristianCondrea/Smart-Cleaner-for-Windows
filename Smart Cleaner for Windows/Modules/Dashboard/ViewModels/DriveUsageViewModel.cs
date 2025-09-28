@@ -1,20 +1,12 @@
 namespace Smart_Cleaner_for_Windows.Modules.Dashboard.ViewModels;
 
-public sealed class DriveUsageViewModel
+public sealed class DriveUsageViewModel(string name, string details, double usedPercentage, string usageSummary)
 {
-    public DriveUsageViewModel(string name, string details, double usedPercentage, string usageSummary)
-    {
-        Name = name;
-        Details = details;
-        UsedPercentage = usedPercentage;
-        UsageSummary = usageSummary;
-    }
+    public string Name { get; } = name;
 
-    public string Name { get; }
+    public string Details { get; } = details;
 
-    public string Details { get; }
+    public double UsedPercentage { get; } = usedPercentage;
 
-    public double UsedPercentage { get; }
-
-    public string UsageSummary { get; }
+    public string UsageSummary { get; } = usageSummary;
 }

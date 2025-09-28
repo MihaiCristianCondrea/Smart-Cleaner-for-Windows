@@ -24,7 +24,7 @@ public sealed partial class MainWindow
             return;
         }
 
-        _diskCleanupCts?.Cancel();
+        await _diskCleanupCts?.CancelAsync()!;
         _diskCleanupCts?.Dispose();
         _diskCleanupCts = new CancellationTokenSource();
 
@@ -83,7 +83,7 @@ public sealed partial class MainWindow
         }
 
         var targets = _diskCleanupItems
-            .Where(item => item.IsSelected && item.CanSelect)
+            .Where(item => item is { IsSelected: true, CanSelect: true })
             .Select(item => item.Item)
             .ToList();
 
@@ -95,7 +95,7 @@ public sealed partial class MainWindow
             return;
         }
 
-        _diskCleanupCts?.Cancel();
+        await _diskCleanupCts?.CancelAsync()!;
         _diskCleanupCts?.Dispose();
         _diskCleanupCts = new CancellationTokenSource();
 
@@ -197,7 +197,7 @@ public sealed partial class MainWindow
         var canInteract = !_isBusy && !_isDiskCleanupOperation;
         DiskCleanupAnalyzeBtn.IsEnabled = !_isBusy;
         DiskCleanupList.IsEnabled = canInteract;
-        var hasSelection = canInteract && _diskCleanupItems.Any(item => item.IsSelected && item.CanSelect);
+        var hasSelection = canInteract && _diskCleanupItems.Any(item => item is { IsSelected: true, CanSelect: true });
         DiskCleanupCleanBtn.IsEnabled = hasSelection;
     }
 

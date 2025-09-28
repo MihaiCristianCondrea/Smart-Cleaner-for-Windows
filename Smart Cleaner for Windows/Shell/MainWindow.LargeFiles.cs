@@ -344,7 +344,7 @@ public sealed partial class MainWindow
                 var extensionLabel = string.IsNullOrEmpty(entry.Extension)
                     ? Localize("LargeFilesNoExtensionLabel", "No extension")
                     : entry.Extension.ToUpperInvariant();
-                var item = new LargeFileItemViewModel(entry, extensionLabel);
+                var item = new LargeFileItemViewModel(entry);
                 viewModel.AddItem(item);
             }
 
