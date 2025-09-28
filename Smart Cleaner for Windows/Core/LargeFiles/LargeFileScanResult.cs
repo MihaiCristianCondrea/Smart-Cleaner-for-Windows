@@ -8,7 +8,7 @@ namespace Smart_Cleaner_for_Windows.Core.LargeFiles;
 public sealed class LargeFileScanResult
 {
     public LargeFileScanResult()
-        : this(Array.Empty<LargeFileEntry>(), Array.Empty<LargeFileScanFailure>())
+        : this([], [])
     {
     }
 
@@ -29,14 +29,12 @@ public sealed class LargeFileScanResult
 
         Files = new ReadOnlyCollection<LargeFileEntry>(fileList);
         Failures = new ReadOnlyCollection<LargeFileScanFailure>(failureList);
-        TotalSize = fileList.Aggregate(0L, (current, entry) => current + Math.Max(0L, entry.Size));
+        fileList.Aggregate(0L, (current, entry) => current + Math.Max(0L, entry.Size));
     }
 
     public IReadOnlyList<LargeFileEntry> Files { get; }
 
     public IReadOnlyList<LargeFileScanFailure> Failures { get; }
-
-    public long TotalSize { get; }
 
     public int FileCount => Files.Count;
 

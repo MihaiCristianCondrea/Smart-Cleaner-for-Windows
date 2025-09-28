@@ -8,7 +8,7 @@ namespace Smart_Cleaner_for_Windows.Core.DiskCleanup;
 
 internal static class RegistryDiskCleanupInterop
 {
-    public const string VolumeCachesPath = @"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VolumeCaches";
+    private const string VolumeCachesPath = @"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VolumeCaches";
 
     public static RegistryKey? TryOpenVolumeCaches(RegistryView view)
     {
@@ -121,25 +121,21 @@ internal static class RegistryDiskCleanupInterop
         }
     }
 
-    internal sealed class DiskCleanupCallback : IEmptyVolumeCacheCallback
+    internal sealed class DiskCleanupCallback(CancellationToken token) : IEmptyVolumeCacheCallback
     {
-        private readonly CancellationToken _token;
-
-        public DiskCleanupCallback(CancellationToken token) => _token = token;
-
         public int ScanProgress(ulong dwlSpaceUsed, ulong dwlSpaceTotal)
         {
-            return _token.IsCancellationRequested ? HResults.OperationAborted : HResults.Success;
+            return token.IsCancellationRequested ? HResults.OperationAborted : HResults.Success;
         }
 
         public int PurgeProgress(ulong dwlSpaceFreed, ulong dwlSpaceToFree)
         {
-            return _token.IsCancellationRequested ? HResults.OperationAborted : HResults.Success;
+            return token.IsCancellationRequested ? HResults.OperationAborted : HResults.Success;
         }
 
         public int ScanCompleted()
         {
-            return _token.IsCancellationRequested ? HResults.OperationAborted : HResults.Success;
+            return token.IsCancellationRequested ? HResults.OperationAborted : HResults.Success;
         }
     }
 

@@ -5,11 +5,6 @@ namespace Smart_Cleaner_for_Windows.Core.DiskCleanup;
 
 public sealed class DiskCleanupCleanResult
 {
-    public DiskCleanupCleanResult()
-        : this(0, 0, Array.Empty<DiskCleanupFailure>())
-    {
-    }
-
     internal DiskCleanupCleanResult(ulong freed, int successCount, IReadOnlyList<DiskCleanupFailure> failures)
     {
         Freed = freed;

@@ -20,7 +20,7 @@ public sealed class StorageOverviewService : IStorageOverviewService
     private static StorageOverviewResult GetDriveUsageInternal(CancellationToken cancellationToken)
     {
         var readyDrives = DriveInfo.GetDrives()
-            .Where(d => d.IsReady && d.TotalSize > 0)
+            .Where(d => d is { IsReady: true, TotalSize: > 0 })
             .OrderBy(d => d.Name, StringComparer.OrdinalIgnoreCase)
             .ToList();
 

@@ -4,14 +4,9 @@ using System.IO;
 
 namespace Smart_Cleaner_for_Windows.Core.FileSystem;
 
-internal sealed class DirectoryDeletionService : IDirectoryDeletionService
+internal sealed class DirectoryDeletionService(IDirectoryDeleter directoryDeleter) : IDirectoryDeletionService
 {
-    private readonly IDirectoryDeleter _directoryDeleter;
-
-    public DirectoryDeletionService(IDirectoryDeleter directoryDeleter)
-    {
-        _directoryDeleter = directoryDeleter ?? throw new ArgumentNullException(nameof(directoryDeleter));
-    }
+    private readonly IDirectoryDeleter _directoryDeleter = directoryDeleter ?? throw new ArgumentNullException(nameof(directoryDeleter));
 
     public bool TryDelete(string directory, DirectoryDeletionMode mode, ICollection<DirectoryCleanFailure> failures)
     {

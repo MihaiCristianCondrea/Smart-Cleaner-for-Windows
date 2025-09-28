@@ -14,13 +14,11 @@ public sealed class LargeFileEntry
         Path = path ?? throw new ArgumentNullException(nameof(path));
         Size = size;
         Type = type ?? throw new ArgumentNullException(nameof(type));
-        Name = System.IO.Path.GetFileName(path);
+        System.IO.Path.GetFileName(path);
         Extension = System.IO.Path.GetExtension(path);
     }
 
     public string Path { get; }
-
-    public string Name { get; }
 
     public string Extension { get; }
 

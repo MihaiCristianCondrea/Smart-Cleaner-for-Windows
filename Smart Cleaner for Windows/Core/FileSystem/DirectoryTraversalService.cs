@@ -5,14 +5,9 @@ using System.Threading;
 
 namespace Smart_Cleaner_for_Windows.Core.FileSystem;
 
-internal sealed class DirectoryTraversalService : IDirectoryTraversalService
+internal sealed class DirectoryTraversalService(IDirectorySystem directorySystem) : IDirectoryTraversalService
 {
-    private readonly IDirectorySystem _directorySystem;
-
-    public DirectoryTraversalService(IDirectorySystem directorySystem)
-    {
-        _directorySystem = directorySystem ?? throw new ArgumentNullException(nameof(directorySystem));
-    }
+    private readonly IDirectorySystem _directorySystem = directorySystem ?? throw new ArgumentNullException(nameof(directorySystem));
 
     public IEnumerable<string> Enumerate(DirectoryTraversalRequest request, CancellationToken cancellationToken)
     {

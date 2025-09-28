@@ -2,20 +2,9 @@ using System;
 
 namespace Smart_Cleaner_for_Windows.Core.LargeFiles;
 
-public sealed class LargeFileScanFailure
+public sealed class LargeFileScanFailure(string path, Exception exception)
 {
-    public LargeFileScanFailure()
-        : this(string.Empty, new InvalidOperationException("Uninitialized failure"))
-    {
-    }
+    public string Path { get; } = path;
 
-    public LargeFileScanFailure(string path, Exception exception)
-    {
-        Path = path;
-        Exception = exception;
-    }
-
-    public string Path { get; }
-
-    public Exception Exception { get; }
+    public Exception Exception { get; } = exception;
 }

@@ -3,25 +3,17 @@ using System.Collections.Generic;
 
 namespace Smart_Cleaner_for_Windows.Core.FileSystem;
 
-public sealed class DirectoryTraversalRequest
+public sealed class DirectoryTraversalRequest(
+    string root,
+    DirectoryCleanOptions options,
+    IDirectoryExclusionEvaluator exclusions,
+    ICollection<DirectoryCleanFailure> failures)
 {
-    public DirectoryTraversalRequest(
-        string root,
-        DirectoryCleanOptions options,
-        IDirectoryExclusionEvaluator exclusions,
-        ICollection<DirectoryCleanFailure> failures)
-    {
-        Root = root ?? throw new ArgumentNullException(nameof(root));
-        Options = options ?? throw new ArgumentNullException(nameof(options));
-        Exclusions = exclusions ?? throw new ArgumentNullException(nameof(exclusions));
-        Failures = failures ?? throw new ArgumentNullException(nameof(failures));
-    }
+    public string Root { get; } = root ?? throw new ArgumentNullException(nameof(root));
 
-    public string Root { get; }
+    public DirectoryCleanOptions Options { get; } = options ?? throw new ArgumentNullException(nameof(options));
 
-    public DirectoryCleanOptions Options { get; }
+    public IDirectoryExclusionEvaluator Exclusions { get; } = exclusions ?? throw new ArgumentNullException(nameof(exclusions));
 
-    public IDirectoryExclusionEvaluator Exclusions { get; }
-
-    public ICollection<DirectoryCleanFailure> Failures { get; }
+    public ICollection<DirectoryCleanFailure> Failures { get; } = failures ?? throw new ArgumentNullException(nameof(failures));
 }

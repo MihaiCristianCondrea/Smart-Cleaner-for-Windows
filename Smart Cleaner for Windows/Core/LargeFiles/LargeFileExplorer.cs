@@ -6,9 +6,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Smart_Cleaner_for_Windows.Core.FileSystem;
+
 namespace Smart_Cleaner_for_Windows.Core.LargeFiles;
 
-public sealed class LargeFileExplorer : ILargeFileExplorer
+public sealed class LargeFileExplorer(IDirectorySystem directorySystem) : ILargeFileExplorer
 {
     private static readonly bool IgnoreCase = OperatingSystem.IsWindows();
     private static readonly StringComparer PathComparer = IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
@@ -97,18 +99,13 @@ public sealed class LargeFileExplorer : ILargeFileExplorer
         [".xps"] = "Documents",
     };
 
-    private readonly IDirectorySystem _directorySystem;
+    private readonly IDirectorySystem _directorySystem = directorySystem ?? throw new ArgumentNullException(nameof(directorySystem));
 
     public static ILargeFileExplorer Default { get; } = new LargeFileExplorer();
 
-    public LargeFileExplorer()
+    private LargeFileExplorer()
         : this(new FileSystemDirectorySystem())
     {
-    }
-
-    public LargeFileExplorer(IDirectorySystem directorySystem)
-    {
-        _directorySystem = directorySystem ?? throw new ArgumentNullException(nameof(directorySystem));
     }
 
     public LargeFileScanResult Scan(string root, LargeFileScanOptions? options = null, CancellationToken cancellationToken = default)
@@ -335,11 +332,11 @@ public sealed class LargeFileExplorer : ILargeFileExplorer
 
                 _patterns = normalized.Count > 0
                     ? normalized.ToArray()
-                    : Array.Empty<string>();
+                    : [];
             }
             else
             {
-                _patterns = Array.Empty<string>();
+                _patterns = [];
             }
         }
 
