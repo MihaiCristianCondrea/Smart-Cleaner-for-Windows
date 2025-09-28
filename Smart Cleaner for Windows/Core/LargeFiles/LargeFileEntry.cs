@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 
 namespace Smart_Cleaner_for_Windows.Core.LargeFiles;
 

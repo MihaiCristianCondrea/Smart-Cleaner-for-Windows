@@ -1,35 +1,90 @@
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using Microsoft.VisualBasic.FileIO;
 
-namespace Smart_Cleaner_for_Windows.Core;
-
-public sealed class FileSystemDirectoryDeleter : IDirectoryDeleter
+namespace Smart_Cleaner_for_Windows.Core
 {
-    public void Delete(string path, DirectoryDeletionMode mode)
+    public sealed class FileSystemDirectoryDeleter : IDirectoryDeleter
     {
-        switch (mode)
+        public void Delete(string path, DirectoryDeletionMode mode)
         {
-            case DirectoryDeletionMode.Permanent:
-                Directory.Delete(path, recursive: false);
-                break;
-            case DirectoryDeletionMode.RecycleBin:
-                DeleteToRecycleBin(path);
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(mode), mode, "Unsupported deletion mode.");
-        }
-    }
+            if (string.IsNullOrWhiteSpace(path))
+                throw new ArgumentException("Path cannot be null or whitespace.", nameof(path));
 
-    [SupportedOSPlatform("windows")]
-    private static void DeleteToRecycleBin(string path)
-    {
-        if (!OperatingSystem.IsWindows())
+            switch (mode)
+            {
+                case DirectoryDeletionMode.Permanent:
+                    // Matches your original behavior (non-recursive); change to true if desired.
+                    Directory.Delete(path, recursive: false);
+                    break;
+
+                case DirectoryDeletionMode.RecycleBin:
+                    DeleteToRecycleBin(path);
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(mode), mode, "Unsupported deletion mode.");
+            }
+        }
+
+        [SupportedOSPlatform("windows")]
+        private static void DeleteToRecycleBin(string path)
         {
-            throw new PlatformNotSupportedException("Deleting to the Recycle Bin is only supported on Windows.");
+            if (!OperatingSystem.IsWindows())
+                throw new PlatformNotSupportedException("Deleting to the Recycle Bin is only supported on Windows.");
+
+            if (!Directory.Exists(path))
+                throw new DirectoryNotFoundException($"Directory not found: {path}");
+
+            // SHFileOperation expects a double-null-terminated string for pFrom.
+            var from = path.EndsWith("\0", StringComparison.Ordinal)
+                ? path + "\0"           // ensure double-null
+                : path + "\0\0";
+
+            var op = new SHFILEOPSTRUCT
+            {
+                wFunc = FO_DELETE,
+                pFrom = from,
+                // Send to Recycle Bin, suppress confirmation/UI (keep error dialogs off)
+                fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT
+            };
+
+            int result = SHFileOperation(ref op);
+
+            // Non-zero = failure (Win32 error code). Also treat user-cancel as failure for programmatic flow.
+            if (result != 0)
+                throw new IOException($"Failed to move '{path}' to Recycle Bin. Win32 error: {result}.");
+
+            if (op.fAnyOperationsAborted)
+                throw new OperationCanceledException("Recycle Bin operation was canceled.");
         }
 
-        FileSystem.DeleteDirectory(path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+        #region P/Invoke for SHFileOperation
+
+        private const uint FO_DELETE = 0x0003;
+
+        private const ushort FOF_SILENT = 0x0004;             // No progress UI
+        private const ushort FOF_NOCONFIRMATION = 0x0010;     // Don't prompt the user
+        private const ushort FOF_ALLOWUNDO = 0x0040;          // Send to Recycle Bin (not permanent)
+        private const ushort FOF_NOERRORUI = 0x0400;          // No error UI
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        private struct SHFILEOPSTRUCT
+        {
+            public IntPtr hwnd;
+            public uint wFunc;
+            [MarshalAs(UnmanagedType.LPWStr)] public string pFrom;
+            [MarshalAs(UnmanagedType.LPWStr)] public string pTo;
+            public ushort fFlags;
+            public bool fAnyOperationsAborted;
+            public IntPtr hNameMappings;
+            [MarshalAs(UnmanagedType.LPWStr)] public string lpszProgressTitle;
+        }
+
+        [DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = false)]
+        private static extern int SHFileOperation(ref SHFILEOPSTRUCT lpFileOp);
+
+        #endregion
     }
 }
