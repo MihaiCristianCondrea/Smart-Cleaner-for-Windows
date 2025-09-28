@@ -11,8 +11,6 @@ public sealed class LargeFileScanOptions
     public int MaxResults { get; init; } = 100;
 
     public IReadOnlyCollection<string>? ExcludedFullPaths { get; init; }
-        = null;
 
     public IReadOnlyCollection<string>? ExcludedNamePatterns { get; init; }
-        = null;
 }

@@ -6,11 +6,10 @@ using System.Threading;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Smart_Cleaner_for_Windows.Core;
-using Smart_Cleaner_for_Windows.Features.EmptyFolders;
 
 namespace Smart_Cleaner_for_Windows;
 
-public sealed partial class MainWindow : IEmptyFolderCleanupView
+public sealed partial class MainWindow
 {
     private async void OnPreview(object sender, RoutedEventArgs e)
     {

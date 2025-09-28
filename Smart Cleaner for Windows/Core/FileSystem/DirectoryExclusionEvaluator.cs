@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Enumeration;
-using Smart_Cleaner_for_Windows.Core;
 
 namespace Smart_Cleaner_for_Windows.Core.FileSystem;
 

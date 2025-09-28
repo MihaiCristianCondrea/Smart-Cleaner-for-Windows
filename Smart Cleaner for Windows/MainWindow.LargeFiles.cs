@@ -527,7 +527,7 @@ public sealed partial class MainWindow
             normalized = path;
         }
 
-        var comparer = _largeFileExclusionLookup.Comparer ?? StringComparer.Ordinal;
+        var comparer = _largeFileExclusionLookup.Comparer;
 
         for (var i = _largeFileExclusions.Count - 1; i >= 0; i--)
         {

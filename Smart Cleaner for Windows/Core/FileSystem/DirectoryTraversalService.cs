@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using Smart_Cleaner_for_Windows.Core;
 
 namespace Smart_Cleaner_for_Windows.Core.FileSystem;
 
