@@ -12,11 +12,6 @@ public sealed class DiskCleanupService : IDiskCleanupService
     private readonly IDiskCleanupAnalyzer _analyzer;
     private readonly IDiskCleanupExecutor _executor;
 
-    public DiskCleanupService()
-        : this(new DiskCleanupVolumeService(), new StaTaskScheduler(), new RegistryDiskCleanupAnalyzer(), new RegistryDiskCleanupExecutor())
-    {
-    }
-
     public DiskCleanupService(
         IDiskCleanupVolumeService volumeService,
         IStaTaskScheduler staTaskScheduler,

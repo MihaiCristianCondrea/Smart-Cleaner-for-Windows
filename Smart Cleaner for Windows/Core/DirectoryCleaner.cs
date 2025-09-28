@@ -17,27 +17,19 @@ namespace Smart_Cleaner_for_Windows.Core
         private readonly IEmptyDirectoryDetector _emptyDirectoryDetector;
         private readonly IDirectoryDeletionService _directoryDeletionService;
 
-        public static IDirectoryCleaner Default { get; } = new DirectoryCleaner();
+        public static IDirectoryCleaner Default { get; } = DirectoryCleanerFactory.CreateDefault();
 
-        // Keep a private parameterless ctor for the default singleton wiring.
-        private DirectoryCleaner()
-            : this(new FileSystemDirectorySystem(), new FileSystemDirectoryDeleter())
-        {
-        }
-
-        // ↓↓↓ Fix: constructor is internal, so we don't expose less-accessible types publicly
-        private DirectoryCleaner(
+        public DirectoryCleaner(
             IDirectorySystem directorySystem,
-            IDirectoryDeleter directoryDeleter,
-            IDirectoryTraversalService? traversalService = null,
-            IEmptyDirectoryDetector? emptyDirectoryDetector = null,
-            IDirectoryDeletionService? directoryDeletionService = null)
+            IDirectoryTraversalService traversalService,
+            IEmptyDirectoryDetector emptyDirectoryDetector,
+            IDirectoryDeletionService directoryDeletionService)
         {
             _directorySystem = directorySystem ?? throw new ArgumentNullException(nameof(directorySystem));
-            _traversalService = traversalService ?? new DirectoryTraversalService(_directorySystem);
-            _emptyDirectoryDetector = emptyDirectoryDetector ?? new EmptyDirectoryDetector(_directorySystem);
+            _traversalService = traversalService ?? throw new ArgumentNullException(nameof(traversalService));
+            _emptyDirectoryDetector = emptyDirectoryDetector ?? throw new ArgumentNullException(nameof(emptyDirectoryDetector));
             _directoryDeletionService = directoryDeletionService
-                ?? new DirectoryDeletionService(directoryDeleter ?? throw new ArgumentNullException(nameof(directoryDeleter)));
+                ?? throw new ArgumentNullException(nameof(directoryDeletionService));
         }
 
         public static DirectoryCleanResult Clean(string root, DirectoryCleanOptions? options = null, CancellationToken cancellationToken = default)

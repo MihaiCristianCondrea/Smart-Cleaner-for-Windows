@@ -3,7 +3,7 @@ using Smart_Cleaner_for_Windows.Core;
 
 namespace Smart_Cleaner_for_Windows.Core.FileSystem;
 
-internal interface IEmptyDirectoryDetector
+public interface IEmptyDirectoryDetector
 {
     bool IsEmpty(string directory, ICollection<DirectoryCleanFailure> failures);
 }

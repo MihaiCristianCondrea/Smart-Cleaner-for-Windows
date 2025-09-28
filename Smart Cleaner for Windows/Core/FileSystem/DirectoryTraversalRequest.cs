@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Smart_Cleaner_for_Windows.Core.FileSystem;
 
-internal sealed class DirectoryTraversalRequest
+public sealed class DirectoryTraversalRequest
 {
     public DirectoryTraversalRequest(
         string root,
