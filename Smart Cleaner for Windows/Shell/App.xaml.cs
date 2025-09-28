@@ -1,8 +1,8 @@
 using Microsoft.UI.Xaml;
 
-namespace Smart_Cleaner_for_Windows;
+namespace Smart_Cleaner_for_Windows.Shell;
 
-public partial class App
+public partial class App : Application
 {
     private Window? _window;
 

@@ -29,7 +29,7 @@ using Windows.UI;
 using WinRT.Interop;
 using System.Security.Principal;
 
-namespace Smart_Cleaner_for_Windows;
+namespace Smart_Cleaner_for_Windows.Shell;
 
 public sealed partial class MainWindow : IEmptyFolderCleanupView
 {

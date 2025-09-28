@@ -10,7 +10,7 @@ using Smart_Cleaner_for_Windows.Core.DiskCleanup;
 using Smart_Cleaner_for_Windows.Core.Storage;
 using Smart_Cleaner_for_Windows.Modules.DiskCleanup.ViewModels;
 
-namespace Smart_Cleaner_for_Windows;
+namespace Smart_Cleaner_for_Windows.Shell;
 
 public sealed partial class MainWindow
 {

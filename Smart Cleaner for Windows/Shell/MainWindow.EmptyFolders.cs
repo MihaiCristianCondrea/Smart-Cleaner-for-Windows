@@ -9,9 +9,9 @@ using Smart_Cleaner_for_Windows.Core.FileSystem;
 using Smart_Cleaner_for_Windows.Modules.EmptyFolders.Contracts;
 using Smart_Cleaner_for_Windows.Modules.EmptyFolders;
 
-namespace Smart_Cleaner_for_Windows;
+namespace Smart_Cleaner_for_Windows.Shell;
 
-public sealed partial class MainWindow : IEmptyFolderCleanupView
+public sealed partial class MainWindow
 {
     private async void OnPreview(object sender, RoutedEventArgs e)
     {

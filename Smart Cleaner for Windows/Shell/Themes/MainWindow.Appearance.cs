@@ -14,7 +14,7 @@ using GdiImageType = Windows.Win32.UI.WindowsAndMessaging.GDI_IMAGE_TYPE;
 using LoadImageFlags = Windows.Win32.UI.WindowsAndMessaging.IMAGE_FLAGS;
 using XamlSystemBackdrop = Microsoft.UI.Xaml.Media.SystemBackdrop;
 
-namespace Smart_Cleaner_for_Windows;
+namespace Smart_Cleaner_for_Windows.Shell;
 
 public sealed partial class MainWindow
 {

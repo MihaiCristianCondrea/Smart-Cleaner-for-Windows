@@ -13,7 +13,7 @@ using Smart_Cleaner_for_Windows.Modules.LargeFiles.ViewModels;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
 
-namespace Smart_Cleaner_for_Windows;
+namespace Smart_Cleaner_for_Windows.Shell;
 
 public sealed partial class MainWindow
 {
