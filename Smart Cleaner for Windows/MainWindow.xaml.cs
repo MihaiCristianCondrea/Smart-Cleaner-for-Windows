@@ -114,7 +114,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
     public MainWindow()
         : this(
-            DirectoryCleaner.Default,
+            DirectoryCleanerFactory.CreateDefault(),
             DiskCleanupServiceFactory.CreateDefault(),
             new StorageOverviewService(),
             LargeFileExplorer.Default)
