@@ -7,8 +7,8 @@ using System.Threading;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Smart_Cleaner_for_Windows.Core.DiskCleanup;
-using Smart_Cleaner_for_Windows.Utilities;
-using Smart_Cleaner_for_Windows.ViewModels;
+using Smart_Cleaner_for_Windows.Core.Storage;
+using Smart_Cleaner_for_Windows.Modules.DiskCleanup.ViewModels;
 
 namespace Smart_Cleaner_for_Windows;
 

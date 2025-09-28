@@ -1,4 +1,4 @@
-namespace Smart_Cleaner_for_Windows.Core;
+namespace Smart_Cleaner_for_Windows.Core.FileSystem;
 
 public interface IDirectoryDeleter
 {

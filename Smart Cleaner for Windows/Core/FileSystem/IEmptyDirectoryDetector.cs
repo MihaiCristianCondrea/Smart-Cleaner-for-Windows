@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Smart_Cleaner_for_Windows.Core;
 
 namespace Smart_Cleaner_for_Windows.Core.FileSystem;
 

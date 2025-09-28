@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Smart_Cleaner_for_Windows.Core;
+namespace Smart_Cleaner_for_Windows.Core.FileSystem;
 
 /// <summary>
 /// Represents the outcome of a directory cleaning operation.

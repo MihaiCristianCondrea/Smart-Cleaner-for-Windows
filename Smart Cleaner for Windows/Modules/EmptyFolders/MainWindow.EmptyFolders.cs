@@ -5,8 +5,9 @@ using System.Linq;
 using System.Threading;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Smart_Cleaner_for_Windows.Core;
-using Smart_Cleaner_for_Windows.Features.EmptyFolders;
+using Smart_Cleaner_for_Windows.Core.FileSystem;
+using Smart_Cleaner_for_Windows.Modules.EmptyFolders.Contracts;
+using Smart_Cleaner_for_Windows.Modules.EmptyFolders;
 
 namespace Smart_Cleaner_for_Windows;
 

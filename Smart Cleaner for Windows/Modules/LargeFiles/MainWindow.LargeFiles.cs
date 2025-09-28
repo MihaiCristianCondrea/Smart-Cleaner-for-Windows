@@ -8,8 +8,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.VisualBasic.FileIO;
 using Smart_Cleaner_for_Windows.Core.LargeFiles;
-using Smart_Cleaner_for_Windows.Utilities;
-using Smart_Cleaner_for_Windows.ViewModels;
+using Smart_Cleaner_for_Windows.Core.Storage;
+using Smart_Cleaner_for_Windows.Modules.LargeFiles.ViewModels;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
 

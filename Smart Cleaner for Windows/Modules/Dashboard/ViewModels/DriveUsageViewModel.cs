@@ -1,4 +1,4 @@
-namespace Smart_Cleaner_for_Windows.ViewModels;
+namespace Smart_Cleaner_for_Windows.Modules.Dashboard.ViewModels;
 
 public sealed class DriveUsageViewModel
 {

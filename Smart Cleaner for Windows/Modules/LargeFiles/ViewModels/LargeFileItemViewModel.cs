@@ -1,7 +1,7 @@
 using Smart_Cleaner_for_Windows.Core.LargeFiles;
-using Smart_Cleaner_for_Windows.Utilities;
+using Smart_Cleaner_for_Windows.Core.Storage;
 
-namespace Smart_Cleaner_for_Windows.ViewModels;
+namespace Smart_Cleaner_for_Windows.Modules.LargeFiles.ViewModels;
 
 public sealed class LargeFileItemViewModel
 {

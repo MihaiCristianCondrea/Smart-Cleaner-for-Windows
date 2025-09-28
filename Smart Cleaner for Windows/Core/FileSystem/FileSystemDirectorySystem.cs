@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Smart_Cleaner_for_Windows.Core;
+namespace Smart_Cleaner_for_Windows.Core.FileSystem;
 
 public sealed class FileSystemDirectorySystem : IDirectorySystem
 {

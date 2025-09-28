@@ -1,6 +1,4 @@
-using Smart_Cleaner_for_Windows.Core.DiskCleanup;
-
-namespace Smart_Cleaner_for_Windows.Core;
+namespace Smart_Cleaner_for_Windows.Core.DiskCleanup;
 
 /// <summary>
 /// Provides helpers for constructing disk cleanup services with the built-in Windows implementations.
