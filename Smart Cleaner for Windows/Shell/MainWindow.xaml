@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="Smart_Cleaner_for_Windows.Shell.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Smart Cleaner for Windows">
+
+    <Grid>
+        <NavigationView
+            x:Name="RootNavigation"
+            PaneDisplayMode="Left"
+            IsBackButtonVisible="Collapsed"
+            IsSettingsVisible="True"
+            IsTitleBarAutoPaddingEnabled="False"
+            MenuItemsSource="{Binding Modules}"
+            SelectedItem="{Binding SelectedModule, Mode=TwoWay}"
+            SelectionChanged="OnNavigationSelectionChanged">
+            <NavigationView.MenuItemTemplate>
+                <DataTemplate>
+                    <NavigationViewItem
+                        Content="{Binding Title}"
+                        Tag="{Binding}">
+                        <NavigationViewItem.Icon>
+                            <SymbolIcon Symbol="{Binding Icon}" />
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
+                </DataTemplate>
+            </NavigationView.MenuItemTemplate>
+            <NavigationView.Content>
+                <ContentPresenter x:Name="ModuleContent" />
+            </NavigationView.Content>
+        </NavigationView>
+    </Grid>
+</Window>
