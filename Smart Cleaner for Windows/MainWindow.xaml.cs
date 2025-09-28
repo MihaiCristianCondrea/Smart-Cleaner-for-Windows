@@ -1,42 +1,30 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Globalization;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.UI;
-using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
-using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Hosting;
-using Microsoft.UI.Dispatching;
 using Microsoft.Windows.ApplicationModel.Resources;
-using Microsoft.VisualBasic.FileIO;
 using Smart_Cleaner_for_Windows.Core;
 using Smart_Cleaner_for_Windows.Core.DiskCleanup;
 using Smart_Cleaner_for_Windows.Core.Storage;
 using Smart_Cleaner_for_Windows.Core.LargeFiles;
 using Smart_Cleaner_for_Windows.Features.EmptyFolders;
 using Windows.Graphics;
+using Smart_Cleaner_for_Windows.Utilities;
+using Smart_Cleaner_for_Windows.ViewModels;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.UI;
-using Windows.Win32;
-using Windows.Win32.Foundation;
-using Windows.Win32.UI.WindowsAndMessaging;
-using GdiImageType = Windows.Win32.UI.WindowsAndMessaging.GDI_IMAGE_TYPE;
-using LoadImageFlags = Windows.Win32.UI.WindowsAndMessaging.IMAGE_FLAGS;
-using WinRT;
 using WinRT.Interop;
-using System.Runtime.CompilerServices;
 using System.Security.Principal;
 
 namespace Smart_Cleaner_for_Windows;
@@ -424,13 +412,13 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 var details = string.Format(
                     CultureInfo.CurrentCulture,
                     "{0} free of {1}",
-                    FormatBytes(freeValue),
-                    FormatBytes(capacityValue));
+                    ValueFormatting.FormatBytes(freeValue),
+                    ValueFormatting.FormatBytes(capacityValue));
                 var usageSummary = string.Format(
                     CultureInfo.CurrentCulture,
                     "{0:0}% used ({1})",
                     usedPercentage,
-                    FormatBytes(usedValue));
+                    ValueFormatting.FormatBytes(usedValue));
 
                 var viewModel = new DriveUsageViewModel(displayName, details, usedPercentage, usageSummary);
                 _driveUsage.Add(viewModel);
@@ -447,8 +435,8 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 "Monitoring {0} {1}. {2} free of {3}.",
                 _driveUsage.Count,
                 driveLabel,
-                FormatBytes(totalFree),
-                FormatBytes(totalCapacity));
+                ValueFormatting.FormatBytes(totalFree),
+                ValueFormatting.FormatBytes(totalCapacity));
 
             if (busiestDrive is not null)
             {
@@ -798,26 +786,6 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         Info.Message = message;
         Info.Severity = severity;
         Info.IsOpen = true;
-    }
-
-    private static string FormatBytes(ulong value)
-    {
-        if (value == 0)
-        {
-            return "0 B";
-        }
-
-        string[] suffixes = new[] { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
-        double size = value;
-        var index = 0;
-
-        while (size >= 1024 && index < suffixes.Length - 1)
-        {
-            size /= 1024;
-            index++;
-        }
-
-        return string.Format(CultureInfo.CurrentCulture, "{0:0.##} {1}", size, suffixes[index]);
     }
 
     private static bool IsAdministrator()

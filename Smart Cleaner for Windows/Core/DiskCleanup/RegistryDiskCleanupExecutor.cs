@@ -8,6 +8,18 @@ namespace Smart_Cleaner_for_Windows.Core.DiskCleanup;
 
 public sealed class RegistryDiskCleanupExecutor : IDiskCleanupExecutor
 {
+    private readonly IRegistryDiskCleanupInterop _interop;
+
+    public RegistryDiskCleanupExecutor()
+        : this(RegistryDiskCleanupInteropFacade.Instance)
+    {
+    }
+
+    internal RegistryDiskCleanupExecutor(IRegistryDiskCleanupInterop interop)
+    {
+        _interop = interop ?? throw new ArgumentNullException(nameof(interop));
+    }
+
     public DiskCleanupCleanResult Clean(string drive, IEnumerable<DiskCleanupItem> items, CancellationToken cancellationToken)
     {
         if (items is null)
@@ -28,7 +40,7 @@ public sealed class RegistryDiskCleanupExecutor : IDiskCleanupExecutor
                 continue;
             }
 
-            using var root = RegistryDiskCleanupInterop.TryOpenVolumeCaches(item.Descriptor.RegistryView);
+            using var root = _interop.TryOpenVolumeCaches(item.Descriptor.RegistryView);
             using var handlerKey = root?.OpenSubKey(item.Descriptor.SubKeyName);
             if (handlerKey is null)
             {
@@ -51,7 +63,7 @@ public sealed class RegistryDiskCleanupExecutor : IDiskCleanupExecutor
         return new DiskCleanupCleanResult(freedTotal, successCount, failures);
     }
 
-    private static HandlerExecutionResult RunHandler(
+    private HandlerExecutionResult RunHandler(
         RegistryKey handlerKey,
         DiskCleanupItem item,
         string drive,
@@ -59,7 +71,7 @@ public sealed class RegistryDiskCleanupExecutor : IDiskCleanupExecutor
     {
         try
         {
-            using var handler = RegistryDiskCleanupInterop.TryCreateHandler(item.Descriptor.ClassId);
+            using var handler = _interop.TryCreateHandler(item.Descriptor.ClassId);
             if (handler is null)
             {
                 return HandlerExecutionResult.Failed("The Disk Cleanup handler could not be instantiated.");
@@ -73,22 +85,15 @@ public sealed class RegistryDiskCleanupExecutor : IDiskCleanupExecutor
                 out var rawDescription,
                 out _);
 
-            if (rawDisplay != IntPtr.Zero)
-            {
-                Marshal.FreeCoTaskMem(rawDisplay);
-            }
-
-            if (rawDescription != IntPtr.Zero)
-            {
-                Marshal.FreeCoTaskMem(rawDescription);
-            }
+            _interop.FreeCoTaskMem(rawDisplay);
+            _interop.FreeCoTaskMem(rawDescription);
 
             if (status < 0)
             {
-                return HandlerExecutionResult.Failed(RegistryDiskCleanupInterop.CreateErrorMessage(status));
+                return HandlerExecutionResult.Failed(_interop.CreateErrorMessage(status));
             }
 
-            var callback = new RegistryDiskCleanupInterop.DiskCleanupCallback(cancellationToken);
+            var callback = _interop.CreateCallback(cancellationToken);
             var result = cache.Purge(0, callback);
 
             if (result == RegistryDiskCleanupInterop.HResults.OperationAborted && cancellationToken.IsCancellationRequested)
@@ -98,7 +103,7 @@ public sealed class RegistryDiskCleanupExecutor : IDiskCleanupExecutor
 
             if (result < 0)
             {
-                return HandlerExecutionResult.Failed(RegistryDiskCleanupInterop.CreateErrorMessage(result));
+                return HandlerExecutionResult.Failed(_interop.CreateErrorMessage(result));
             }
 
             ulong freed = 0;

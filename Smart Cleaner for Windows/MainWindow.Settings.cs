@@ -184,8 +184,6 @@ public sealed partial class MainWindow
         {
             ThemePreferenceLight => ThemePreferenceLight,
             ThemePreferenceDark => ThemePreferenceDark,
-            ThemePreferenceDefault => ThemePreferenceDefault,
-            "system" => ThemePreferenceDefault,
             _ => ThemePreferenceDefault
         };
     }

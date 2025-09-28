@@ -38,7 +38,7 @@ public sealed record DirectoryCleanResult(
 /// <summary>
 /// Describes a failure that happened when interacting with a directory.
 /// </summary>
-public sealed record class DirectoryCleanFailure
+public sealed record DirectoryCleanFailure
 {
     public DirectoryCleanFailure()
         : this(string.Empty, new InvalidOperationException("Uninitialized failure"))

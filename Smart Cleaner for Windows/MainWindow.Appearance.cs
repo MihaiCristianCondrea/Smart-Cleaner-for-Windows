@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -252,13 +251,13 @@ public sealed partial class MainWindow
                     _ = PInvoke.SendMessage(
                         hwnd,
                         PInvoke.WM_SETICON,
-                        new WPARAM((nuint)PInvoke.ICON_BIG),
+                        new WPARAM(PInvoke.ICON_BIG),
                         iconParam);
 
                     _ = PInvoke.SendMessage(
                         hwnd,
                         PInvoke.WM_SETICON,
-                        new WPARAM((nuint)PInvoke.ICON_SMALL),
+                        new WPARAM(PInvoke.ICON_SMALL),
                         iconParam);
                 }
                 finally
