@@ -6,18 +6,18 @@ using WinRT;
 
 namespace Smart_Cleaner_for_Windows;
 
-public static class Program
+public partial class Program
 {
     [STAThread]
     public static void Main(string[] args)
     {
         ComWrappersSupport.InitializeComWrappers();
 
-        Application.Start(_ =>
+        Application.Start(p =>
         {
             var context = new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread());
             SynchronizationContext.SetSynchronizationContext(context);
-            _ = new Shell.App();
+            new Shell.App();
         });
     }
 }
