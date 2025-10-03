@@ -24,9 +24,19 @@ public sealed partial class MainWindow
             return;
         }
 
-        await _diskCleanupCts?.CancelAsync()!;
-        _diskCleanupCts?.Dispose();
-        _diskCleanupCts = new CancellationTokenSource();
+        var previousCts = _diskCleanupCts;
+        if (previousCts is not null)
+        {
+            if (ReferenceEquals(_diskCleanupCts, previousCts))
+            {
+                _diskCleanupCts = null;
+            }
+
+            await CancelAndDisposeAsync(previousCts);
+        }
+
+        var cts = new CancellationTokenSource();
+        _diskCleanupCts = cts;
 
         DiskCleanupInfoBar.IsOpen = false;
         _isDiskCleanupOperation = true;
@@ -36,7 +46,7 @@ public sealed partial class MainWindow
 
         try
         {
-            var items = await _diskCleanupService.AnalyzeAsync(_diskCleanupVolume, _diskCleanupCts.Token);
+            var items = await _diskCleanupService.AnalyzeAsync(_diskCleanupVolume, cts.Token);
             ApplyDiskCleanupResults(items);
             UpdateDiskCleanupStatusSummary();
             SetActivity(Localize("ActivityDiskCleanupAnalysisComplete", "Disk cleanup analysis complete."));
@@ -44,7 +54,7 @@ public sealed partial class MainWindow
                 LocalizeFormat("InfoDiskCleanupAnalyzed", "Analyzed {0} handler(s).", items.Count),
                 InfoBarSeverity.Success);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (cts.IsCancellationRequested)
         {
             ShowDiskCleanupInfo(
                 Localize("InfoDiskCleanupAnalysisCancelled", "Disk cleanup analysis cancelled."),
@@ -66,8 +76,12 @@ public sealed partial class MainWindow
             _isDiskCleanupOperation = false;
             DiskCleanupProgress.Visibility = Visibility.Collapsed;
             SetBusy(false);
-            _diskCleanupCts?.Dispose();
-            _diskCleanupCts = null;
+            if (ReferenceEquals(_diskCleanupCts, cts))
+            {
+                _diskCleanupCts = null;
+            }
+
+            cts.Dispose();
             UpdateDiskCleanupActionState();
         }
     }
@@ -95,9 +109,19 @@ public sealed partial class MainWindow
             return;
         }
 
-        await _diskCleanupCts?.CancelAsync()!;
-        _diskCleanupCts?.Dispose();
-        _diskCleanupCts = new CancellationTokenSource();
+        var previousCts = _diskCleanupCts;
+        if (previousCts is not null)
+        {
+            if (ReferenceEquals(_diskCleanupCts, previousCts))
+            {
+                _diskCleanupCts = null;
+            }
+
+            await CancelAndDisposeAsync(previousCts);
+        }
+
+        var cts = new CancellationTokenSource();
+        _diskCleanupCts = cts;
 
         DiskCleanupInfoBar.IsOpen = false;
         _isDiskCleanupOperation = true;
@@ -107,7 +131,7 @@ public sealed partial class MainWindow
 
         try
         {
-            var result = await _diskCleanupService.CleanAsync(_diskCleanupVolume, targets, _diskCleanupCts.Token);
+            var result = await _diskCleanupService.CleanAsync(_diskCleanupVolume, targets, cts.Token);
 
             var severity = result.HasFailures
                 ? InfoBarSeverity.Warning
@@ -132,11 +156,11 @@ public sealed partial class MainWindow
             ShowDiskCleanupInfo(message, severity);
             SetActivity(Localize("ActivityDiskCleanupCompleted", "Disk cleanup completed."));
 
-            var refreshed = await _diskCleanupService.AnalyzeAsync(_diskCleanupVolume, _diskCleanupCts.Token);
+            var refreshed = await _diskCleanupService.AnalyzeAsync(_diskCleanupVolume, cts.Token);
             ApplyDiskCleanupResults(refreshed);
             UpdateDiskCleanupStatusSummary();
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (cts.IsCancellationRequested)
         {
             ShowDiskCleanupInfo(
                 Localize("InfoDiskCleanupCancelled", "Disk cleanup cancelled."),
@@ -158,8 +182,12 @@ public sealed partial class MainWindow
             _isDiskCleanupOperation = false;
             DiskCleanupProgress.Visibility = Visibility.Collapsed;
             SetBusy(false);
-            _diskCleanupCts?.Dispose();
-            _diskCleanupCts = null;
+            if (ReferenceEquals(_diskCleanupCts, cts))
+            {
+                _diskCleanupCts = null;
+            }
+
+            cts.Dispose();
             UpdateDiskCleanupActionState();
         }
     }

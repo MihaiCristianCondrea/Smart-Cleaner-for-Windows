@@ -355,10 +355,38 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         visual.StartAnimation("Translation", translationAnimation);
     }
 
+    private static async Task CancelAndDisposeAsync(CancellationTokenSource? source)
+    {
+        if (source is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await source.CancelAsync();
+        }
+        catch (ObjectDisposedException)
+        {
+        }
+        finally
+        {
+            source.Dispose();
+        }
+    }
+
     private async Task UpdateStorageOverviewAsync()
     {
-        await _storageOverviewCts?.CancelAsync()!;
-        _storageOverviewCts?.Dispose();
+        var previousCts = _storageOverviewCts;
+        if (previousCts is not null)
+        {
+            if (ReferenceEquals(_storageOverviewCts, previousCts))
+            {
+                _storageOverviewCts = null;
+            }
+
+            await CancelAndDisposeAsync(previousCts);
+        }
 
         var cts = new CancellationTokenSource();
         _storageOverviewCts = cts;
@@ -440,7 +468,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
             StorageTipText.Text = busiestDrive is not null ? GetStorageTip(busiestDrive) : "Storage tips will appear once drives are detected.";
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (cts.IsCancellationRequested)
         {
             // Swallow cancellations when refreshing the storage overview.
         }
@@ -449,6 +477,29 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             _driveUsage.Clear();
             StorageSummaryText.Text = "Storage overview is unavailable.";
             StorageTipText.Text = "We couldn't access drive information. Try again later or adjust your permissions.";
+
+            ShowInfo(
+                string.Format(
+                    CultureInfo.CurrentCulture,
+                    "Storage overview failed: {0}",
+                    ex.Message),
+                InfoBarSeverity.Warning);
+        }
+        catch (Exception ex)
+        {
+            _driveUsage.Clear();
+            StorageSummaryText.Text = "Storage overview is unavailable.";
+            StorageTipText.Text = string.Format(
+                CultureInfo.CurrentCulture,
+                "Something went wrong while loading drives: {0}",
+                ex.Message);
+
+            ShowInfo(
+                string.Format(
+                    CultureInfo.CurrentCulture,
+                    "Storage overview failed: {0}",
+                    ex.Message),
+                InfoBarSeverity.Error);
         }
         finally
         {
