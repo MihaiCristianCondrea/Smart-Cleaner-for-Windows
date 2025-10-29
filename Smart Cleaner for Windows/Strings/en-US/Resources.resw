@@ -312,4 +312,91 @@
   <data name="DiskCleanupStatusHasIssues" xml:space="preserve">
     <value>Some handlers reported issues.</value>
   </data>
+  <data name="InternetRepairStatusReadyTitle" xml:space="preserve">
+    <value>Ready to fix common issues</value>
+  </data>
+  <data name="InternetRepairStatusReadyDescription" xml:space="preserve">
+    <value>Select the repairs you want to run, then choose Fix now.</value>
+  </data>
+  <data name="InternetRepairActivityIdle" xml:space="preserve">
+    <value>Waiting to start a repair.</value>
+  </data>
+  <data name="InternetRepairSummaryReady" xml:space="preserve">
+    <value>Select the repairs you want to run.</value>
+  </data>
+  <data name="InternetRepairSummarySelection" xml:space="preserve">
+    <value>Ready to run {0} selected repair(s).</value>
+  </data>
+  <data name="InternetRepairStatusRunningTitle" xml:space="preserve">
+    <value>Applying fixes…</value>
+  </data>
+  <data name="InternetRepairStatusRunningDescription" xml:space="preserve">
+    <value>Hang tight while we apply the selected network repairs.</value>
+  </data>
+  <data name="InternetRepairActivityRunning" xml:space="preserve">
+    <value>Running network repair actions…</value>
+  </data>
+  <data name="InternetRepairSummaryRunning" xml:space="preserve">
+    <value>Running {0} repair action(s)…</value>
+  </data>
+  <data name="InternetRepairLogRunning" xml:space="preserve">
+    <value>Running {0}…</value>
+  </data>
+  <data name="InternetRepairLogCompleted" xml:space="preserve">
+    <value>Completed successfully.</value>
+  </data>
+  <data name="InternetRepairLogFailed" xml:space="preserve">
+    <value>Failed. Check the InfoBar for details.</value>
+  </data>
+  <data name="InternetRepairLogCancelled" xml:space="preserve">
+    <value>Cancelled.</value>
+  </data>
+  <data name="InternetRepairInfoNoSelection" xml:space="preserve">
+    <value>Select at least one repair before running.</value>
+  </data>
+  <data name="InternetRepairInfoSuccess" xml:space="preserve">
+    <value>Completed {0} repair action(s) successfully.</value>
+  </data>
+  <data name="InternetRepairInfoPartial" xml:space="preserve">
+    <value>Completed {0} repair action(s). {1} action(s) failed.</value>
+  </data>
+  <data name="InternetRepairInfoCancelled" xml:space="preserve">
+    <value>Repairs cancelled.</value>
+  </data>
+  <data name="InternetRepairStatusCompleteTitle" xml:space="preserve">
+    <value>Repairs completed</value>
+  </data>
+  <data name="InternetRepairStatusCompleteDescription" xml:space="preserve">
+    <value>Network repairs finished. Test your connection.</value>
+  </data>
+  <data name="InternetRepairStatusWarningsTitle" xml:space="preserve">
+    <value>Repairs completed with issues</value>
+  </data>
+  <data name="InternetRepairStatusWarningsDescription" xml:space="preserve">
+    <value>Some repairs failed. Review the log for details.</value>
+  </data>
+  <data name="InternetRepairStatusCancelledTitle" xml:space="preserve">
+    <value>Repairs cancelled</value>
+  </data>
+  <data name="InternetRepairStatusCancelledDescription" xml:space="preserve">
+    <value>The selected actions were cancelled. Adjust your selection and try again.</value>
+  </data>
+  <data name="InternetRepairSummaryCompleted" xml:space="preserve">
+    <value>Last run: {0} action(s) completed without issues.</value>
+  </data>
+  <data name="InternetRepairSummaryPartial" xml:space="preserve">
+    <value>Last run: {0} succeeded, {1} failed.</value>
+  </data>
+  <data name="InternetRepairSummaryError" xml:space="preserve">
+    <value>The last run encountered issues.</value>
+  </data>
+  <data name="InternetRepairSummaryCancelled" xml:space="preserve">
+    <value>Repairs were cancelled before completion.</value>
+  </data>
+  <data name="InternetRepairActivityCompleted" xml:space="preserve">
+    <value>Finished running the selected actions.</value>
+  </data>
+  <data name="InternetRepairActivityCancelled" xml:space="preserve">
+    <value>Repair run cancelled.</value>
+  </data>
 </root>

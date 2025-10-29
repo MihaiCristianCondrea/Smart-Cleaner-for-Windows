@@ -337,6 +337,12 @@ public sealed partial class MainWindow
             cancelled = true;
         }
 
+        if (_internetRepairCts is { IsCancellationRequested: false })
+        {
+            _internetRepairCts.Cancel();
+            cancelled = true;
+        }
+
         if (cancelled && (_isBusy || _isDiskCleanupOperation))
         {
             SetActivity(Localize("ActivityCancelling", "Cancelling current operation…"));
@@ -345,6 +351,11 @@ public sealed partial class MainWindow
         if (cancelled && _isLargeFilesBusy)
         {
             SetLargeFilesActivity(Localize("ActivityCancelling", "Cancelling current operation…"));
+        }
+
+        if (cancelled && _isInternetRepairBusy)
+        {
+            SetInternetRepairActivity(Localize("ActivityCancelling", "Cancelling current operation…"));
         }
     }
 }

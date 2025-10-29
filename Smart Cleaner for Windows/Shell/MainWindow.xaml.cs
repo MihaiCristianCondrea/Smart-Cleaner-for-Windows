@@ -17,11 +17,13 @@ using Smart_Cleaner_for_Windows.Core.FileSystem;
 using Smart_Cleaner_for_Windows.Core.DiskCleanup;
 using Smart_Cleaner_for_Windows.Core.Storage;
 using Smart_Cleaner_for_Windows.Core.LargeFiles;
+using Smart_Cleaner_for_Windows.Core.Networking;
 using Smart_Cleaner_for_Windows.Modules.Dashboard.ViewModels;
 using Smart_Cleaner_for_Windows.Modules.DiskCleanup.ViewModels;
 using Smart_Cleaner_for_Windows.Modules.EmptyFolders;
 using Smart_Cleaner_for_Windows.Modules.EmptyFolders.Contracts;
 using Smart_Cleaner_for_Windows.Modules.LargeFiles.ViewModels;
+using Smart_Cleaner_for_Windows.Modules.InternetRepair.ViewModels;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.UI;
@@ -35,6 +37,7 @@ public sealed partial class MainWindow : IEmptyFolderCleanupView
     private readonly IDiskCleanupService _diskCleanupService;
     private readonly IStorageOverviewService _storageOverviewService;
     private readonly ILargeFileExplorer _largeFileExplorer;
+    private readonly IInternetRepairService _internetRepairService;
     private CancellationTokenSource? _cts;
     private MicaController? _mica;
     private SystemBackdropConfiguration? _backdropConfig;
@@ -45,13 +48,18 @@ public sealed partial class MainWindow : IEmptyFolderCleanupView
     private readonly ObservableCollection<DiskCleanupItemViewModel> _diskCleanupItems = new();
     private readonly ObservableCollection<LargeFileGroupViewModel> _largeFileGroups = new();
     private readonly ObservableCollection<string> _largeFileExclusions = new();
+    private readonly ObservableCollection<InternetRepairLogEntry> _internetRepairLog = new();
     private readonly HashSet<string> _largeFileExclusionLookup = new(OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+    private readonly Dictionary<string, InternetRepairAction> _internetRepairActions = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, InternetRepairLogEntry> _internetRepairLogLookup = new(StringComparer.OrdinalIgnoreCase);
     private CancellationTokenSource? _diskCleanupCts;
     private CancellationTokenSource? _largeFilesCts;
+    private CancellationTokenSource? _internetRepairCts;
     private readonly string _diskCleanupVolume;
     private CancellationTokenSource? _storageOverviewCts;
     private bool _isDiskCleanupOperation;
     private bool _isLargeFilesBusy;
+    private bool _isInternetRepairBusy;
     private readonly Dictionary<string, Color> _defaultAccentColors = new();
     private readonly ResourceLoader? _resources = TryCreateResourceLoader();
     private readonly ApplicationDataContainer? _settings = TryGetLocalSettings();
@@ -117,7 +125,8 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             DirectoryCleanerFactory.CreateDefault(),
             DiskCleanupServiceFactory.CreateDefault(),
             new StorageOverviewService(),
-            LargeFileExplorer.Default)
+            LargeFileExplorer.Default,
+            InternetRepairServiceFactory.CreateDefault())
     {
     }
 
@@ -126,12 +135,13 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             directoryCleaner,
             DiskCleanupServiceFactory.CreateDefault(),
             new StorageOverviewService(),
-            LargeFileExplorer.Default)
+            LargeFileExplorer.Default,
+            InternetRepairServiceFactory.CreateDefault())
     {
     }
 
     public MainWindow(IDirectoryCleaner directoryCleaner, IDiskCleanupService diskCleanupService)
-        : this(directoryCleaner, diskCleanupService, new StorageOverviewService(), LargeFileExplorer.Default)
+        : this(directoryCleaner, diskCleanupService, new StorageOverviewService(), LargeFileExplorer.Default, InternetRepairServiceFactory.CreateDefault())
     {
     }
 
@@ -139,7 +149,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         IDirectoryCleaner directoryCleaner,
         IDiskCleanupService diskCleanupService,
         IStorageOverviewService storageOverviewService)
-        : this(directoryCleaner, diskCleanupService, storageOverviewService, LargeFileExplorer.Default)
+        : this(directoryCleaner, diskCleanupService, storageOverviewService, LargeFileExplorer.Default, InternetRepairServiceFactory.CreateDefault())
     {
     }
 
@@ -147,12 +157,14 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         IDirectoryCleaner directoryCleaner,
         IDiskCleanupService diskCleanupService,
         IStorageOverviewService storageOverviewService,
-        ILargeFileExplorer largeFileExplorer)
+        ILargeFileExplorer largeFileExplorer,
+        IInternetRepairService internetRepairService)
     {
         var directoryCleaner1 = directoryCleaner ?? throw new ArgumentNullException(nameof(directoryCleaner));
         _diskCleanupService = diskCleanupService ?? throw new ArgumentNullException(nameof(diskCleanupService));
         _storageOverviewService = storageOverviewService ?? throw new ArgumentNullException(nameof(storageOverviewService));
         _largeFileExplorer = largeFileExplorer ?? throw new ArgumentNullException(nameof(largeFileExplorer));
+        _internetRepairService = internetRepairService ?? throw new ArgumentNullException(nameof(internetRepairService));
         _diskCleanupVolume = _diskCleanupService.GetDefaultVolume();
 
         InitializeComponent();
@@ -166,6 +178,8 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
         LargeFilesExclusionsList.ItemsSource = _largeFileExclusions;
         LoadLargeFilePreferences();
+
+        InitializeInternetRepair();
 
         SetLargeFilesStatus(
             Symbol.SaveLocal,
@@ -184,6 +198,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             DeleteBtn.Style = accentStyle;
             DiskCleanupCleanBtn.Style = accentStyle;
             LargeFilesScanBtn.Style = accentStyle;
+            InternetRepairRunBtn.Style = accentStyle;
         }
 
         SetStatus(
@@ -231,6 +246,9 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         _largeFilesCts?.Cancel();
         _largeFilesCts?.Dispose();
         _largeFilesCts = null;
+        _internetRepairCts?.Cancel();
+        _internetRepairCts?.Dispose();
+        _internetRepairCts = null;
         _storageOverviewCts?.Cancel();
         _storageOverviewCts?.Dispose();
         _storageOverviewCts = null;
@@ -259,6 +277,8 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
     private void OnNavigateToDiskCleanup(object sender, RoutedEventArgs e) => NavigateTo(DiskCleanupItem);
 
+    private void OnNavigateToInternetRepair(object sender, RoutedEventArgs e) => NavigateTo(InternetRepairItem);
+
     private void NavigateTo(object? target)
     {
         if (target is null)
@@ -283,12 +303,14 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         var isEmptyFolders = Equals(target, EmptyFoldersItem);
         var isLargeFiles = Equals(target, LargeFilesItem);
         var isDiskCleanup = Equals(target, DiskCleanupItem);
+        var isInternetRepair = Equals(target, InternetRepairItem);
         var isSettings = settingsItem is not null && Equals(target, settingsItem);
 
         SetViewVisibility(DashboardView, isDashboard);
         SetViewVisibility(EmptyFoldersView, isEmptyFolders);
         SetViewVisibility(LargeFilesView, isLargeFiles);
         SetViewVisibility(DiskCleanupView, isDiskCleanup);
+        SetViewVisibility(InternetRepairView, isInternetRepair);
         SetViewVisibility(SettingsView, isSettings);
 
         UIElement? activeView = isDashboard
@@ -299,9 +321,11 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                     ? LargeFilesView
                     : isDiskCleanup
                         ? DiskCleanupView
-                        : isSettings
-                            ? SettingsView
-                            : null;
+                        : isInternetRepair
+                            ? InternetRepairView
+                            : isSettings
+                                ? SettingsView
+                                : null;
 
         if (activeView is not null)
         {
