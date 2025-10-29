@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Smart_Cleaner_for_Windows.Core.DiskCleanup;
@@ -14,7 +15,14 @@ namespace Smart_Cleaner_for_Windows.Shell;
 
 public sealed partial class MainWindow
 {
-    private async void OnDiskCleanupAnalyze(object sender, RoutedEventArgs e)
+    private void OnDiskCleanupAnalyze(object sender, RoutedEventArgs e)
+    {
+        _ = RunDiskCleanupAnalyzeAsync()
+            .ContinueWith(t => ReportAsyncHandlerException(t.Exception),
+                TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
+    }
+
+    private async Task RunDiskCleanupAnalyzeAsync()
     {
         if (_isBusy)
         {
@@ -86,7 +94,14 @@ public sealed partial class MainWindow
         }
     }
 
-    private async void OnDiskCleanupClean(object sender, RoutedEventArgs e)
+    private void OnDiskCleanupClean(object sender, RoutedEventArgs e)
+    {
+        _ = RunDiskCleanupCleanAsync()
+            .ContinueWith(t => ReportAsyncHandlerException(t.Exception),
+                TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
+    }
+
+    private async Task RunDiskCleanupCleanAsync()
     {
         if (_isBusy)
         {
@@ -288,5 +303,16 @@ public sealed partial class MainWindow
         DiskCleanupInfoBar.IsOpen = true;
     }
 
-}
+    private void ReportAsyncHandlerException(Exception? ex)
+    {
+        if (ex is null) return;
 
+        var message = ex.InnerException?.Message ?? ex.Message;
+        ShowDiskCleanupInfo(
+            string.Format(
+                CultureInfo.CurrentCulture,
+                Localize("InfoUnexpectedAsyncError", "Unexpected error: {0}"),
+                message),
+            InfoBarSeverity.Error);
+    }
+}

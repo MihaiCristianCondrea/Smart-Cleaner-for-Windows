@@ -11,7 +11,7 @@ namespace Smart_Cleaner_for_Windows.Shell;
 
 public sealed partial class MainWindow
 {
-    private async void OnPreview(object sender, RoutedEventArgs e)
+    private async void OnPreview(object sender, RoutedEventArgs e) // FIXME: Avoid using 'async' for method with the 'void' return type or catch all exceptions in it: any exceptions unhandled by the method might lead to the process crash
     {
         _emptyFolderController.DismissInfo();
 
@@ -36,7 +36,7 @@ public sealed partial class MainWindow
         }
     }
 
-    private async void OnDelete(object sender, RoutedEventArgs e)
+    private async void OnDelete(object sender, RoutedEventArgs e) // FIXME: Avoid using 'async' for method with the 'void' return type or catch all exceptions in it: any exceptions unhandled by the method might lead to the process crash
     {
         _emptyFolderController.DismissInfo();
 

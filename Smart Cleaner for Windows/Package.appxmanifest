@@ -7,11 +7,6 @@
         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
         IgnorableNamespaces="uap rescap">
 
-    <Identity
-            Name="499a730b-c745-450c-aad4-7fa736fcdc39"
-            Publisher="CN=d4rk7"
-            Version="1.0.0.0" />
-
     <mp:PhoneIdentity PhoneProductId="499a730b-c745-450c-aad4-7fa736fcdc39" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
     <Properties>
@@ -31,16 +26,16 @@
 
     <Applications>
         <Application Id="App"
-                     Executable="$targetnametoken$.exe"
-                     EntryPoint="$targetentrypoint$">
+                     Executable="Smart Cleaner for Windows.exe"
+                     EntryPoint="Windows.FullTrustApplication">
             <uap:VisualElements
                     DisplayName="Smart Cleaner for Windows"
                     Description="Smart Cleaner for Windows"
                     BackgroundColor="transparent"
-                    Square150x150Logo="Assets\Square150x150Logo.png"
-                    Square44x44Logo="Assets\Square44x44Logo.png">
-                <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
-                <uap:SplashScreen Image="Assets\SplashScreen.png" />
+                    Square150x150Logo="Assets\Square150x150Logo.scale-200.png"
+                    Square44x44Logo="Assets\Square44x44Logo.scale-200.png">
+                <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.scale-200.png" />
+                <uap:SplashScreen Image="Assets\SplashScreen.scale-200.png" />
             </uap:VisualElements>
         </Application>
     </Applications>

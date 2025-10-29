@@ -17,7 +17,7 @@ namespace Smart_Cleaner_for_Windows.Shell;
 
 public sealed partial class MainWindow
 {
-    private async void OnLargeFilesBrowse(object sender, RoutedEventArgs e)
+    private async void OnLargeFilesBrowse(object sender, RoutedEventArgs e) // FIXME: Avoid using 'async' for method with the 'void' return type or catch all exceptions in it: any exceptions unhandled by the method might lead to the process crash
     {
         var picker = new FolderPicker();
         picker.FileTypeFilter.Add("*");
@@ -61,7 +61,7 @@ public sealed partial class MainWindow
         }
     }
 
-    private async void OnLargeFilesScan(object sender, RoutedEventArgs e)
+    private async void OnLargeFilesScan(object sender, RoutedEventArgs e) // FIXME: Avoid using 'async' for method with the 'void' return type or catch all exceptions in it: any exceptions unhandled by the method might lead to the process crash
     {
         if (_isLargeFilesBusy)
         {
@@ -82,7 +82,7 @@ public sealed partial class MainWindow
             return;
         }
 
-        _largeFilesCts?.Cancel();
+        await _largeFilesCts?.CancelAsync(); // FIXME: Dereference of a possibly null reference
         _largeFilesCts?.Dispose();
         _largeFilesCts = new CancellationTokenSource();
 
@@ -341,7 +341,7 @@ public sealed partial class MainWindow
             var viewModel = new LargeFileGroupViewModel(group.Name, FormatFileCount, ValueFormatting.FormatBytes);
             foreach (var entry in group.Entries)
             {
-                var extensionLabel = string.IsNullOrEmpty(entry.Extension)
+                var extensionLabel = string.IsNullOrEmpty(entry.Extension) // FIXME: Local variable 'extensionLabel' is never used
                     ? Localize("LargeFilesNoExtensionLabel", "No extension")
                     : entry.Extension.ToUpperInvariant();
                 var item = new LargeFileItemViewModel(entry);
@@ -365,14 +365,10 @@ public sealed partial class MainWindow
             return;
         }
 
-        if (hasFailures)
-        {
-            SetLargeFilesResultsCaption(Localize("LargeFilesResultsWithIssues", "Some results may be missing due to access issues. Review the largest files below."));
-        }
-        else
-        {
-            SetLargeFilesResultsCaption(Localize("LargeFilesResultsReady", "Review the largest files below before taking action."));
-        }
+        SetLargeFilesResultsCaption(hasFailures
+            ? Localize("LargeFilesResultsWithIssues",
+                "Some results may be missing due to access issues. Review the largest files below.")
+            : Localize("LargeFilesResultsReady", "Review the largest files below before taking action."));
     }
 
     private void SetLargeFilesResultsCaption(string message) => LargeFilesResultsCaption.Text = message;
@@ -407,7 +403,7 @@ public sealed partial class MainWindow
         LargeFilesStatusHero.Background = GetStatusHeroBrush(symbol);
         LargeFilesStatusGlyph.Foreground = GetStatusGlyphBrush(symbol);
 
-        if (badgeValue.HasValue && badgeValue.Value > 0)
+        if (badgeValue is > 0)
         {
             LargeFilesResultBadge.Value = badgeValue.Value;
             LargeFilesResultBadge.Visibility = Visibility.Visible;
@@ -478,7 +474,7 @@ public sealed partial class MainWindow
         try
         {
             var normalized = NormalizeLargeFilePath(path);
-            if (_largeFileExclusionLookup.Contains(normalized))
+            if (!_largeFileExclusionLookup.Add(normalized))
             {
                 if (showMessageOnError)
                 {
@@ -488,7 +484,6 @@ public sealed partial class MainWindow
                 return false;
             }
 
-            _largeFileExclusionLookup.Add(normalized);
             _largeFileExclusions.Add(normalized);
 
             if (save)
