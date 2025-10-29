@@ -29,8 +29,8 @@ public sealed partial class MainWindow
         }
 
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000) &&
-            MicaController.IsSupported() &&
-            TrySetSystemBackdropSafe(new MicaBackdrop()))
+            IsMicaSupported() &&
+            TryCreateSystemBackdrop(static () => new MicaBackdrop()))
         {
             return;
         }
@@ -66,7 +66,7 @@ public sealed partial class MainWindow
 
     private bool TryInitializeLegacyMicaController()
     {
-        if (!MicaController.IsSupported())
+        if (!IsMicaSupported())
         {
             return false;
         }
@@ -100,13 +100,13 @@ public sealed partial class MainWindow
 
     private void TryEnableDesktopAcrylic()
     {
-        if (!DesktopAcrylicController.IsSupported())
+        if (!IsDesktopAcrylicSupported())
         {
             SystemBackdrop = null;
             return;
         }
 
-        _ = TrySetSystemBackdropSafe(new DesktopAcrylicBackdrop());
+        _ = TryCreateSystemBackdrop(static () => new DesktopAcrylicBackdrop());
     }
 
     private void OnWindowActivated(object sender, WindowActivatedEventArgs args)
@@ -114,6 +114,44 @@ public sealed partial class MainWindow
         if (_backdropConfig is not null)
         {
             _backdropConfig.IsInputActive = args.WindowActivationState != WindowActivationState.Deactivated;
+        }
+    }
+
+    private static bool IsMicaSupported()
+    {
+        try
+        {
+            return MicaController.IsSupported();
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static bool IsDesktopAcrylicSupported()
+    {
+        try
+        {
+            return DesktopAcrylicController.IsSupported();
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private bool TryCreateSystemBackdrop(Func<XamlSystemBackdrop> factory)
+    {
+        try
+        {
+            var backdrop = factory();
+            return TrySetSystemBackdropSafe(backdrop);
+        }
+        catch
+        {
+            SystemBackdrop = null;
+            return false;
         }
     }
 

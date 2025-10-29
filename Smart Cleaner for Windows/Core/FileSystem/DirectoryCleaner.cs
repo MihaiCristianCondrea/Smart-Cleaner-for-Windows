@@ -21,7 +21,11 @@ public sealed class DirectoryCleaner(
     private readonly IDirectoryDeletionService _directoryDeletionService = directoryDeletionService
                                                                            ?? throw new ArgumentNullException(nameof(directoryDeletionService));
 
-    private static IDirectoryCleaner Default { get; } = DirectoryCleanerFactory.CreateDefault();
+    private static readonly Lazy<IDirectoryCleaner> DefaultInstance = new(
+        DirectoryCleanerFactory.CreateDefault,
+        LazyThreadSafetyMode.ExecutionAndPublication);
+
+    private static IDirectoryCleaner Default => DefaultInstance.Value;
 
     public static DirectoryCleanResult Clean(string root, DirectoryCleanOptions? options = null, CancellationToken cancellationToken = default)
         => Default.Clean(root, options, cancellationToken);
