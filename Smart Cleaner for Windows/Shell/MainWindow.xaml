@@ -6,7 +6,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:empty="using:Smart_Cleaner_for_Windows.Modules.EmptyFolders.ViewModels"
     xmlns:ir="using:Smart_Cleaner_for_Windows.Modules.InternetRepair.ViewModels"
-    xmlns:local="using:Smart_Cleaner_for_Windows.Shell"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Title="Smart Cleaner for Windows">
@@ -766,6 +765,7 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <Border Width="32" Height="32" CornerRadius="12"
@@ -782,7 +782,18 @@
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                     </StackPanel>
 
-                    <ToggleButton Grid.Column="2"
+                    <StackPanel
+                        Grid.Column="2"
+                        Orientation="Horizontal"
+                        Spacing="6"
+                        VerticalAlignment="Center">
+                        <InfoBadge
+                            Value="{x:Bind PathLength}"
+                            Visibility="{x:Bind IsPathLengthWarning, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            ToolTipService.ToolTip="{x:Bind PathLengthIndicatorTooltip}" />
+                    </StackPanel>
+
+                    <ToggleButton Grid.Column="3"
                                   Content="Exclude"
                                   IsChecked="{x:Bind IsDirectlyExcluded, Mode=TwoWay}"
                                   IsEnabled="{x:Bind IsInlineToggleEnabled}"

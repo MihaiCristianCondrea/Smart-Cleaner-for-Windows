@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
 namespace Smart_Cleaner_for_Windows.Modules.EmptyFolders.ViewModels;
@@ -13,6 +14,14 @@ namespace Smart_Cleaner_for_Windows.Modules.EmptyFolders.ViewModels;
 public sealed class EmptyFolderNode(string name, string fullPath, string relativePath, int depth)
     : INotifyPropertyChanged
 {
+    // ViewModel-safe severity (map to UI severity in XAML via a converter)
+    public enum PathSeverity
+    {
+        None = 0,
+        Warning = 1,
+        Error = 2
+    }
+
     private readonly List<EmptyFolderNode> _allChildren = new();
     private readonly ObservableCollection<EmptyFolderNode> _visibleChildren = new();
     private bool _isDirectlyExcluded;
@@ -27,6 +36,27 @@ public sealed class EmptyFolderNode(string name, string fullPath, string relativ
     public string RelativePath { get; } = relativePath ?? throw new ArgumentNullException(nameof(relativePath));
 
     public int Depth { get; } = depth;
+
+    public int PathLength { get; } = (fullPath ?? throw new ArgumentNullException(nameof(fullPath))).Length;
+
+    public bool IsPathLengthWarning => PathLength >= PathLengthWarningThreshold;
+
+    private bool IsPathLengthCritical => PathLength >= PathLengthCriticalThreshold;
+
+    // Decoupled from Microsoft.UI types so this compiles in ViewModel layer
+    public PathSeverity PathLengthSeverity => IsPathLengthCritical ? PathSeverity.Error : PathSeverity.Warning;
+
+    public string PathLengthIndicatorTooltip => IsPathLengthCritical
+        ? string.Format(
+            CultureInfo.CurrentCulture,
+            "Path length {0} meets or exceeds the Windows MAX_PATH limit ({1}).",
+            PathLength,
+            PathLengthCriticalThreshold)
+        : string.Format(
+            CultureInfo.CurrentCulture,
+            "Path length {0}. Paths longer than {1} characters might fail to delete.",
+            PathLength,
+            PathLengthCriticalThreshold);
 
     public EmptyFolderNode? Parent { get; private set; }
 
@@ -99,6 +129,9 @@ public sealed class EmptyFolderNode(string name, string fullPath, string relativ
     public event EventHandler? ExclusionChanged;
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    private const int PathLengthWarningThreshold = 200;
+    private const int PathLengthCriticalThreshold = 260;
 
     public void AddChild(EmptyFolderNode child)
     {
