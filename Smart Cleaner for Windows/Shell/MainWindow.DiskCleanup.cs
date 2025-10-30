@@ -46,9 +46,9 @@ public sealed partial class MainWindow
         var cts = new CancellationTokenSource();
         _diskCleanupCts = cts;
 
-        DiskCleanupInfoBar.IsOpen = false;
+        DiskCleanupInfoBar.IsOpen = false;/*FIXME: Cannot resolve symbol 'DiskCleanupInfoBar'*/
         _isDiskCleanupOperation = true;
-        DiskCleanupProgress.Visibility = Visibility.Visible;
+        DiskCleanupProgress.Visibility = Visibility.Visible;/*FIXME: Cannot resolve symbol 'DiskCleanupProgress'*/
         SetActivity(Localize("ActivityDiskCleanupAnalyzing", "Analyzing disk cleanup handlers…"));
         SetBusy(true);
 
@@ -82,7 +82,7 @@ public sealed partial class MainWindow
         finally
         {
             _isDiskCleanupOperation = false;
-            DiskCleanupProgress.Visibility = Visibility.Collapsed;
+            DiskCleanupProgress.Visibility = Visibility.Collapsed;/*FIXME: Cannot resolve symbol 'DiskCleanupProgress'*/
             SetBusy(false);
             if (ReferenceEquals(_diskCleanupCts, cts))
             {
@@ -138,9 +138,9 @@ public sealed partial class MainWindow
         var cts = new CancellationTokenSource();
         _diskCleanupCts = cts;
 
-        DiskCleanupInfoBar.IsOpen = false;
+        DiskCleanupInfoBar.IsOpen = false;/*FIXME: Cannot resolve symbol 'DiskCleanupInfoBar'*/
         _isDiskCleanupOperation = true;
-        DiskCleanupProgress.Visibility = Visibility.Visible;
+        DiskCleanupProgress.Visibility = Visibility.Visible;/*FIXME: Cannot resolve symbol 'DiskCleanupProgress'*/
         SetActivity(Localize("ActivityDiskCleanupRunning", "Running disk cleanup handlers…"));
         SetBusy(true);
 
@@ -195,7 +195,7 @@ public sealed partial class MainWindow
         finally
         {
             _isDiskCleanupOperation = false;
-            DiskCleanupProgress.Visibility = Visibility.Collapsed;
+            DiskCleanupProgress.Visibility = Visibility.Collapsed;/*FIXME:Cannot resolve symbol 'DiskCleanupProgress'*/
             SetBusy(false);
             if (ReferenceEquals(_diskCleanupCts, cts))
             {
@@ -238,17 +238,17 @@ public sealed partial class MainWindow
     private void UpdateDiskCleanupActionState()
     {
         var canInteract = !_isBusy && !_isDiskCleanupOperation;
-        DiskCleanupAnalyzeBtn.IsEnabled = !_isBusy;
-        DiskCleanupList.IsEnabled = canInteract;
+        DiskCleanupAnalyzeBtn.IsEnabled = !_isBusy;/*FIXME:Cannot resolve symbol 'DiskCleanupAnalyzeBtn'*/
+        DiskCleanupList.IsEnabled = canInteract;/*FIXME:Cannot resolve symbol 'DiskCleanupList'*/
         var hasSelection = canInteract && _diskCleanupItems.Any(item => item is { IsSelected: true, CanSelect: true });
-        DiskCleanupCleanBtn.IsEnabled = hasSelection;
+        DiskCleanupCleanBtn.IsEnabled = hasSelection;/*FIXME:Cannot resolve symbol 'DiskCleanupCleanBtn'*/
     }
 
     private void UpdateDiskCleanupStatusSummary()
     {
         if (_diskCleanupItems.Count == 0)
         {
-            DiskCleanupStatusText.Text = LocalizeFormat(
+            DiskCleanupStatusText.Text = LocalizeFormat(/*FIXME:Cannot resolve symbol 'DiskCleanupStatusText'*/
                 "DiskCleanupStatusNoData",
                 "No Disk Cleanup handlers reported data for {0}. Try running as Administrator.",
                 _diskCleanupVolume);
@@ -260,7 +260,7 @@ public sealed partial class MainWindow
 
         if (selectable.Count == 0)
         {
-            DiskCleanupStatusText.Text = LocalizeFormat(
+            DiskCleanupStatusText.Text = LocalizeFormat(/*FIXME:Cannot resolve symbol 'DiskCleanupStatusText'*/
                 "DiskCleanupStatusNoSpace",
                 "No reclaimable space detected on {0}.",
                 _diskCleanupVolume);
@@ -270,7 +270,7 @@ public sealed partial class MainWindow
             var label = selectable.Count == 1
                 ? Localize("DiskCleanupCategorySingular", "category")
                 : Localize("DiskCleanupCategoryPlural", "categories");
-            DiskCleanupStatusText.Text = string.Format(
+            DiskCleanupStatusText.Text = string.Format(/*FIXME:Cannot resolve symbol 'DiskCleanupStatusText'*/
                 CultureInfo.CurrentCulture,
                 Localize(
                     "DiskCleanupStatusPotential",
@@ -283,7 +283,7 @@ public sealed partial class MainWindow
 
         if (_diskCleanupItems.Any(item => item.Item.RequiresElevation))
         {
-            DiskCleanupStatusText.Text += " " + Localize(
+            DiskCleanupStatusText.Text += " " + Localize(/*FIXME:Cannot resolve symbol 'DiskCleanupStatusText'*/
                 "DiskCleanupStatusNeedsElevation",
                 "Some handlers require Administrator privileges.");
         }

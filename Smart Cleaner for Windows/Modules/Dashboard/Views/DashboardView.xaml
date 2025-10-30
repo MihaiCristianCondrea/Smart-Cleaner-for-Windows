@@ -1,0 +1,234 @@
+<UserControl
+    x:Class="Smart_Cleaner_for_Windows.Modules.Dashboard.Views.DashboardView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Padding="{StaticResource Padding.Page}" Spacing="{StaticResource Spacing.Size240}">
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size160}" VerticalAlignment="Center">
+                <Border
+                    Width="56"
+                    Height="56"
+                    CornerRadius="18"
+                    Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                    VerticalAlignment="Center">
+                    <Image
+                        Source="ms-appx:///Assets/Square44x44Logo.scale-200.png"
+                        Stretch="Uniform"
+                        Width="36"
+                        Height="36"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center" />
+                </Border>
+                <StackPanel Spacing="{StaticResource Spacing.Size40}" VerticalAlignment="Center">
+                    <TextBlock Text="Dashboard" FontSize="32" FontWeight="SemiBold" />
+                    <TextBlock
+                        Text="Choose a tool to continue."
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+            </StackPanel>
+
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="{StaticResource Spacing.Size160}">
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                        <Border
+                            Width="48"
+                            Height="48"
+                            CornerRadius="16"
+                            Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                            VerticalAlignment="Center">
+                            <FontIcon
+                                Glyph="&#xE8A0;"
+                                FontFamily="Segoe MDL2 Assets"
+                                Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel>
+                            <TextBlock Text="Storage overview" FontSize="22" FontWeight="SemiBold" />
+                            <TextBlock
+                                x:Name="StorageSummaryText"
+                                Text="Collecting drive information…"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                TextWrapping="WrapWholeWords" />
+                        </StackPanel>
+                    </StackPanel>
+                    <ItemsControl x:Name="DriveUsageList">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Spacing="{StaticResource Spacing.Size120}" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="160" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Spacing="{StaticResource Spacing.Size40}">
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                                        <TextBlock
+                                            Text="{Binding Details}"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Spacing="{StaticResource Spacing.Size40}" VerticalAlignment="Center">
+                                        <ProgressBar Minimum="0" Maximum="100" Value="{Binding UsedPercentage}" Height="6" />
+                                        <TextBlock
+                                            Text="{Binding UsageSummary}"
+                                            HorizontalAlignment="Right"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
+                        <FontIcon
+                            Glyph="&#xE946;"
+                            FontFamily="Segoe MDL2 Assets"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            VerticalAlignment="Center" />
+                        <TextBlock
+                            x:Name="StorageTipText"
+                            Text="Keep an eye on your drives to maintain performance."
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            TextWrapping="WrapWholeWords" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="16">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Border
+                            Width="48"
+                            Height="48"
+                            CornerRadius="16"
+                            Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                            VerticalAlignment="Center">
+                            <SymbolIcon
+                                Symbol="Folder"
+                                Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel>
+                            <TextBlock Text="Empty folders cleaner" FontSize="22" FontWeight="SemiBold" />
+                            <TextBlock
+                                Text="Scan for empty directories and remove them safely."
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+                    </StackPanel>
+                    <Button Click="OnNavigateToEmptyFolders">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <SymbolIcon Symbol="Play" />
+                            <TextBlock Text="Open empty folders cleaner" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="16">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Border
+                            Width="48"
+                            Height="48"
+                            CornerRadius="16"
+                            Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                            VerticalAlignment="Center">
+                            <SymbolIcon
+                                Symbol="SaveLocal"
+                                Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel>
+                            <TextBlock Text="Large files explorer" FontSize="22" FontWeight="SemiBold" />
+                            <TextBlock
+                                Text="Find the biggest files by type and reclaim space quickly."
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                TextWrapping="Wrap" />
+                        </StackPanel>
+                    </StackPanel>
+                    <Button Click="OnNavigateToLargeFiles">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <SymbolIcon Symbol="SaveLocal" />
+                            <TextBlock Text="Open large files explorer" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="16">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Border
+                            Width="48"
+                            Height="48"
+                            CornerRadius="16"
+                            Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                            VerticalAlignment="Center">
+                            <FontIcon
+                                Glyph="&#xE74D;"
+                                FontFamily="Segoe MDL2 Assets"
+                                Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel>
+                            <TextBlock Text="Disk cleanup" FontSize="22" FontWeight="SemiBold" />
+                            <TextBlock
+                                Text="Analyze Windows cleanup handlers and free up disk space."
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                TextWrapping="Wrap" />
+                        </StackPanel>
+                    </StackPanel>
+                    <Button Click="OnNavigateToDiskCleanup">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <SymbolIcon Symbol="Delete" />
+                            <TextBlock Text="Open disk cleanup" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel Spacing="16">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Border
+                            Width="48"
+                            Height="48"
+                            CornerRadius="16"
+                            Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                            VerticalAlignment="Center">
+                            <SymbolIcon
+                                Symbol="Globe"
+                                Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel>
+                            <TextBlock Text="Internet repair" FontSize="22" FontWeight="SemiBold" />
+                            <TextBlock
+                                Text="Run guided fixes for common connectivity problems."
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                TextWrapping="Wrap" />
+                        </StackPanel>
+                    </StackPanel>
+                    <Button Click="OnNavigateToInternetRepair">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <SymbolIcon Symbol="Globe" />
+                            <TextBlock Text="Open internet repair" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

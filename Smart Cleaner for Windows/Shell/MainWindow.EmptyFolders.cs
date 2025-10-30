@@ -92,7 +92,7 @@ public sealed partial class MainWindow
 
     public void DismissInfo()
     {
-        Info.IsOpen = false;
+        Info.IsOpen = false;/*FIXME:Cannot resolve symbol 'Info'*/
     }
 
     public void ShowInvalidRootSelection()
@@ -317,11 +317,11 @@ public sealed partial class MainWindow
 
     private DirectoryCleanOptions CreateOptions(bool dryRun)
     {
-        var depthValue = DepthBox.Value;
+        var depthValue = DepthBox.Value;/*FIXME:Cannot resolve symbol 'DepthBox'*/
         int? maxDepth = null;
         if (!double.IsNaN(depthValue))
         {
-            var depth = (int)Math.Max(0, Math.Round(depthValue));
+            var depth = (int)Math.Max(0, Math.Round(depthValue));/*FIXME:<html>Ambiguous invocation.<br/>Candidates are:<br/>Round(decimal) : decimal<br/>Round(double) : double<br/>all from class Math*/
             if (depth > 0)
             {
                 maxDepth = depth;
@@ -331,18 +331,18 @@ public sealed partial class MainWindow
         return new DirectoryCleanOptions
         {
             DryRun = dryRun,
-            SendToRecycleBin = RecycleChk.IsChecked == true,
+            SendToRecycleBin = RecycleChk.IsChecked == true,/*FIXME:Cannot resolve symbol 'RecycleChk'*/
             SkipReparsePoints = true,
             DeleteRootWhenEmpty = false,
             MaxDepth = maxDepth,
-            ExcludedNamePatterns = ParseExclusions(ExcludeBox.Text),
+            ExcludedNamePatterns = ParseExclusions(ExcludeBox.Text),/*FIXME:Cannot resolve symbol 'ExcludeBox'*/
             ExcludedFullPaths = _inlineExcludedPaths.ToArray(),
         };
     }
 
     private bool TryGetRootPath(out string root)
     {
-        root = RootPathBox.Text.Trim();
+        root = RootPathBox.Text.Trim();/*Cannot resolve symbol 'RootPathBox'*/
         return !string.IsNullOrWhiteSpace(root) && Directory.Exists(root);
     }
 
@@ -405,18 +405,18 @@ public sealed partial class MainWindow
     private void ResetResultFilters()
     {
         _currentResultSearch = string.Empty;
-        ResultsSearchBox.Text = string.Empty;
+        ResultsSearchBox.Text = string.Empty;/*Cannot resolve symbol 'ResultsSearchBox'*/
 
         _hideExcludedResults = false;
-        if (HideExcludedToggle.IsOn)
+        if (HideExcludedToggle.IsOn)/*Cannot resolve symbol 'HideExcludedToggle'*/
         {
-            HideExcludedToggle.IsOn = false;
+            HideExcludedToggle.IsOn = false;/*Cannot resolve symbol 'HideExcludedToggle'*/
         }
 
         _currentResultSort = EmptyFolderSortOption.NameAscending;
-        if (ResultsSortBox.SelectedIndex != 0)
+        if (ResultsSortBox.SelectedIndex != 0)/*Cannot resolve symbol 'ResultsSortBox'*/
         {
-            ResultsSortBox.SelectedIndex = 0;
+            ResultsSortBox.SelectedIndex = 0;/*Cannot resolve symbol 'ResultsSortBox'*/
         }
 
         UpdateResultFilterControls();
@@ -652,7 +652,7 @@ public sealed partial class MainWindow
 
     private void UpdateInlineExclusionSummary()
     {
-        InlineExclusionSummary.Text = _inlineExcludedPaths.Count > 0
+        InlineExclusionSummary.Text = _inlineExcludedPaths.Count > 0/*Cannot resolve symbol 'InlineExclusionSummary'*/
             ? LocalizeFormat("InlineExclusionSummaryCount", "Inline exclusions: {0} folder(s).", _inlineExcludedPaths.Count)
             : Localize("InlineExclusionSummaryNone", "No inline exclusions applied.");
     }

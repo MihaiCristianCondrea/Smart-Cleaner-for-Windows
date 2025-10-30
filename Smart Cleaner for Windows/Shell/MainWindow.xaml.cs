@@ -180,14 +180,58 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         InitializeComponent();
 
         _emptyFolderController = new EmptyFolderCleanupController(directoryCleaner1, this);
-        CandidatesTree.ItemsSource = _filteredEmptyFolderRoots;
+        EmptyFoldersView.CandidatesTree.ItemsSource = _filteredEmptyFolderRoots;
 
-        LargeFilesGroupList.ItemsSource = _largeFileGroups;
+        LargeFilesView.LargeFilesGroupList.ItemsSource = _largeFileGroups;
+
+        DashboardView.NavigateToEmptyFoldersRequested += (_, _) => NavigateTo(EmptyFoldersItem);
+        DashboardView.NavigateToLargeFilesRequested += (_, _) => NavigateTo(LargeFilesItem);
+        DashboardView.NavigateToDiskCleanupRequested += (_, _) => NavigateTo(DiskCleanupItem);
+        DashboardView.NavigateToInternetRepairRequested += (_, _) => NavigateTo(InternetRepairItem);
+
+        EmptyFoldersView.BrowseRequested += OnBrowse;
+        EmptyFoldersView.CancelRequested += OnCancel;
+        EmptyFoldersView.CandidatesSelectionChanged += OnCandidatesSelectionChanged;/*FIXME: Argument type 'method group' is not assignable to parameter type 'TreeViewSelectionChangedEventHandler?'*/
+        EmptyFoldersView.InlineExclusionsCleared += OnClearInlineExclusions;
+        EmptyFoldersView.ResultFiltersCleared += OnClearResultFilters;
+        EmptyFoldersView.DeleteRequested += OnDelete;
+        EmptyFoldersView.ExcludeSelectedRequested += OnExcludeSelected;
+        EmptyFoldersView.IncludeSelectedRequested += OnIncludeSelected;
+        EmptyFoldersView.PreviewRequested += OnPreview;
+        EmptyFoldersView.ResultSearchChanged += OnResultSearchChanged;
+        EmptyFoldersView.ResultSortChanged += OnResultSortChanged;
+        EmptyFoldersView.RootPathTextChanged += RootPathBox_TextChanged;
+
+        LargeFilesView.BrowseRequested += OnLargeFilesBrowse;
+        LargeFilesView.CancelRequested += OnLargeFilesCancel;
+        LargeFilesView.ClearExclusionsRequested += OnLargeFilesClearExclusions;
+        LargeFilesView.RootPathChanged += OnLargeFilesRootPathChanged;
+        LargeFilesView.ScanRequested += OnLargeFilesScan;
+        LargeFilesView.DeleteRequested += OnLargeFileDelete;
+        LargeFilesView.ExcludeRequested += OnLargeFileExclude;
+        LargeFilesView.OpenRequested += OnLargeFileOpen;
+        LargeFilesView.RemoveExclusionRequested += OnLargeFilesRemoveExclusion;
+
+        DiskCleanupView.AnalyzeRequested += OnDiskCleanupAnalyze;
+        DiskCleanupView.CleanRequested += OnDiskCleanupClean;
+        DiskCleanupView.CancelRequested += OnCancel;
+
+        InternetRepairView.RunRequested += OnInternetRepairRun;
+        InternetRepairView.CancelRequested += OnInternetRepairCancel;
+        InternetRepairView.ActionSelectionChanged += OnInternetRepairActionSelectionChanged;
+
+        SettingsView.ThemeSelectionChanged += OnThemeSelectionChanged;
+        SettingsView.AccentPreferenceChanged += OnAccentPreferenceChanged;
+        SettingsView.CleanerDefaultsApplied += OnApplyCleanerDefaults;
+        SettingsView.CleanerRecyclePreferenceToggled += OnCleanerRecyclePreferenceToggled;
+        SettingsView.CleanerExclusionsPreferenceChanged += OnCleanerExclusionsPreferenceChanged;
+        SettingsView.AutomationPreferenceToggled += OnAutomationPreferenceToggled;
+        SettingsView.NotificationPreferenceToggled += OnNotificationPreferenceToggled;
 
         CaptureDefaultAccentColors();
         LoadPreferences();
 
-        LargeFilesExclusionsList.ItemsSource = _largeFileExclusions;
+        LargeFilesView.LargeFilesExclusionsList.ItemsSource = _largeFileExclusions;
         LoadLargeFilePreferences();
 
         InitializeInternetRepair();
@@ -200,16 +244,16 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         UpdateLargeFilesSummary();
         UpdateLargeFilesExclusionState();
 
-        DriveUsageList.ItemsSource = _driveUsage;
+        DashboardView.DriveUsageListControl.ItemsSource = _driveUsage;
         _ = UpdateStorageOverviewAsync();
 
         if (Application.Current.Resources.TryGetValue("AccentButtonStyle", out var accentStyleObj) &&
             accentStyleObj is Style accentStyle)
         {
-            DeleteBtn.Style = accentStyle;
-            DiskCleanupCleanBtn.Style = accentStyle;
-            LargeFilesScanBtn.Style = accentStyle;
-            InternetRepairRunBtn.Style = accentStyle;
+            EmptyFoldersView.DeleteBtn.Style = accentStyle;
+            DiskCleanupView.DiskCleanupCleanBtn.Style = accentStyle;
+            LargeFilesView.LargeFilesScanBtn.Style = accentStyle;
+            InternetRepairView.InternetRepairRunBtn.Style = accentStyle;
         }
 
         SetStatus(
@@ -219,15 +263,15 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         SetActivity(Localize("ActivityIdle", "Waiting for the next action."));
         UpdateResultsSummary(0, Localize("ResultsPlaceholder", "Preview results will appear here once you run a scan."));
 
-        DiskCleanupList.ItemsSource = _diskCleanupItems;
-        DiskCleanupStatusText.Text = LocalizeFormat(
+        DiskCleanupView.DiskCleanupList.ItemsSource = _diskCleanupItems;
+        DiskCleanupView.DiskCleanupStatusText.Text = LocalizeFormat(
             "DiskCleanupStatusReady",
             "Ready to analyze disk cleanup handlers for {0}.",
             _diskCleanupVolume);
         if (!IsAdministrator())
         {
-            DiskCleanupIntro.Text = Localize(
-                "DiskCleanupIntro",
+            DiskCleanupView.DiskCleanupIntro.Text = Localize(
+                "DiskCleanupView.DiskCleanupIntro",
                 "Analyze Windows cleanup handlers. Some categories require Administrator privileges.");
         }
         UpdateDiskCleanupActionState();
@@ -281,14 +325,6 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         var target = args.IsSettingsSelected ? sender.SettingsItem : args.SelectedItem;
         ShowPage(target);
     }
-
-    private void OnNavigateToEmptyFolders(object sender, RoutedEventArgs e) => NavigateTo(EmptyFoldersItem);
-
-    private void OnNavigateToLargeFiles(object sender, RoutedEventArgs e) => NavigateTo(LargeFilesItem);
-
-    private void OnNavigateToDiskCleanup(object sender, RoutedEventArgs e) => NavigateTo(DiskCleanupItem);
-
-    private void OnNavigateToInternetRepair(object sender, RoutedEventArgs e) => NavigateTo(InternetRepairItem);
 
     private void NavigateTo(object? target)
     {
@@ -438,15 +474,15 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
             if (result.ReadyDriveCount == 0)
             {
-                StorageSummaryText.Text = "No ready drives detected.";
-                StorageTipText.Text = "Connect or unlock a drive to view usage details.";
+                DashboardView.StorageSummaryTextBlock.Text = "No ready drives detected.";
+                DashboardView.StorageTipTextBlock.Text = "Connect or unlock a drive to view usage details.";
                 return;
             }
 
             if (result.Drives.Count == 0)
             {
-                StorageSummaryText.Text = "No accessible drives detected.";
-                StorageTipText.Text = "We couldn't read your drive information. Try running the app with higher permissions.";
+                DashboardView.StorageSummaryTextBlock.Text = "No accessible drives detected.";
+                DashboardView.StorageTipTextBlock.Text = "We couldn't read your drive information. Try running the app with higher permissions.";
                 return;
             }
 
@@ -493,7 +529,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             }
 
             var driveLabel = _driveUsage.Count == 1 ? "drive" : "drives";
-            StorageSummaryText.Text = string.Format(
+            DashboardView.StorageSummaryTextBlock.Text = string.Format(
                 CultureInfo.CurrentCulture,
                 "Monitoring {0} {1}. {2} free of {3}.",
                 _driveUsage.Count,
@@ -501,7 +537,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 ValueFormatting.FormatBytes(totalFree),
                 ValueFormatting.FormatBytes(totalCapacity));
 
-            StorageTipText.Text = busiestDrive is not null ? GetStorageTip(busiestDrive) : "Storage tips will appear once drives are detected.";
+            DashboardView.StorageTipTextBlock.Text = busiestDrive is not null ? GetStorageTip(busiestDrive) : "Storage tips will appear once drives are detected.";
         }
         catch (OperationCanceledException) when (cts.IsCancellationRequested)
         {
@@ -510,8 +546,8 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             _driveUsage.Clear();
-            StorageSummaryText.Text = "Storage overview is unavailable.";
-            StorageTipText.Text = "We couldn't access drive information. Try again later or adjust your permissions.";
+            DashboardView.StorageSummaryTextBlock.Text = "Storage overview is unavailable.";
+            DashboardView.StorageTipTextBlock.Text = "We couldn't access drive information. Try again later or adjust your permissions.";
 
             ShowInfo(
                 string.Format(
@@ -523,8 +559,8 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         catch (Exception ex)
         {
             _driveUsage.Clear();
-            StorageSummaryText.Text = "Storage overview is unavailable.";
-            StorageTipText.Text = string.Format(
+            DashboardView.StorageSummaryTextBlock.Text = "Storage overview is unavailable.";
+            DashboardView.StorageTipTextBlock.Text = string.Format(
                 CultureInfo.CurrentCulture,
                 "Something went wrong while loading drives: {0}",
                 ex.Message);
@@ -602,7 +638,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 return;
             }
 
-            RootPathBox.Text = folder.Path;
+            EmptyFoldersView.RootPathBox.Text = folder.Path;
             UpdateResultsActionState();
             SetStatus(
                 Symbol.Folder,
@@ -635,25 +671,25 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
     private void ApplyCleanerDefaultsToSession()
     {
-        if (RecycleChk is not null)
+        if (EmptyFoldersView.RecycleChk is not null)
         {
-            RecycleChk.IsChecked = _cleanerSendToRecycleBin;
+            EmptyFoldersView.RecycleChk.IsChecked = _cleanerSendToRecycleBin;
         }
 
-        if (DepthBox is not null)
+        if (EmptyFoldersView.DepthBox is not null)
         {
-            DepthBox.Value = _cleanerDepthLimit;
+            EmptyFoldersView.DepthBox.Value = _cleanerDepthLimit;
         }
 
-        if (ExcludeBox is not null)
+        if (EmptyFoldersView.ExcludeBox is not null)
         {
-            ExcludeBox.Text = _cleanerExclusions;
+            EmptyFoldersView.ExcludeBox.Text = _cleanerExclusions;
         }
     }
 
     private void UpdateCleanerDefaultsSummary()
     {
-        if (CleanerDefaultsSummaryText is null)
+        if (SettingsView.CleanerDefaultsSummaryText is null)
         {
             return;
         }
@@ -668,7 +704,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 _cleanerDepthLimit)
             : Localize("SettingsCleanerDefaultsNoDepth", "No depth limit");
 
-        CleanerDefaultsSummaryText.Text = string.Format(
+        SettingsView.CleanerDefaultsSummaryText.Text = string.Format(
             CultureInfo.CurrentCulture,
             Localize("SettingsCleanerDefaultsSummary", "{0} • {1}"),
             recycleText,
@@ -677,7 +713,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
     private void UpdateAutomationSummary()
     {
-        if (AutomationSummaryText is null)
+        if (SettingsView.AutomationSummaryText is null)
         {
             return;
         }
@@ -693,14 +729,14 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             descriptors.Add(Localize("SettingsAutomationWeeklyReminder", "Weekly reminders"));
         }
 
-        AutomationSummaryText.Text = descriptors.Count > 0
+        SettingsView.AutomationSummaryText.Text = descriptors.Count > 0
             ? string.Join(" • ", descriptors)
             : Localize("SettingsAutomationDisabled", "Automation disabled");
     }
 
     private void UpdateNotificationSummary()
     {
-        if (NotificationSummaryText is null)
+        if (SettingsView.NotificationSummaryText is null)
         {
             return;
         }
@@ -723,12 +759,12 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             summary = Localize("SettingsNotificationsMuted", "Notifications muted");
         }
 
-        NotificationSummaryText.Text = summary;
+        SettingsView.NotificationSummaryText.Text = summary;
     }
 
     private void UpdateHistoryRetentionSummary()
     {
-        if (HistoryRetentionSummaryText is null)
+        if (SettingsView.HistoryRetentionSummaryText is null)
         {
             return;
         }
@@ -740,19 +776,19 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 _historyRetentionDays)
             : Localize("SettingsHistoryRetentionOff", "Do not keep history");
 
-        HistoryRetentionSummaryText.Text = summary;
+        SettingsView.HistoryRetentionSummaryText.Text = summary;
     }
 
     private void ShowCleanerDefaultsInfo(string message, InfoBarSeverity severity)
     {
-        if (CleanerDefaultsInfoBar is null)
+        if (SettingsView.CleanerDefaultsInfoBar is null)
         {
             return;
         }
 
-        CleanerDefaultsInfoBar.Message = message;
-        CleanerDefaultsInfoBar.Severity = severity;
-        CleanerDefaultsInfoBar.IsOpen = true;
+        SettingsView.CleanerDefaultsInfoBar.Message = message;
+        SettingsView.CleanerDefaultsInfoBar.Severity = severity;
+        SettingsView.CleanerDefaultsInfoBar.IsOpen = true;
     }
 
     private string Localize(string key, string fallback)
@@ -782,11 +818,11 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
     private void SetStatus(Symbol symbol, string title, string description, int? badgeValue = null)
     {
-        StatusGlyph.Symbol = symbol;
-        StatusTitle.Text = title;
-        StatusDescription.Text = description;
-        StatusHero.Background = GetStatusHeroBrush(symbol);
-        StatusGlyph.Foreground = GetStatusGlyphBrush(symbol);
+        EmptyFoldersView.StatusGlyph.Symbol = symbol;
+        EmptyFoldersView.StatusTitle.Text = title;
+        EmptyFoldersView.StatusDescription.Text = description;
+        EmptyFoldersView.StatusHero.Background = GetStatusHeroBrush(symbol);
+        EmptyFoldersView.StatusGlyph.Foreground = GetStatusGlyphBrush(symbol);
 
         UpdateResultBadgeValue(badgeValue ?? 0);
     }
@@ -795,13 +831,13 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     {
         if (count > 0)
         {
-            ResultBadge.Value = count;
-            ResultBadge.Visibility = Visibility.Visible;
+            EmptyFoldersView.ResultBadge.Value = count;
+            EmptyFoldersView.ResultBadge.Visibility = Visibility.Visible;
         }
         else
         {
-            ResultBadge.ClearValue(InfoBadge.ValueProperty);
-            ResultBadge.Visibility = Visibility.Collapsed;
+            EmptyFoldersView.ResultBadge.ClearValue(InfoBadge.ValueProperty);
+            EmptyFoldersView.ResultBadge.Visibility = Visibility.Collapsed;
         }
     }
 
@@ -849,7 +885,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     {
         if (!string.IsNullOrWhiteSpace(customMessage))
         {
-            ResultsCaption.Text = customMessage;
+            EmptyFoldersView.ResultsCaption.Text = customMessage;
             return;
         }
 
@@ -857,20 +893,20 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         {
             if (count == 0)
             {
-                ResultsCaption.Text = Localize(
+                EmptyFoldersView.ResultsCaption.Text = Localize(
                     "ResultsFilteredEmpty",
                     "No folders match the current filters. Adjust the search or clear filters to review all items.");
             }
             else if (count == totalCount.Value)
             {
-                ResultsCaption.Text = LocalizeFormat(
+                EmptyFoldersView.ResultsCaption.Text = LocalizeFormat(
                     "ResultsAllVisible",
                     "Showing all {0} folders. Review the list below before cleaning.",
                     totalCount.Value);
             }
             else
             {
-                ResultsCaption.Text = LocalizeFormat(
+                EmptyFoldersView.ResultsCaption.Text = LocalizeFormat(
                     "ResultsFilteredSummary",
                     "Showing {0} of {1} folders after filters.",
                     count,
@@ -880,33 +916,33 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             return;
         }
 
-        ResultsCaption.Text = count > 0
+        EmptyFoldersView.ResultsCaption.Text = count > 0
             ? Localize("ResultsAvailable", "Review the folders below before cleaning.")
             : Localize("ResultsPlaceholder", "Preview results will appear here once you run a scan.");
     }
 
     private void SetActivity(string message)
     {
-        ActivityText.Text = message;
-        DiskCleanupActivityText.Text = message;
+        EmptyFoldersView.ActivityText.Text = message;
+        DiskCleanupView.DiskCleanupActivityText.Text = message;
     }
 
     private void SetBusy(bool isBusy)
     {
         _isBusy = isBusy;
-        Progress.Visibility = isBusy ? Visibility.Visible : Visibility.Collapsed;
-        Progress.IsIndeterminate = isBusy;
-        CancelBtn.Visibility = isBusy ? Visibility.Visible : Visibility.Collapsed;
-        CancelBtn.IsEnabled = isBusy;
+        EmptyFoldersView.Progress.Visibility = isBusy ? Visibility.Visible : Visibility.Collapsed;
+        EmptyFoldersView.Progress.IsIndeterminate = isBusy;
+        EmptyFoldersView.CancelBtn.Visibility = isBusy ? Visibility.Visible : Visibility.Collapsed;
+        EmptyFoldersView.CancelBtn.IsEnabled = isBusy;
         var showDiskCleanupCancel = isBusy && _isDiskCleanupOperation;
-        DiskCleanupCancelBtn.Visibility = showDiskCleanupCancel ? Visibility.Visible : Visibility.Collapsed;
-        DiskCleanupCancelBtn.IsEnabled = showDiskCleanupCancel;
-        PreviewBtn.IsEnabled = !isBusy;
-        BrowseBtn.IsEnabled = !isBusy;
-        RootPathBox.IsEnabled = !isBusy;
-        DepthBox.IsEnabled = !isBusy;
-        ExcludeBox.IsEnabled = !isBusy;
-        RecycleChk.IsEnabled = !isBusy;
+        DiskCleanupView.DiskCleanupCancelBtn.Visibility = showDiskCleanupCancel ? Visibility.Visible : Visibility.Collapsed;
+        DiskCleanupView.DiskCleanupCancelBtn.IsEnabled = showDiskCleanupCancel;
+        EmptyFoldersView.PreviewBtn.IsEnabled = !isBusy;
+        EmptyFoldersView.BrowseBtn.IsEnabled = !isBusy;
+        EmptyFoldersView.RootPathBox.IsEnabled = !isBusy;
+        EmptyFoldersView.DepthBox.IsEnabled = !isBusy;
+        EmptyFoldersView.ExcludeBox.IsEnabled = !isBusy;
+        EmptyFoldersView.RecycleChk.IsEnabled = !isBusy;
         UpdateResultFilterControls();
         UpdateResultsActionState();
         UpdateDiskCleanupActionState();
@@ -914,9 +950,9 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
     private void ShowInfo(string message, InfoBarSeverity severity)
     {
-        Info.Message = message;
-        Info.Severity = severity;
-        Info.IsOpen = true;
+        EmptyFoldersView.Info.Message = message;
+        EmptyFoldersView.Info.Severity = severity;
+        EmptyFoldersView.Info.IsOpen = true;
     }
 
     private static bool IsAdministrator()
