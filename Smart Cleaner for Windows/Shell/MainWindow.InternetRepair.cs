@@ -14,9 +14,9 @@ public sealed partial class MainWindow
 {
     private void InitializeInternetRepair()
     {
-        if (InternetRepairLogList is not null)
+        if (InternetRepairLogList is not null)/*FIXME: Cannot resolve symbol 'InternetRepairLogList'*/
         {
-            InternetRepairLogList.ItemsSource = _internetRepairLog;
+            InternetRepairLogList.ItemsSource = _internetRepairLog;/*FIXME: Cannot resolve symbol 'InternetRepairLogList'*/
         }
 
         _internetRepairLog.CollectionChanged += OnInternetRepairLogChanged;
@@ -33,11 +33,11 @@ public sealed partial class MainWindow
             Localize("InternetRepairStatusReadyTitle", "Ready to fix common issues"),
             Localize("InternetRepairStatusReadyDescription", "Select the repairs you want to run, then choose Fix now."));
         SetInternetRepairActivity(Localize("InternetRepairActivityIdle", "Waiting to start a repair."));
-        InternetRepairSummaryText.Text = Localize("InternetRepairSummaryReady", "Select the repairs you want to run.");
-        InternetRepairProgress.IsIndeterminate = false;
-        InternetRepairProgress.Value = 0;
-        InternetRepairCancelBtn.Visibility = Visibility.Collapsed;
-        InternetRepairCancelBtn.IsEnabled = false;
+        InternetRepairSummaryText.Text = Localize("InternetRepairSummaryReady", "Select the repairs you want to run.");/*FIXME: Cannot resolve symbol 'InternetRepairSummaryText'*/
+        InternetRepairProgress.IsIndeterminate = false;/*FIXME: Cannot resolve symbol 'InternetRepairProgress'*/
+        InternetRepairProgress.Value = 0;/*FIXME: Cannot resolve symbol 'InternetRepairProgress'*/
+        InternetRepairCancelBtn.Visibility = Visibility.Collapsed;/*FIXME: Cannot resolve symbol 'InternetRepairCancelBtn'*/
+        InternetRepairCancelBtn.IsEnabled = false;/*FIXME: Cannot resolve symbol 'InternetRepairCancelBtn'*/
         DismissInternetRepairInfo();
         UpdateInternetRepairSelectionState();
     }
@@ -99,7 +99,7 @@ public sealed partial class MainWindow
 
     private void UpdateInternetRepairLogPlaceholder()
     {
-        if (InternetRepairLogPlaceholder is null)
+        if (InternetRepairLogPlaceholder is null)/*FIXME: Cannot resolve symbol 'InternetRepairLogPlaceholder'*/
         {
             return;
         }
@@ -109,12 +109,12 @@ public sealed partial class MainWindow
 
     private IEnumerable<CheckBox> EnumerateInternetRepairActionCheckBoxes()
     {
-        yield return InternetRepairWinsockChk;
-        yield return InternetRepairTcpIpChk;
-        yield return InternetRepairDnsChk;
-        yield return InternetRepairReleaseChk;
-        yield return InternetRepairRenewChk;
-        yield return InternetRepairProxyChk;
+        yield return InternetRepairWinsockChk;/*FIXME: Cannot resolve symbol 'InternetRepairWinsockChk'*/
+        yield return InternetRepairTcpIpChk;/*FIXME: Cannot resolve symbol 'InternetRepairTcpIpChk'*/
+        yield return InternetRepairDnsChk;/*FIXME: Cannot resolve symbol 'InternetRepairDnsChk'*/
+        yield return InternetRepairReleaseChk;/*FIXME: Cannot resolve symbol 'InternetRepairReleaseChk'*/
+        yield return InternetRepairRenewChk;/*FIXME: Cannot resolve symbol 'InternetRepairRenewChk'*/
+        yield return InternetRepairProxyChk;/*FIXME: Cannot resolve symbol 'InternetRepairProxyChk'*/
     }
 
     private void OnInternetRepairActionSelectionChanged(object sender, RoutedEventArgs e) => UpdateInternetRepairSelectionState();

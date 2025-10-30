@@ -1,3 +1,4 @@
+using ABI.Windows.Foundation;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -14,7 +15,7 @@ public sealed partial class EmptyFoldersView : UserControl
 
     public event RoutedEventHandler? CancelRequested;
 
-    public event TreeViewSelectionChangedEventHandler? CandidatesSelectionChanged; // FIXME: Cannot resolve symbol 'TreeViewSelectionChangedEventHandler'
+    public event TypedEventHandler<TreeView, TreeViewSelectionChangedEventArgs>? CandidatesSelectionChanged;
 
     public event RoutedEventHandler? InlineExclusionsCleared;
 
@@ -32,6 +33,8 @@ public sealed partial class EmptyFoldersView : UserControl
 
     public event SelectionChangedEventHandler? ResultSortChanged;
 
+    public event RoutedEventHandler? HideExcludedToggled;
+
     public event TextChangedEventHandler? RootPathTextChanged;
 
     private void OnBrowse(object sender, RoutedEventArgs e) => BrowseRequested?.Invoke(sender, e);
@@ -40,6 +43,8 @@ public sealed partial class EmptyFoldersView : UserControl
 
     private void OnCandidatesSelectionChanged(TreeView sender, TreeViewSelectionChangedEventArgs args) =>
         CandidatesSelectionChanged?.Invoke(sender, args);
+
+    private void OnHideExcludedToggled(object sender, RoutedEventArgs e) => HideExcludedToggled?.Invoke(sender, e);
 
     private void OnClearInlineExclusions(object sender, RoutedEventArgs e) => InlineExclusionsCleared?.Invoke(sender, e);
 

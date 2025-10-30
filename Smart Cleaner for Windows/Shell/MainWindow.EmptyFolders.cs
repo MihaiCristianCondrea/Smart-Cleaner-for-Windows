@@ -92,7 +92,7 @@ public sealed partial class MainWindow
 
     public void DismissInfo()
     {
-        Info.IsOpen = false;/*FIXME:Cannot resolve symbol 'Info'*/
+        EmptyFoldersView.Info.IsOpen = false;
     }
 
     public void ShowInvalidRootSelection()
@@ -317,11 +317,11 @@ public sealed partial class MainWindow
 
     private DirectoryCleanOptions CreateOptions(bool dryRun)
     {
-        var depthValue = DepthBox.Value;/*FIXME:Cannot resolve symbol 'DepthBox'*/
+        var depthValue = EmptyFoldersView.DepthBox.Value;
         int? maxDepth = null;
         if (!double.IsNaN(depthValue))
         {
-            var depth = (int)Math.Max(0, Math.Round(depthValue));/*FIXME:<html>Ambiguous invocation.<br/>Candidates are:<br/>Round(decimal) : decimal<br/>Round(double) : double<br/>all from class Math*/
+            var depth = (int)Math.Max(0, Math.Round(depthValue, MidpointRounding.AwayFromZero));
             if (depth > 0)
             {
                 maxDepth = depth;
@@ -331,18 +331,18 @@ public sealed partial class MainWindow
         return new DirectoryCleanOptions
         {
             DryRun = dryRun,
-            SendToRecycleBin = RecycleChk.IsChecked == true,/*FIXME:Cannot resolve symbol 'RecycleChk'*/
+            SendToRecycleBin = EmptyFoldersView.RecycleChk.IsChecked == true,
             SkipReparsePoints = true,
             DeleteRootWhenEmpty = false,
             MaxDepth = maxDepth,
-            ExcludedNamePatterns = ParseExclusions(ExcludeBox.Text),/*FIXME:Cannot resolve symbol 'ExcludeBox'*/
+            ExcludedNamePatterns = ParseExclusions(EmptyFoldersView.ExcludeBox.Text),
             ExcludedFullPaths = _inlineExcludedPaths.ToArray(),
         };
     }
 
     private bool TryGetRootPath(out string root)
     {
-        root = RootPathBox.Text.Trim();/*Cannot resolve symbol 'RootPathBox'*/
+        root = EmptyFoldersView.RootPathBox.Text.Trim();
         return !string.IsNullOrWhiteSpace(root) && Directory.Exists(root);
     }
 
@@ -404,19 +404,20 @@ public sealed partial class MainWindow
 
     private void ResetResultFilters()
     {
+        var view = EmptyFoldersView;
         _currentResultSearch = string.Empty;
-        ResultsSearchBox.Text = string.Empty;/*Cannot resolve symbol 'ResultsSearchBox'*/
+        view.ResultsSearchBox.Text = string.Empty;
 
         _hideExcludedResults = false;
-        if (HideExcludedToggle.IsOn)/*Cannot resolve symbol 'HideExcludedToggle'*/
+        if (view.HideExcludedToggle.IsOn)
         {
-            HideExcludedToggle.IsOn = false;/*Cannot resolve symbol 'HideExcludedToggle'*/
+            view.HideExcludedToggle.IsOn = false;
         }
 
         _currentResultSort = EmptyFolderSortOption.NameAscending;
-        if (ResultsSortBox.SelectedIndex != 0)/*Cannot resolve symbol 'ResultsSortBox'*/
+        if (view.ResultsSortBox.SelectedIndex != 0)
         {
-            ResultsSortBox.SelectedIndex = 0;/*Cannot resolve symbol 'ResultsSortBox'*/
+            view.ResultsSortBox.SelectedIndex = 0;
         }
 
         UpdateResultFilterControls();
@@ -424,6 +425,7 @@ public sealed partial class MainWindow
 
     private void ClearPreviewTree()
     {
+        var view = EmptyFoldersView;
         foreach (var node in EnumeratePreviewNodes())
         {
             node.ExclusionChanged -= OnInlineExclusionChanged;
@@ -435,7 +437,7 @@ public sealed partial class MainWindow
         _previewCandidates.Clear();
         _inlineExcludedPaths.Clear();
         _totalPreviewCount = 0;
-        CandidatesTree.SelectedItems?.Clear();
+        view.CandidatesTree.SelectedItems?.Clear();
         UpdateResultBadgeValue(0);
         UpdateInlineExclusionSummary();
         UpdateResultFilterControls();
@@ -652,7 +654,8 @@ public sealed partial class MainWindow
 
     private void UpdateInlineExclusionSummary()
     {
-        InlineExclusionSummary.Text = _inlineExcludedPaths.Count > 0/*Cannot resolve symbol 'InlineExclusionSummary'*/
+        var view = EmptyFoldersView;
+        view.InlineExclusionSummary.Text = _inlineExcludedPaths.Count > 0
             ? LocalizeFormat("InlineExclusionSummaryCount", "Inline exclusions: {0} folder(s).", _inlineExcludedPaths.Count)
             : Localize("InlineExclusionSummaryNone", "No inline exclusions applied.");
     }
@@ -660,11 +663,12 @@ public sealed partial class MainWindow
     private void UpdateResultFilterControls()
     {
         var hasFilters = HasActiveFilters();
-        ResultsSearchBox.IsEnabled = !_isBusy;
-        ResultsSortBox.IsEnabled = !_isBusy;
-        HideExcludedToggle.IsEnabled = !_isBusy;
-        ClearFiltersBtn.IsEnabled = !_isBusy && hasFilters;
-        CandidatesTree.IsEnabled = !_isBusy;
+        var view = EmptyFoldersView;
+        view.ResultsSearchBox.IsEnabled = !_isBusy;
+        view.ResultsSortBox.IsEnabled = !_isBusy;
+        view.HideExcludedToggle.IsEnabled = !_isBusy;
+        view.ClearFiltersBtn.IsEnabled = !_isBusy && hasFilters;
+        view.CandidatesTree.IsEnabled = !_isBusy;
     }
 
     private static string GetNodeName(string fullPath)
@@ -696,13 +700,13 @@ public sealed partial class MainWindow
 
     private void OnResultSearchChanged(object sender, TextChangedEventArgs e)
     {
-        _currentResultSearch = ResultsSearchBox.Text?.Trim() ?? string.Empty;
+        _currentResultSearch = EmptyFoldersView.ResultsSearchBox.Text?.Trim() ?? string.Empty;
         RefreshPreviewTree();
     }
 
     private void OnResultSortChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (ResultsSortBox.SelectedItem is ComboBoxItem { Tag: string tag })
+        if (EmptyFoldersView.ResultsSortBox.SelectedItem is ComboBoxItem { Tag: string tag })
         {
             _currentResultSort = tag switch
             {
@@ -717,7 +721,7 @@ public sealed partial class MainWindow
 
     private void OnHideExcludedToggled(object sender, RoutedEventArgs e)
     {
-        _hideExcludedResults = HideExcludedToggle.IsOn;
+        _hideExcludedResults = EmptyFoldersView.HideExcludedToggle.IsOn;
         UpdateResultFilterControls();
         RefreshPreviewTree();
     }
@@ -727,12 +731,12 @@ public sealed partial class MainWindow
         var previousSearch = _currentResultSearch;
         var previousHide = _hideExcludedResults;
 
-        ResultsSearchBox.Text = string.Empty;
+        EmptyFoldersView.ResultsSearchBox.Text = string.Empty;
         _currentResultSearch = string.Empty;
 
-        if (HideExcludedToggle.IsOn)
+        if (EmptyFoldersView.HideExcludedToggle.IsOn)
         {
-            HideExcludedToggle.IsOn = false;
+            EmptyFoldersView.HideExcludedToggle.IsOn = false;
         }
         else if (previousHide)
         {
@@ -776,12 +780,12 @@ public sealed partial class MainWindow
 
     private IEnumerable<EmptyFolderNode> GetSelectedNodes()
     {
-        if (CandidatesTree.SelectedItems is null)
+        if (EmptyFoldersView.CandidatesTree.SelectedItems is null)
         {
             return [];
         }
 
-        return CandidatesTree.SelectedItems.OfType<EmptyFolderNode>();
+        return EmptyFoldersView.CandidatesTree.SelectedItems.OfType<EmptyFolderNode>();
     }
 
     private void OnInlineExclusionChanged(object? sender, EventArgs e)
@@ -810,10 +814,10 @@ public sealed partial class MainWindow
         var canExclude = isReady && selectedNodes.Any(n => n is { IsInlineToggleEnabled: true, IsDirectlyExcluded: false });
         var canInclude = isReady && selectedNodes.Any(n => n.IsDirectlyExcluded);
 
-        ExcludeSelectedBtn.IsEnabled = canExclude;
-        IncludeSelectedBtn.IsEnabled = canInclude;
-        ClearInlineExclusionsBtn.IsEnabled = isReady && _inlineExcludedPaths.Count > 0;
-        DeleteBtn.IsEnabled = isReady && _previewCandidates.Count > 0;
+        EmptyFoldersView.ExcludeSelectedBtn.IsEnabled = canExclude;
+        EmptyFoldersView.IncludeSelectedBtn.IsEnabled = canInclude;
+        EmptyFoldersView.ClearInlineExclusionsBtn.IsEnabled = isReady && _inlineExcludedPaths.Count > 0;
+        EmptyFoldersView.DeleteBtn.IsEnabled = isReady && _previewCandidates.Count > 0;
     }
 
     private bool HasActiveFilters()

@@ -191,7 +191,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
         EmptyFoldersView.BrowseRequested += OnBrowse;
         EmptyFoldersView.CancelRequested += OnCancel;
-        EmptyFoldersView.CandidatesSelectionChanged += OnCandidatesSelectionChanged;/*FIXME: Argument type 'method group' is not assignable to parameter type 'TreeViewSelectionChangedEventHandler?'*/
+        EmptyFoldersView.CandidatesSelectionChanged += OnCandidatesSelectionChanged;/*FIXME: Argument type 'method group' is not assignable to parameter type 'ABI.Windows.Foundation.TypedEventHandler<Microsoft.UI.Xaml.Controls.TreeView,Microsoft.UI.Xaml.Controls.TreeViewSelectionChangedEventArgs>?'*/
         EmptyFoldersView.InlineExclusionsCleared += OnClearInlineExclusions;
         EmptyFoldersView.ResultFiltersCleared += OnClearResultFilters;
         EmptyFoldersView.DeleteRequested += OnDelete;
@@ -201,6 +201,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         EmptyFoldersView.ResultSearchChanged += OnResultSearchChanged;
         EmptyFoldersView.ResultSortChanged += OnResultSortChanged;
         EmptyFoldersView.RootPathTextChanged += RootPathBox_TextChanged;
+        EmptyFoldersView.HideExcludedToggled += OnHideExcludedToggled;
 
         LargeFilesView.BrowseRequested += OnLargeFilesBrowse;
         LargeFilesView.CancelRequested += OnLargeFilesCancel;
@@ -225,8 +226,10 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         SettingsView.CleanerDefaultsApplied += OnApplyCleanerDefaults;
         SettingsView.CleanerRecyclePreferenceToggled += OnCleanerRecyclePreferenceToggled;
         SettingsView.CleanerExclusionsPreferenceChanged += OnCleanerExclusionsPreferenceChanged;
+        SettingsView.CleanerDepthPreferenceChanged += OnCleanerDepthPreferenceChanged;/*FIXME: Argument type 'method group' is not assignable to parameter type 'NumberBoxValueChangedEventHandler?'*/
         SettingsView.AutomationPreferenceToggled += OnAutomationPreferenceToggled;
         SettingsView.NotificationPreferenceToggled += OnNotificationPreferenceToggled;
+        SettingsView.HistoryRetentionChanged += OnHistoryRetentionChanged;/*FIXMEL: Argument type 'method group' is not assignable to parameter type 'NumberBoxValueChangedEventHandler?'*/
 
         CaptureDefaultAccentColors();
         LoadPreferences();

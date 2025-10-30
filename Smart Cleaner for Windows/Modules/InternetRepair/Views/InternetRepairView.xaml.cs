@@ -14,12 +14,12 @@ public sealed partial class InternetRepairView : UserControl
 
     public event RoutedEventHandler? CancelRequested;
 
-    public event SelectionChangedEventHandler? ActionSelectionChanged;
+    public event RoutedEventHandler? ActionSelectionChanged;
 
     private void OnInternetRepairRun(object sender, RoutedEventArgs e) => RunRequested?.Invoke(sender, e);
 
     private void OnInternetRepairCancel(object sender, RoutedEventArgs e) => CancelRequested?.Invoke(sender, e);
 
-    private void OnInternetRepairActionSelectionChanged(object sender, SelectionChangedEventArgs e) =>
+    private void OnInternetRepairActionSelectionChanged(object sender, RoutedEventArgs e) =>
         ActionSelectionChanged?.Invoke(sender, e);
 }

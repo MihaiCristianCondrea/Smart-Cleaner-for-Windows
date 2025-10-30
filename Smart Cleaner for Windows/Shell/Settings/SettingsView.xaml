@@ -16,7 +16,7 @@
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                         </StackPanel>
 
-                        <Border Style="{StaticResource CardStyle}"><!--FIXME: Resource 'CardStyle' is not found-->
+                        <Border Style="{StaticResource CardStyle}">
                             <StackPanel Spacing="{StaticResource Spacing.Size200}">
                                 <TextBlock Text="About" FontSize="22" FontWeight="SemiBold" />
                                 <StackPanel Spacing="{StaticResource Spacing.Size40}">
@@ -88,7 +88,7 @@
                                             Width="96"
                                             Minimum="0"
                                             Maximum="999"
-                                            ValueChanged="OnCleanerDepthPreferenceChanged" /><!--FIXME: Unable to resolve symbol 'OnCleanerDepthPreferenceChanged'-->
+                                            ValueChanged="OnCleanerDepthPreferenceChanged" />
                                     </StackPanel>
 
                                     <StackPanel Spacing="{StaticResource Spacing.Size40}">
@@ -245,7 +245,7 @@
                                             Minimum="0"
                                             Maximum="365"
                                             Value="30"
-                                            ValueChanged="OnHistoryRetentionChanged" /><!--FIXME: Unable to resolve symbol 'OnHistoryRetentionChanged'-->
+                                            ValueChanged="OnHistoryRetentionChanged" />
                                     </StackPanel>
 
                                     <TextBlock

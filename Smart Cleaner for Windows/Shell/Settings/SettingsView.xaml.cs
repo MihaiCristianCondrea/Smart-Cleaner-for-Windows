@@ -21,9 +21,13 @@ public sealed partial class SettingsView : UserControl
 
     public event TextChangedEventHandler? CleanerExclusionsPreferenceChanged;
 
+    public event NumberBoxValueChangedEventHandler? CleanerDepthPreferenceChanged;
+
     public event RoutedEventHandler? AutomationPreferenceToggled;
 
     public event RoutedEventHandler? NotificationPreferenceToggled;
+
+    public event NumberBoxValueChangedEventHandler? HistoryRetentionChanged;
 
     private void OnThemeSelectionChanged(object sender, SelectionChangedEventArgs e) => ThemeSelectionChanged?.Invoke(sender, e);
 
@@ -38,9 +42,15 @@ public sealed partial class SettingsView : UserControl
     private void OnCleanerExclusionsPreferenceChanged(object sender, TextChangedEventArgs e) =>
         CleanerExclusionsPreferenceChanged?.Invoke(sender, e);
 
+    private void OnCleanerDepthPreferenceChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) =>
+        CleanerDepthPreferenceChanged?.Invoke(sender, args);
+
     private void OnAutomationPreferenceToggled(object sender, RoutedEventArgs e) =>
         AutomationPreferenceToggled?.Invoke(sender, e);
 
     private void OnNotificationPreferenceToggled(object sender, RoutedEventArgs e) =>
         NotificationPreferenceToggled?.Invoke(sender, e);
+
+    private void OnHistoryRetentionChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) =>
+        HistoryRetentionChanged?.Invoke(sender, args);
 }

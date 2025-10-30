@@ -33,7 +33,7 @@
                                     Width="76"
                                     Height="76"
                                     CornerRadius="24"
-                                    Background="{StaticResource HeroCardOverlayBrush}"<!--FIXME:Resource 'HeroCardOverlayBrush' is not found-->
+                                    Background="{StaticResource HeroCardOverlayBrush}"
                                     VerticalAlignment="Center">
                                     <SymbolIcon
                                         x:Name="StatusGlyph" x:FieldModifier="internal"
@@ -123,7 +123,7 @@
                             </VisualStateManager.VisualStateGroups>
 
                             <StackPanel Grid.Column="0" Spacing="{StaticResource Spacing.Size160}">
-                                <Border Style="{StaticResource CardStyle}"><!--FIXME:Resource 'CardStyle' is not found-->
+                                <Border Style="{StaticResource CardStyle}">
                                     <Grid RowSpacing="{StaticResource Spacing.Size200}">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto" />
@@ -397,7 +397,7 @@
                                         x:Name="HideExcludedToggle" x:FieldModifier="internal"
                                         Grid.Column="2"
                                         Header="Hide excluded"
-                                        Toggled="OnHideExcludedToggled" <!--FIXME:Unable to resolve symbol 'OnHideExcludedToggled'-->
+                                        Toggled="OnHideExcludedToggled"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center" />
                                     <Button
@@ -461,7 +461,7 @@
                       Background="{ThemeResource LayerFillColorDefaultBrush}"
                       CornerRadius="8"
                       ToolTipService.ToolTip="{x:Bind FullPath}"
-                      Opacity="{Binding IsEffectivelyExcluded, Converter={StaticResource BoolToOpacityConverter}}"><!--FIXME: Constructor must be public-->
+                      Opacity="{Binding IsEffectivelyExcluded, Converter={StaticResource BoolToOpacityConverter}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
@@ -490,7 +490,7 @@
                         VerticalAlignment="Center">
                         <InfoBadge
                             Value="{x:Bind PathLength}"
-                            Visibility="{x:Bind IsPathLengthWarning, Converter={StaticResource BooleanToVisibilityConverter}}"<!--FIXME: Resource 'BooleanToVisibilityConverter' is not found-->
+                            Visibility="{x:Bind IsPathLengthWarning, Converter={StaticResource BooleanToVisibilityConverter}}"
                             ToolTipService.ToolTip="{x:Bind PathLengthIndicatorTooltip}" />
                     </StackPanel>
 

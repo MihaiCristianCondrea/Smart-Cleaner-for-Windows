@@ -64,44 +64,44 @@ public sealed partial class MainWindow
             min: HistoryRetentionMinDays,
             max: HistoryRetentionMaxDays);
 
-        if (CleanerRecycleToggle is not null)
+        if (CleanerRecycleToggle is not null)/*FIXME: Cannot resolve symbol 'CleanerRecycleToggle'*/
         {
-            CleanerRecycleToggle.IsOn = _cleanerSendToRecycleBin;
+            CleanerRecycleToggle.IsOn = _cleanerSendToRecycleBin;/*FIXME: Cannot resolve symbol 'CleanerRecycleToggle'*/
         }
 
-        if (CleanerDepthPreferenceBox is not null)
+        if (CleanerDepthPreferenceBox is not null)/*FIXME: Cannot resolve symbol 'CleanerDepthPreferenceBox'*/
         {
-            CleanerDepthPreferenceBox.Value = _cleanerDepthLimit;
+            CleanerDepthPreferenceBox.Value = _cleanerDepthLimit;/*FIXME: Cannot resolve symbol 'CleanerDepthPreferenceBox'*/
         }
 
-        if (CleanerExclusionsPreferenceBox is not null)
+        if (CleanerExclusionsPreferenceBox is not null)/*FIXME: Cannot resolve symbol 'CleanerExclusionsPreferenceBox'*/
         {
-            CleanerExclusionsPreferenceBox.Text = _cleanerExclusions;
+            CleanerExclusionsPreferenceBox.Text = _cleanerExclusions;/*FIXME: Cannot resolve symbol 'CleanerExclusionsPreferenceBox'*/
         }
 
-        if (AutomationAutoPreviewToggle is not null)
+        if (AutomationAutoPreviewToggle is not null)/*FIXME: Cannot resolve symbol 'AutomationAutoPreviewToggle'*/
         {
-            AutomationAutoPreviewToggle.IsOn = _automationAutoPreview;
+            AutomationAutoPreviewToggle.IsOn = _automationAutoPreview;/*FIXME: Cannot resolve symbol 'AutomationAutoPreviewToggle'*/
         }
 
-        if (AutomationReminderToggle is not null)
+        if (AutomationReminderToggle is not null)/*FIXME: Cannot resolve symbol 'AutomationReminderToggle'*/
         {
-            AutomationReminderToggle.IsOn = _automationWeeklyReminder;
+            AutomationReminderToggle.IsOn = _automationWeeklyReminder;/*FIXME: Cannot resolve symbol 'AutomationReminderToggle'*/
         }
 
-        if (NotificationCompletionToggle is not null)
+        if (NotificationCompletionToggle is not null)/*FIXME: Cannot resolve symbol 'NotificationCompletionToggle'*/
         {
-            NotificationCompletionToggle.IsOn = _notificationShowCompletion;
+            NotificationCompletionToggle.IsOn = _notificationShowCompletion;/*FIXME: Cannot resolve symbol 'NotificationCompletionToggle'*/
         }
 
-        if (NotificationDesktopToggle is not null)
+        if (NotificationDesktopToggle is not null)/*FIXME: Cannot resolve symbol 'NotificationDesktopToggle'*/
         {
-            NotificationDesktopToggle.IsOn = _notificationDesktopAlerts;
+            NotificationDesktopToggle.IsOn = _notificationDesktopAlerts;/*FIXME: Cannot resolve symbol 'NotificationDesktopToggle'*/
         }
 
-        if (HistoryRetentionNumberBox is not null)
+        if (HistoryRetentionNumberBox is not null)/*FIXME: Cannot resolve symbol 'HistoryRetentionNumberBox'*/
         {
-            HistoryRetentionNumberBox.Value = _historyRetentionDays;
+            HistoryRetentionNumberBox.Value = _historyRetentionDays;/*FIXME: Cannot resolve symbol 'HistoryRetentionNumberBox'*/
         }
 
         UpdateCleanerDefaultsSummary();
@@ -160,9 +160,9 @@ public sealed partial class MainWindow
             };
         }
 
-        if (ThemeSummaryText is not null)
+        if (ThemeSummaryText is not null)/*FIXME: Cannot resolve symbol 'ThemeSummaryText'*/
         {
-            ThemeSummaryText.Text = normalized switch
+            ThemeSummaryText.Text = normalized switch/*FIXME: Cannot resolve symbol 'ThemeSummaryText'*/
             {
                 ThemePreferenceLight => "Light",
                 ThemePreferenceDark => "Dark",
@@ -190,9 +190,9 @@ public sealed partial class MainWindow
 
     private void SelectThemeOption(string preference)
     {
-        if (ThemeRadioButtons is null) return;
+        if (ThemeRadioButtons is null) return;/*FIXME: Cannot resolve symbol 'ThemeRadioButtons'*/
 
-        ThemeRadioButtons.SelectedIndex = preference switch
+        ThemeRadioButtons.SelectedIndex = preference switch/*FIXME: Cannot resolve symbol 'ThemeRadioButtons'*/
         {
             ThemePreferenceLight => 0,
             ThemePreferenceDark => 1,
@@ -223,9 +223,9 @@ public sealed partial class MainWindow
             _accentPreference = AccentPreferenceDefault;
         }
 
-        if (AccentSummaryText is not null)
+        if (AccentSummaryText is not null)/*FIXME: Cannot resolve symbol 'AccentSummaryText'*/
         {
-            AccentSummaryText.Text = FormatAccentSummary(_accentPreference);
+            AccentSummaryText.Text = FormatAccentSummary(_accentPreference);/*FIXME: Cannot resolve symbol 'AccentSummaryText'*/
         }
 
         if (save)
@@ -260,9 +260,9 @@ public sealed partial class MainWindow
 
     private void SelectAccentOption(string preference)
     {
-        if (AccentColorRadioButtons is null) return;
+        if (AccentColorRadioButtons is null) return;/*FIXME: Cannot resolve symbol 'AccentColorRadioButtons'*/
 
-        AccentColorRadioButtons.SelectedIndex = preference switch
+        AccentColorRadioButtons.SelectedIndex = preference switch/*FIXME: Cannot resolve symbol 'AccentColorRadioButtons'*/
         {
             AccentPreferenceZest => 0,
             AccentPreferenceDefault => 1,
@@ -349,14 +349,14 @@ public sealed partial class MainWindow
         if (_isInitializingSettings) return;
         if (sender is not ToggleSwitch source) return;
 
-        if (AutomationAutoPreviewToggle is not null && ReferenceEquals(source, AutomationAutoPreviewToggle))
+        if (AutomationAutoPreviewToggle is not null && ReferenceEquals(source, AutomationAutoPreviewToggle))/*FIXME: Cannot resolve symbol 'AutomationAutoPreviewToggle'*/
         {
-            _automationAutoPreview = AutomationAutoPreviewToggle.IsOn;
+            _automationAutoPreview = AutomationAutoPreviewToggle.IsOn;/*FIXME: Cannot resolve symbol 'AutomationAutoPreviewToggle'*/
             SaveSetting(
                 AutomationAutoPreviewKey,
                 _automationAutoPreview.ToString(CultureInfo.InvariantCulture));
         }
-        else if (AutomationReminderToggle is not null && ReferenceEquals(source, AutomationReminderToggle))
+        else if (AutomationReminderToggle is not null && ReferenceEquals(source, AutomationReminderToggle))/*FIXME: Cannot resolve symbol 'AutomationReminderToggle'*/
         {
             _automationWeeklyReminder = AutomationReminderToggle.IsOn;
             SaveSetting(
@@ -372,16 +372,16 @@ public sealed partial class MainWindow
         if (_isInitializingSettings) return;
         if (sender is not ToggleSwitch source) return;
 
-        if (NotificationCompletionToggle is not null && ReferenceEquals(source, NotificationCompletionToggle))
+        if (NotificationCompletionToggle is not null && ReferenceEquals(source, NotificationCompletionToggle))/*FIXME: Cannot resolve symbol 'NotificationCompletionToggle'*/
         {
-            _notificationShowCompletion = NotificationCompletionToggle.IsOn;
+            _notificationShowCompletion = NotificationCompletionToggle.IsOn;/*FIXME: Cannot resolve symbol 'NotificationCompletionToggle'*/
             SaveSetting(
                 NotificationShowCompletionKey,
                 _notificationShowCompletion.ToString(CultureInfo.InvariantCulture));
         }
-        else if (NotificationDesktopToggle is not null && ReferenceEquals(source, NotificationDesktopToggle))
+        else if (NotificationDesktopToggle is not null && ReferenceEquals(source, NotificationDesktopToggle))/*FIXME: Cannot resolve symbol 'NotificationCompletionToggle'*/
         {
-            _notificationDesktopAlerts = NotificationDesktopToggle.IsOn;
+            _notificationDesktopAlerts = NotificationDesktopToggle.IsOn;/*FIXME: Cannot resolve symbol 'NotificationCompletionToggle'*/
             SaveSetting(
                 NotificationDesktopAlertsKey,
                 _notificationDesktopAlerts.ToString(CultureInfo.InvariantCulture));

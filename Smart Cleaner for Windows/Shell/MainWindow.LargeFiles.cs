@@ -27,7 +27,7 @@ public sealed partial class MainWindow
             var folder = await picker.PickSingleFolderAsync();
             if (folder is not null)
             {
-                LargeFilesRootPathBox.Text = folder.Path;
+                LargeFilesRootPathBox.Text = folder.Path;/*FIXME: Cannot resolve symbol 'LargeFilesRootPathBox'*/
                 ClearLargeFilesResults();
                 SetLargeFilesStatus(
                     Symbol.SaveLocal,
@@ -48,7 +48,7 @@ public sealed partial class MainWindow
 
     private void OnLargeFilesRootPathChanged(object sender, TextChangedEventArgs e)
     {
-        LargeFilesInfoBar.IsOpen = false;
+        LargeFilesInfoBar.IsOpen = false;/*FIXME: Cannot resolve symbol 'LargeFilesInfoBar'*/
 
         if (_isLargeFilesBusy)
         {
@@ -56,7 +56,7 @@ public sealed partial class MainWindow
         }
 
         ClearLargeFilesResults();
-        if (!string.IsNullOrWhiteSpace(LargeFilesRootPathBox.Text))
+        if (!string.IsNullOrWhiteSpace(LargeFilesRootPathBox.Text))/*FIXME: Cannot resolve symbol 'LargeFilesRootPathBox'*/
         {
             SetLargeFilesStatus(
                 Symbol.SaveLocal,
@@ -82,7 +82,7 @@ public sealed partial class MainWindow
                 return;
             }
 
-            LargeFilesInfoBar.IsOpen = false;
+            LargeFilesInfoBar.IsOpen = false;/*FIXME: Cannot resolve symbol 'LargeFilesInfoBar'*/
 
             if (!TryGetLargeFilesRoot(out var root))
             {
@@ -259,7 +259,7 @@ public sealed partial class MainWindow
                 return;
             }
 
-            var recycleMode = LargeFilesRecycleChk.IsChecked == true
+            var recycleMode = LargeFilesRecycleChk.IsChecked == true/*FIXME: Cannot resolve symbol 'LargeFilesRecycleChk'*/
                 ? RecycleOption.SendToRecycleBin
                 : RecycleOption.DeletePermanently;
             FileSystem.DeleteFile(item.Path, UIOption.OnlyErrorDialogs, recycleMode);
@@ -317,18 +317,18 @@ public sealed partial class MainWindow
 
     private bool TryGetLargeFilesRoot(out string root)
     {
-        root = LargeFilesRootPathBox.Text.Trim();
+        root = LargeFilesRootPathBox.Text.Trim();/*FIXME: Cannot resolve symbol 'LargeFilesRootPathBox'*/
         return !string.IsNullOrWhiteSpace(root) && Directory.Exists(root);
     }
 
     private LargeFileScanOptions CreateLargeFileOptions()
     {
-        var includeSubfolders = LargeFilesIncludeSubfoldersCheck.IsChecked != false;
-        var maxItemsValue = LargeFilesMaxItemsBox.Value;
+        var includeSubfolders = LargeFilesIncludeSubfoldersCheck.IsChecked != false;/*FIXME: Cannot resolve symbol 'LargeFilesIncludeSubfoldersCheck'*/
+        var maxItemsValue = LargeFilesMaxItemsBox.Value;/*FIXME: Cannot resolve symbol 'LargeFilesMaxItemsBox'*/
         var maxItems = 100;
         if (!double.IsNaN(maxItemsValue))
         {
-            maxItems = (int)Math.Max(1, Math.Round(maxItemsValue));
+            maxItems = (int)Math.Max(1, Math.Round(maxItemsValue));/*FIXME: <html>Ambiguous invocation.<br/>Candidates are:<br/>Round(decimal) : decimal<br/>Round(double) : double<br/>all from class Math*/
         }
 
         return new LargeFileScanOptions
@@ -336,7 +336,7 @@ public sealed partial class MainWindow
             IncludeSubdirectories = includeSubfolders,
             SkipReparsePoints = true,
             MaxResults = maxItems,
-            ExcludedNamePatterns = ParseExclusions(LargeFilesExclusionsBox.Text),
+            ExcludedNamePatterns = ParseExclusions(LargeFilesExclusionsBox.Text),/*FIXME: Cannot resolve symbol 'LargeFilesExclusionsBox'*/
             ExcludedFullPaths = _largeFileExclusions.ToList(),
         };
     }
@@ -344,8 +344,8 @@ public sealed partial class MainWindow
     private void ClearLargeFilesResults()
     {
         _largeFileGroups.Clear();
-        LargeFilesInfoBar.IsOpen = false;
-        SetLargeFilesResultsCaption(Localize("LargeFilesResultsPlaceholder", "Scan results will appear here after you run a scan."));
+        LargeFilesInfoBar.IsOpen = false;/*FIXME: Cannot resolve symbol 'LargeFilesInfoBar'*/
+        SetLargeFilesResultsCaption(Localize("LargeFilesResultsPlaceholder", "Scan results will appear here after you run a scan."));/*FIXME: Cannot resolve symbol 'LargeFilesResultBadge'*/
         LargeFilesResultBadge.ClearValue(InfoBadge.ValueProperty);
         LargeFilesResultBadge.Visibility = Visibility.Collapsed;
         UpdateLargeFilesSummary();
@@ -406,7 +406,7 @@ public sealed partial class MainWindow
             : Localize("LargeFilesResultsReady", "Review the largest files below before taking action."));
     }
 
-    private void SetLargeFilesResultsCaption(string message) => LargeFilesResultsCaption.Text = message;
+    private void SetLargeFilesResultsCaption(string message) => LargeFilesResultsCaption.Text = message;/*FIXME: Cannot resolve symbol 'LargeFilesResultsCaption'*/
 
     private void UpdateLargeFilesSummary()
     {
@@ -415,33 +415,33 @@ public sealed partial class MainWindow
 
         if (totalCount == 0)
         {
-            LargeFilesSummaryText.Text = Localize("LargeFilesSummaryPlaceholder", "No scan results yet.");
-            LargeFilesResultBadge.ClearValue(InfoBadge.ValueProperty);
-            LargeFilesResultBadge.Visibility = Visibility.Collapsed;
+            LargeFilesSummaryText.Text = Localize("LargeFilesSummaryPlaceholder", "No scan results yet.");/*FIXME: Cannot resolve symbol 'LargeFilesSummaryText'*/
+            LargeFilesResultBadge.ClearValue(InfoBadge.ValueProperty);/*FIXME: Cannot resolve symbol 'LargeFilesResultBadge'*/
+            LargeFilesResultBadge.Visibility = Visibility.Collapsed;/*FIXME: Cannot resolve symbol 'LargeFilesResultBadge'*/
             return;
         }
 
-        LargeFilesSummaryText.Text = string.Format(
+        LargeFilesSummaryText.Text = string.Format(/*FIXME: Cannot resolve symbol 'LargeFilesSummaryText'*/
             CultureInfo.CurrentCulture,
             Localize("LargeFilesSummaryDetails", "{0} • {1}"),
             FormatFileCount(totalCount),
             ValueFormatting.FormatBytes((ulong)Math.Max(0L, totalBytes)));
-        LargeFilesResultBadge.Value = totalCount;
-        LargeFilesResultBadge.Visibility = Visibility.Visible;
+        LargeFilesResultBadge.Value = totalCount;/*FIXME: Cannot resolve symbol 'LargeFilesResultBadge'*/
+        LargeFilesResultBadge.Visibility = Visibility.Visible;/*FIXME: Cannot resolve symbol 'LargeFilesResultBadge'*/
     }
 
     private void SetLargeFilesStatus(Symbol symbol, string title, string description, int? badgeValue = null)
     {
-        LargeFilesStatusGlyph.Symbol = symbol;
-        LargeFilesStatusTitle.Text = title;
-        LargeFilesStatusDescription.Text = description;
-        LargeFilesStatusHero.Background = GetStatusHeroBrush(symbol);
-        LargeFilesStatusGlyph.Foreground = GetStatusGlyphBrush(symbol);
+        LargeFilesStatusGlyph.Symbol = symbol;/*FIXME: Cannot resolve symbol 'LargeFilesStatusGlyph'*/
+        LargeFilesStatusTitle.Text = title;/*FIXME: Cannot resolve symbol 'LargeFilesStatusTitle'*/
+        LargeFilesStatusDescription.Text = description;/* FIXME: Cannot resolve symbol 'LargeFilesStatusDescription'*/
+        LargeFilesStatusHero.Background = GetStatusHeroBrush(symbol); /*FIXME: Cannot resolve symbol 'LargeFilesStatusHero'*/
+        LargeFilesStatusGlyph.Foreground = GetStatusGlyphBrush(symbol);/*FIXME: Cannot resolve symbol 'LargeFilesStatusGlyph'*/
 
         if (badgeValue is > 0)
         {
-            LargeFilesResultBadge.Value = badgeValue.Value;
-            LargeFilesResultBadge.Visibility = Visibility.Visible;
+            LargeFilesResultBadge.Value = badgeValue.Value;/*FIXME: Cannot resolve symbol 'LargeFilesResultBadge'*/
+            LargeFilesResultBadge.Visibility = Visibility.Visible;/*FIXME: Cannot resolve symbol 'LargeFilesResultBadge'*/
         }
     }
 
