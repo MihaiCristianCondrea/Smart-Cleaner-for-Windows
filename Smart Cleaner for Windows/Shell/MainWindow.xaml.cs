@@ -578,7 +578,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     }
 
 
-    private async void OnBrowse(object sender, RoutedEventArgs e)
+    private async void OnBrowse(object sender, RoutedEventArgs e) // FIXME: Avoid using 'async' for method with the 'void' return type or catch all exceptions in it: any exceptions unhandled by the method might lead to the process crash
     {
         var picker = new FolderPicker();
         picker.FileTypeFilter.Add("*");

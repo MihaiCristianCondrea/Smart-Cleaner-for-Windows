@@ -25,11 +25,6 @@ public sealed class InternetRepairService : IInternetRepairService
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (action is null)
-            {
-                continue;
-            }
-
             progress?.Report(new InternetRepairStepUpdate(action, InternetRepairStepState.Starting, null));
 
             try
@@ -81,7 +76,7 @@ public sealed class InternetRepairService : IInternetRepairService
             CreateNoWindow = true,
         };
 
-        using var process = new Process
+        using var process = new Process // FIXME: Initialize object properties inside the 'using' statement to ensure that the object is disposed if an exception is thrown during initialization
         {
             StartInfo = startInfo,
             EnableRaisingEvents = true,
@@ -92,12 +87,12 @@ public sealed class InternetRepairService : IInternetRepairService
             throw new InvalidOperationException($"Failed to start '{action.Command}'.");
         }
 
-        var outputTask = process.StandardOutput.ReadToEndAsync();
+        var outputTask = process.StandardOutput.ReadToEndAsync(); // FIXME: Method has overload with cancellation support
         var errorTask = process.StandardError.ReadToEndAsync();
 
         try
         {
-            await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
+            await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false); // FIXME: Method has overload with cancellation support
         }
         catch (OperationCanceledException)
         {
@@ -140,7 +135,7 @@ public sealed class InternetRepairService : IInternetRepairService
         }
 
         var line = text
-            .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+            .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries) // FIXME: Use collection expression
             .FirstOrDefault();
 
         return string.IsNullOrWhiteSpace(line) ? null : line.Trim();

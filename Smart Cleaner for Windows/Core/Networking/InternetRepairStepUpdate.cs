@@ -10,18 +10,14 @@ public enum InternetRepairStepState
     Cancelled
 }
 
-public sealed class InternetRepairStepUpdate
+public sealed class InternetRepairStepUpdate(
+    InternetRepairAction action,
+    InternetRepairStepState state,
+    string? message)
 {
-    public InternetRepairStepUpdate(InternetRepairAction action, InternetRepairStepState state, string? message)
-    {
-        Action = action ?? throw new ArgumentNullException(nameof(action));
-        State = state;
-        Message = message;
-    }
+    public InternetRepairAction Action { get; } = action ?? throw new ArgumentNullException(nameof(action));
 
-    public InternetRepairAction Action { get; }
+    public InternetRepairStepState State { get; } = state;
 
-    public InternetRepairStepState State { get; }
-
-    public string? Message { get; }
+    public string? Message { get; } = message;
 }

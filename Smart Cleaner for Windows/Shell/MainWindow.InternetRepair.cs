@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Smart_Cleaner_for_Windows.Core.Networking;
@@ -150,7 +149,7 @@ public sealed partial class MainWindow
         var selected = new List<InternetRepairAction>();
         foreach (var check in EnumerateInternetRepairActionCheckBoxes())
         {
-            if (check.IsChecked == true && check.Tag is string id && _internetRepairActions.TryGetValue(id, out var action))
+            if (check is { IsChecked: true, Tag: string id } && _internetRepairActions.TryGetValue(id, out var action))
             {
                 selected.Add(action);
             }
@@ -159,7 +158,7 @@ public sealed partial class MainWindow
         return selected;
     }
 
-    private async void OnInternetRepairRun(object sender, RoutedEventArgs e)
+    private async void OnInternetRepairRun(object sender, RoutedEventArgs e) // FIXME: Avoid using 'async' for method with the 'void' return type or catch all exceptions in it: any exceptions unhandled by the method might lead to the process crash
     {
         DismissInternetRepairInfo();
 
@@ -174,7 +173,7 @@ public sealed partial class MainWindow
 
         if (_internetRepairCts is { IsCancellationRequested: false })
         {
-            _internetRepairCts.Cancel();
+            _internetRepairCts.Cancel(); // FIXME: Method has async overload
         }
 
         _internetRepairCts = new CancellationTokenSource();
@@ -197,7 +196,7 @@ public sealed partial class MainWindow
         try
         {
             var progress = new Progress<InternetRepairStepUpdate>(OnInternetRepairProgress);
-            var result = await _internetRepairService.RunAsync(actions, progress, _internetRepairCts.Token);
+            var result = await _internetRepairService.RunAsync(actions, progress, _internetRepairCts.Token); // FIXME: Argument type 'System.Progress<Smart_Cleaner_for_Windows.Core.Networking.InternetRepairStepUpdate>' is not assignable to parameter type 'IProgress<InternetRepairStepUpdate>?'
             HandleInternetRepairCompletion(result);
         }
         catch (OperationCanceledException)

@@ -5,16 +5,16 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Windows.Graphics;
-using Windows.Win32;
-using Windows.Win32.Foundation;
-using Windows.Win32.UI.WindowsAndMessaging;
+using Windows.Win32; // FIXME: Cannot resolve symbol 'Win32'
+using Windows.Win32.Foundation; // FIXME: Cannot resolve symbol 'Win32'
+using Windows.Win32.UI.WindowsAndMessaging; // FIXME: Cannot resolve symbol 'Win32'
 using WinRT;
 using WinRT.Interop;
-using GdiImageType = Windows.Win32.UI.WindowsAndMessaging.GDI_IMAGE_TYPE;
-using LoadImageFlags = Windows.Win32.UI.WindowsAndMessaging.IMAGE_FLAGS;
+using GdiImageType = Windows.Win32.UI.WindowsAndMessaging.GDI_IMAGE_TYPE; // FIXME: Cannot resolve symbol 'Win32'
+using LoadImageFlags = Windows.Win32.UI.WindowsAndMessaging.IMAGE_FLAGS; // FIXME: Cannot resolve symbol 'Win32'
 using XamlSystemBackdrop = Microsoft.UI.Xaml.Media.SystemBackdrop;
 
-namespace Smart_Cleaner_for_Windows.Shell;
+namespace Smart_Cleaner_for_Windows.Shell; // FIXME: Namespace does not correspond to file location, must be: 'Smart_Cleaner_for_Windows.Shell.Themes'
 
 public sealed partial class MainWindow
 {
@@ -265,24 +265,24 @@ public sealed partial class MainWindow
             return false;
         }
 
-        var hwnd = new HWND(hwndValue);
+        var hwnd = new HWND(hwndValue); // FIXME: Cannot resolve symbol 'HWND'
 
         var iconPath = ResolveTitleBarIconPath();
         if (!string.IsNullOrEmpty(iconPath))
         {
-            var iconHandle = PInvoke.LoadImage(
+            var iconHandle = PInvoke.LoadImage( // FIXME: Cannot resolve symbol 'PInvoke'
                 default,
                 iconPath,
-                GdiImageType.IMAGE_ICON,
+                GdiImageType.IMAGE_ICON, // FIXME: Cannot resolve symbol 'GdiImageType'
                 0,
                 0,
-                LoadImageFlags.LR_DEFAULTSIZE | LoadImageFlags.LR_LOADFROMFILE);
+                LoadImageFlags.LR_DEFAULTSIZE | LoadImageFlags.LR_LOADFROMFILE); // FIXME: Cannot resolve symbol 'LoadImageFlags'
 
             if (iconHandle is not null && !iconHandle.IsInvalid)
             {
                 var iconValue = iconHandle.DangerousGetHandle();
-                var iconParam = new LPARAM(iconValue);
-                var hIcon = new HICON(iconValue);
+                var iconParam = new LPARAM(iconValue); // FIXME: Cannot resolve symbol 'LPARAM'
+                var hIcon = new HICON(iconValue); // FIXME: Cannot resolve symbol 'HICON'
 
                 try
                 {
