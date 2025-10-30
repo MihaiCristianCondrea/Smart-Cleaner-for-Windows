@@ -78,6 +78,15 @@
   <data name="ResultsNoneDetected" xml:space="preserve">
     <value>No se detectaron carpetas vacías en esta ubicación.</value>
   </data>
+  <data name="ResultsFilteredSummary" xml:space="preserve">
+    <value>Mostrando {0} de {1} carpetas tras aplicar filtros.</value>
+  </data>
+  <data name="ResultsFilteredEmpty" xml:space="preserve">
+    <value>Ninguna carpeta coincide con los filtros actuales. Ajusta la búsqueda o borra los filtros para revisar todos los elementos.</value>
+  </data>
+  <data name="ResultsAllVisible" xml:space="preserve">
+    <value>Mostrando las {0} carpetas. Revisa la lista antes de limpiar.</value>
+  </data>
   <data name="InfoFoundEmptyFolders" xml:space="preserve">
     <value>Se encontraron {0} carpeta(s) vacía(s).</value>
   </data>
@@ -164,6 +173,12 @@
   </data>
   <data name="InfoItemsNotRemoved" xml:space="preserve">
     <value>{0} elemento(s) no pudieron eliminarse.</value>
+  </data>
+  <data name="InlineExclusionSummaryCount" xml:space="preserve">
+    <value>Exclusiones en línea: {0} carpeta(s).</value>
+  </data>
+  <data name="InlineExclusionSummaryNone" xml:space="preserve">
+    <value>No hay exclusiones en línea aplicadas.</value>
   </data>
   <data name="StatusCleanWarningsTitle" xml:space="preserve">
     <value>Limpieza completada con advertencias</value>

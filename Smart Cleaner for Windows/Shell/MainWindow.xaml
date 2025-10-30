@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:empty="using:Smart_Cleaner_for_Windows.Modules.EmptyFolders.ViewModels"
     xmlns:ir="using:Smart_Cleaner_for_Windows.Modules.InternetRepair.ViewModels"
     xmlns:local="using:Smart_Cleaner_for_Windows.Shell"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -637,8 +638,10 @@
                         </Grid>
 
                         <Border Grid.Row="2" Style="{StaticResource CardStyle}">
-                            <Grid RowSpacing="16">
+                            <Grid RowSpacing="{StaticResource Spacing.Size160}">
                                 <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
@@ -666,48 +669,131 @@
                                     Text="Preview results will appear here once you run a scan."
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 
-                                <ListView
-                                    x:Name="Candidates"
-                                    Grid.Row="2"
-                                    Margin="0"
-                                    SelectionMode="None"
-                                    IsItemClickEnabled="False">
-                                    <ListView.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border
-                                                Background="{ThemeResource LayerFillColorDefaultBrush}"
-                                                CornerRadius="12"
-                                                Padding="12">
-                                                <Grid ColumnSpacing="12">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="*" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <Border
-                                                        Width="32"
-                                                        Height="32"
-                                                        CornerRadius="12"
-                                                        Background="{ThemeResource AccentFillColorTertiaryBrush}"
-                                                        HorizontalAlignment="Center"
-                                                        VerticalAlignment="Center">
-                                                        <SymbolIcon
-                                                            Symbol="Folder"
-                                                            HorizontalAlignment="Center"
-                                                            VerticalAlignment="Center"
-                                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
-                                                    </Border>
-                                                    <TextBlock
-                                                        Grid.Column="1"
-                                                        Text="{Binding}"
-                                                        TextTrimming="CharacterEllipsis"
-                                                        VerticalAlignment="Center"
-                                                        ToolTipService.ToolTip="{Binding}"
-                                                        Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                                </Grid>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ListView.ItemTemplate>
-                                </ListView>
+                                <Grid Grid.Row="2" ColumnSpacing="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox
+                                        x:Name="ResultsSearchBox"
+                                        Grid.Column="0"
+                                        PlaceholderText="Search results…"
+                                        TextChanged="OnResultSearchChanged"
+                                        Margin="0"
+                                        VerticalAlignment="Center" />
+                                    <ComboBox
+                                        x:Name="ResultsSortBox"
+                                        Grid.Column="1"
+                                        Width="180"
+                                        SelectionChanged="OnResultSortChanged"
+                                        VerticalAlignment="Center">
+                                        <ComboBoxItem Content="Name (A-Z)" Tag="NameAscending" IsSelected="True" />
+                                        <ComboBoxItem Content="Name (Z-A)" Tag="NameDescending" />
+                                        <ComboBoxItem Content="Deepest folders first" Tag="DepthDescending" />
+                                    </ComboBox>
+                                    <ToggleSwitch
+                                        x:Name="HideExcludedToggle"
+                                        Grid.Column="2"
+                                        Header="Hide excluded"
+                                        Toggled="OnHideExcludedToggled"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center" />
+                                    <Button
+                                        x:Name="ClearFiltersBtn"
+                                        Grid.Column="3"
+                                        Click="OnClearResultFilters"
+                                        VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <SymbolIcon Symbol="Clear" />
+                                            <TextBlock Text="Clear filters" />
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+
+                                <Grid Grid.Row="3" ColumnSpacing="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                        <Button x:Name="ExcludeSelectedBtn" Click="OnExcludeSelected">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <SymbolIcon Symbol="BlockContact" />
+                                                <TextBlock Text="Exclude selected" />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button x:Name="IncludeSelectedBtn" Click="OnIncludeSelected">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <SymbolIcon Symbol="Accept" />
+                                                <TextBlock Text="Include selected" />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button x:Name="ClearInlineExclusionsBtn" Click="OnClearInlineExclusions">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <SymbolIcon Symbol="Redo" />
+                                                <TextBlock Text="Clear inline exclusions" />
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        x:Name="InlineExclusionSummary"
+                                        Text="No inline exclusions applied."
+                                        HorizontalAlignment="Right"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        VerticalAlignment="Center" />
+                                </Grid>
+
+                                <TreeView x:Name="CandidatesTree"
+          Grid.Row="4"
+          SelectionMode="Multiple"
+          SelectionChanged="OnCandidatesSelectionChanged">
+
+    <TreeView.ItemTemplate>
+        <!-- The x:DataType MUST be on the DataTemplate -->
+        <DataTemplate x:DataType="empty:EmptyFolderNode">
+            <!-- For hierarchical data, wrap your item in a TreeViewItem and bind its ItemsSource -->
+            <TreeViewItem ItemsSource="{x:Bind Children}">
+                <Grid ColumnSpacing="12"
+                      Padding="8"
+                      Background="{ThemeResource LayerFillColorDefaultBrush}"
+                      CornerRadius="8"
+                      ToolTipService.ToolTip="{x:Bind FullPath}"
+                      Opacity="{Binding IsEffectivelyExcluded, Converter={StaticResource BoolToOpacityConverter}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Width="32" Height="32" CornerRadius="12"
+                            Background="{ThemeResource AccentFillColorTertiaryBrush}"
+                            HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <SymbolIcon Symbol="Folder"
+                                    Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+                    </Border>
+
+                    <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                        <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" />
+                        <TextBlock Text="{x:Bind RelativePath}"
+                                   FontSize="12"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </StackPanel>
+
+                    <ToggleButton Grid.Column="2"
+                                  Content="Exclude"
+                                  IsChecked="{x:Bind IsDirectlyExcluded, Mode=TwoWay}"
+                                  IsEnabled="{x:Bind IsInlineToggleEnabled}"
+                                  VerticalAlignment="Center"
+                                  ToolTipService.ToolTip="Exclude this folder from cleanup" />
+                </Grid>
+            </TreeViewItem>
+        </DataTemplate>
+    </TreeView.ItemTemplate>
+</TreeView>
+
                             </Grid>
                         </Border>
                     </Grid>

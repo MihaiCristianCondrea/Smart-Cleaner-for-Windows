@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Globalization;
+using System.IO;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,6 +22,7 @@ using Smart_Cleaner_for_Windows.Modules.Dashboard.ViewModels;
 using Smart_Cleaner_for_Windows.Modules.DiskCleanup.ViewModels;
 using Smart_Cleaner_for_Windows.Modules.EmptyFolders;
 using Smart_Cleaner_for_Windows.Modules.EmptyFolders.Contracts;
+using Smart_Cleaner_for_Windows.Modules.EmptyFolders.ViewModels;
 using Smart_Cleaner_for_Windows.Modules.LargeFiles.ViewModels;
 using Smart_Cleaner_for_Windows.Modules.InternetRepair.ViewModels;
 using Windows.Storage;
@@ -42,7 +43,16 @@ public sealed partial class MainWindow : IEmptyFolderCleanupView
     private MicaController? _mica;
     private SystemBackdropConfiguration? _backdropConfig;
     private readonly EmptyFolderCleanupController _emptyFolderController;
-    private List<string> _previewCandidates = new();
+    private readonly List<string> _previewCandidates = new();
+    private readonly ObservableCollection<EmptyFolderNode> _emptyFolderRoots = new();
+    private readonly ObservableCollection<EmptyFolderNode> _filteredEmptyFolderRoots = new();
+    private readonly Dictionary<string, EmptyFolderNode> _emptyFolderLookup = new(FileSystemPathComparer.PathComparer);
+    private readonly HashSet<string> _inlineExcludedPaths = new(FileSystemPathComparer.PathComparer);
+    private int _totalPreviewCount;
+    private string _currentPreviewRoot = string.Empty;
+    private string _currentResultSearch = string.Empty;
+    private bool _hideExcludedResults;
+    private EmptyFolderSortOption _currentResultSort = EmptyFolderSortOption.NameAscending;
     private bool _isBusy;
     private readonly ObservableCollection<DriveUsageViewModel> _driveUsage = new();
     private readonly ObservableCollection<DiskCleanupItemViewModel> _diskCleanupItems = new();
@@ -170,6 +180,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         InitializeComponent();
 
         _emptyFolderController = new EmptyFolderCleanupController(directoryCleaner1, this);
+        CandidatesTree.ItemsSource = _filteredEmptyFolderRoots;
 
         LargeFilesGroupList.ItemsSource = _largeFileGroups;
 
@@ -592,7 +603,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             }
 
             RootPathBox.Text = folder.Path;
-            DeleteBtn.IsEnabled = !_isBusy && _previewCandidates.Count > 0;
+            UpdateResultsActionState();
             SetStatus(
                 Symbol.Folder,
                 Localize("StatusFolderSelectedTitle", "Folder selected"),
@@ -618,9 +629,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             return;
         }
 
-        _previewCandidates.Clear();
-        Candidates.ItemsSource = null;
-        DeleteBtn.IsEnabled = false;
+        ClearPreviewTree();
         UpdateResultsSummary(0, Localize("ResultsPlaceholder", "Preview results will appear here once you run a scan."));
     }
 
@@ -779,9 +788,14 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         StatusHero.Background = GetStatusHeroBrush(symbol);
         StatusGlyph.Foreground = GetStatusGlyphBrush(symbol);
 
-        if (badgeValue is > 0)
+        UpdateResultBadgeValue(badgeValue ?? 0);
+    }
+
+    private void UpdateResultBadgeValue(int count)
+    {
+        if (count > 0)
         {
-            ResultBadge.Value = badgeValue.Value;
+            ResultBadge.Value = count;
             ResultBadge.Visibility = Visibility.Visible;
         }
         else
@@ -824,11 +838,45 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         return new SolidColorBrush(Colors.Transparent);
     }
 
-    private void UpdateResultsSummary(int count, string? customMessage = null)
+    private enum EmptyFolderSortOption
+    {
+        NameAscending,
+        NameDescending,
+        DepthDescending,
+    }
+
+    private void UpdateResultsSummary(int count, string? customMessage = null, int? totalCount = null)
     {
         if (!string.IsNullOrWhiteSpace(customMessage))
         {
             ResultsCaption.Text = customMessage;
+            return;
+        }
+
+        if (totalCount is > 0)
+        {
+            if (count == 0)
+            {
+                ResultsCaption.Text = Localize(
+                    "ResultsFilteredEmpty",
+                    "No folders match the current filters. Adjust the search or clear filters to review all items.");
+            }
+            else if (count == totalCount.Value)
+            {
+                ResultsCaption.Text = LocalizeFormat(
+                    "ResultsAllVisible",
+                    "Showing all {0} folders. Review the list below before cleaning.",
+                    totalCount.Value);
+            }
+            else
+            {
+                ResultsCaption.Text = LocalizeFormat(
+                    "ResultsFilteredSummary",
+                    "Showing {0} of {1} folders after filters.",
+                    count,
+                    totalCount.Value);
+            }
+
             return;
         }
 
@@ -854,12 +902,13 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         DiskCleanupCancelBtn.Visibility = showDiskCleanupCancel ? Visibility.Visible : Visibility.Collapsed;
         DiskCleanupCancelBtn.IsEnabled = showDiskCleanupCancel;
         PreviewBtn.IsEnabled = !isBusy;
-        DeleteBtn.IsEnabled = !isBusy && _previewCandidates.Count > 0;
         BrowseBtn.IsEnabled = !isBusy;
         RootPathBox.IsEnabled = !isBusy;
         DepthBox.IsEnabled = !isBusy;
         ExcludeBox.IsEnabled = !isBusy;
         RecycleChk.IsEnabled = !isBusy;
+        UpdateResultFilterControls();
+        UpdateResultsActionState();
         UpdateDiskCleanupActionState();
     }
 

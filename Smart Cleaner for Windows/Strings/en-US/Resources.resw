@@ -78,6 +78,15 @@
   <data name="ResultsNoneDetected" xml:space="preserve">
     <value>No empty folders were detected for this location.</value>
   </data>
+  <data name="ResultsFilteredSummary" xml:space="preserve">
+    <value>Showing {0} of {1} folders after filters.</value>
+  </data>
+  <data name="ResultsFilteredEmpty" xml:space="preserve">
+    <value>No folders match the current filters. Adjust the search or clear filters to review all items.</value>
+  </data>
+  <data name="ResultsAllVisible" xml:space="preserve">
+    <value>Showing all {0} folders. Review the list below before cleaning.</value>
+  </data>
   <data name="InfoFoundEmptyFolders" xml:space="preserve">
     <value>Found {0} empty folder(s).</value>
   </data>
@@ -164,6 +173,12 @@
   </data>
   <data name="InfoItemsNotRemoved" xml:space="preserve">
     <value>{0} item(s) could not be removed.</value>
+  </data>
+  <data name="InlineExclusionSummaryCount" xml:space="preserve">
+    <value>Inline exclusions: {0} folder(s).</value>
+  </data>
+  <data name="InlineExclusionSummaryNone" xml:space="preserve">
+    <value>No inline exclusions applied.</value>
   </data>
   <data name="StatusCleanWarningsTitle" xml:space="preserve">
     <value>Clean completed with warnings</value>

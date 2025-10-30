@@ -6,6 +6,7 @@ using System.Threading;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Smart_Cleaner_for_Windows.Core.FileSystem;
+using Smart_Cleaner_for_Windows.Modules.EmptyFolders.ViewModels;
 
 namespace Smart_Cleaner_for_Windows.Shell;
 
@@ -23,11 +24,14 @@ public sealed partial class MainWindow
                 return;
             }
 
+            _currentPreviewRoot = PathUtilities.NormalizeDirectoryPath(root);
+
             CancelActiveOperation();
             _cts = new CancellationTokenSource();
 
             try
             {
+                ResetResultFilters();
                 var options = CreateOptions(dryRun: true);
                 await _emptyFolderController.PreviewAsync(root, options, _cts.Token).ConfigureAwait(true);
             }
@@ -58,6 +62,8 @@ public sealed partial class MainWindow
                 _emptyFolderController.HandleInvalidRoot();
                 return;
             }
+
+            _currentPreviewRoot = PathUtilities.NormalizeDirectoryPath(root);
 
             CancelActiveOperation();
             _cts = new CancellationTokenSource();
@@ -102,8 +108,8 @@ public sealed partial class MainWindow
 
     public void PreparePreview()
     {
-        _previewCandidates = new List<string>();
-        Candidates.ItemsSource = null;
+        ResetResultFilters();
+        ClearPreviewTree();
         SetBusy(true);
         SetActivity(Localize("ActivityScanning", "Scanning for empty folders…"));
         SetStatus(
@@ -115,8 +121,12 @@ public sealed partial class MainWindow
 
     public void ShowPreviewResult(DirectoryCleanResult result)
     {
-        _previewCandidates = new List<string>(result.EmptyDirectories);
-        Candidates.ItemsSource = _previewCandidates;
+        _totalPreviewCount = result.EmptyFound;
+
+        ClearPreviewTree();
+        BuildPreviewTree(result.EmptyDirectories);
+        SortPreviewTree();
+        var visibleIncludedCount = ApplyPreviewFilters();
 
         var hasResults = result.EmptyFound > 0;
         var resultsMessage = result.HasFailures
@@ -124,7 +134,6 @@ public sealed partial class MainWindow
             : hasResults
                 ? Localize("ResultsReadyToReview", "Review the folders below before cleaning.")
                 : Localize("ResultsNoneDetected", "No empty folders were detected for this location.");
-        UpdateResultsSummary(result.EmptyFound, resultsMessage);
 
         var message = LocalizeFormat("InfoFoundEmptyFolders", "Found {0} empty folder(s).", result.EmptyFound);
         var severity = InfoBarSeverity.Informational;
@@ -148,6 +157,11 @@ public sealed partial class MainWindow
             severity = InfoBarSeverity.Warning;
         }
 
+        if (!string.IsNullOrWhiteSpace(resultsMessage))
+        {
+            message += Environment.NewLine + resultsMessage;
+        }
+
         var statusTitle = result.HasFailures
             ? Localize("StatusScanWarningsTitle", "Scan completed with warnings")
             : hasResults
@@ -163,7 +177,7 @@ public sealed partial class MainWindow
             : hasResults
                 ? Symbol.View
                 : Symbol.Accept;
-        int? badgeValue = hasResults ? result.EmptyFound : null;
+        int? badgeValue = visibleIncludedCount > 0 ? visibleIncludedCount : null;
 
         SetStatus(statusSymbol, statusTitle, statusDescription, badgeValue);
         SetActivity(Localize("ActivityScanComplete", "Scan complete."));
@@ -178,7 +192,10 @@ public sealed partial class MainWindow
             Symbol.Cancel,
             Localize("StatusScanCancelledTitle", "Scan cancelled"),
             Localize("StatusScanCancelledDescription", "Preview was cancelled. Adjust settings or try again."));
-        UpdateResultsSummary(0, Localize("ResultsScanCancelled", "Preview was cancelled. Run Preview to refresh the list."));
+        UpdateResultsSummary(
+            CountVisibleNodes(_filteredEmptyFolderRoots, includeExcluded: false),
+            Localize("ResultsScanCancelled", "Preview was cancelled. Run Preview to refresh the list."),
+            _totalPreviewCount == 0 ? null : _totalPreviewCount);
         ShowInfo(Localize("InfoPreviewCancelled", "Preview cancelled."), InfoBarSeverity.Informational);
     }
 
@@ -203,15 +220,17 @@ public sealed partial class MainWindow
             Localize("StatusCleaningTitle", "Cleaning in progress…"),
             Localize("StatusCleaningDescription", "Removing empty folders safely. You can cancel the operation if needed."),
             pendingBadge);
-        UpdateResultsSummary(pendingCount, pendingCount > 0
-            ? Localize("ResultsCleaningProgressWithPreview", "Cleaning in progress. We'll refresh the preview afterwards.")
-            : Localize("ResultsCleaningProgress", "Cleaning in progress…"));
+        UpdateResultsSummary(
+            pendingCount,
+            pendingCount > 0
+                ? Localize("ResultsCleaningProgressWithPreview", "Cleaning in progress. We'll refresh the preview afterwards.")
+                : Localize("ResultsCleaningProgress", "Cleaning in progress…"),
+            _totalPreviewCount == 0 ? null : _totalPreviewCount);
     }
 
     public void ShowCleanupResult(DirectoryCleanResult result)
     {
-        _previewCandidates.Clear();
-        Candidates.ItemsSource = null;
+        ClearPreviewTree();
 
         var message = result.EmptyFound == 0
             ? Localize("InfoNoEmptyFoldersDetected", "No empty folders detected.")
@@ -264,7 +283,7 @@ public sealed partial class MainWindow
             Symbol.Cancel,
             Localize("StatusCleanCancelledTitle", "Clean cancelled"),
             Localize("StatusCleanCancelledDescription", "Cleaning was cancelled. Preview again to refresh the list."));
-        UpdateResultsSummary(0, Localize("ResultsCleanCancelled", "Cleaning cancelled. Run Preview to review folders."));
+        UpdateResultsSummary(CountVisibleNodes(_filteredEmptyFolderRoots, includeExcluded: false), Localize("ResultsCleanCancelled", "Cleaning cancelled. Run Preview to review folders."), _totalPreviewCount == 0 ? null : _totalPreviewCount);
         ShowInfo(Localize("InfoCleanCancelled", "Cleaning cancelled."), InfoBarSeverity.Informational);
     }
 
@@ -317,6 +336,7 @@ public sealed partial class MainWindow
             DeleteRootWhenEmpty = false,
             MaxDepth = maxDepth,
             ExcludedNamePatterns = ParseExclusions(ExcludeBox.Text),
+            ExcludedFullPaths = _inlineExcludedPaths.ToArray(),
         };
     }
 
@@ -380,5 +400,424 @@ public sealed partial class MainWindow
         {
             SetInternetRepairActivity(Localize("ActivityCancelling", "Cancelling current operation…"));
         }
+    }
+
+    private void ResetResultFilters()
+    {
+        _currentResultSearch = string.Empty;
+        ResultsSearchBox.Text = string.Empty;
+
+        _hideExcludedResults = false;
+        if (HideExcludedToggle.IsOn)
+        {
+            HideExcludedToggle.IsOn = false;
+        }
+
+        _currentResultSort = EmptyFolderSortOption.NameAscending;
+        if (ResultsSortBox.SelectedIndex != 0)
+        {
+            ResultsSortBox.SelectedIndex = 0;
+        }
+
+        UpdateResultFilterControls();
+    }
+
+    private void ClearPreviewTree()
+    {
+        foreach (var node in EnumeratePreviewNodes())
+        {
+            node.ExclusionChanged -= OnInlineExclusionChanged;
+        }
+
+        _emptyFolderRoots.Clear();
+        _filteredEmptyFolderRoots.Clear();
+        _emptyFolderLookup.Clear();
+        _previewCandidates.Clear();
+        _inlineExcludedPaths.Clear();
+        _totalPreviewCount = 0;
+        CandidatesTree.SelectedItems?.Clear();
+        UpdateResultBadgeValue(0);
+        UpdateInlineExclusionSummary();
+        UpdateResultFilterControls();
+        UpdateResultsActionState();
+    }
+
+    private void BuildPreviewTree(IReadOnlyList<string> directories)
+    {
+        foreach (var directory in directories)
+        {
+            var normalized = PathUtilities.NormalizeDirectoryPath(directory);
+            EnsureNodeForPath(normalized);
+        }
+    }
+
+    private EmptyFolderNode EnsureNodeForPath(string fullPath)
+    {
+        if (_emptyFolderLookup.TryGetValue(fullPath, out var existing))
+        {
+            return existing;
+        }
+
+        var relative = string.IsNullOrEmpty(_currentPreviewRoot)
+            ? fullPath
+            : Path.GetRelativePath(_currentPreviewRoot, fullPath);
+
+        if (relative == "." || string.IsNullOrEmpty(relative))
+        {
+            var rootName = GetNodeName(fullPath);
+            var rootNode = new EmptyFolderNode(rootName, fullPath, rootName, depth: 0);
+            RegisterNode(rootNode, parent: null);
+            return rootNode;
+        }
+
+        var segments = relative.Split([Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar], StringSplitOptions.RemoveEmptyEntries);
+        var currentPath = _currentPreviewRoot;
+        EmptyFolderNode? parent = null;
+        EmptyFolderNode? lastNode = null;
+        var depth = 0;
+
+        foreach (var segment in segments)
+        {
+            depth++;
+            currentPath = string.IsNullOrEmpty(currentPath)
+                ? PathUtilities.NormalizeDirectoryPath(segment)
+                : PathUtilities.NormalizeDirectoryPath(Path.Combine(currentPath, segment));
+
+            if (_emptyFolderLookup.TryGetValue(currentPath, out var node))
+            {
+                parent = node;
+                lastNode = node;
+                continue;
+            }
+
+            var relativePath = string.IsNullOrEmpty(_currentPreviewRoot)
+                ? currentPath
+                : Path.GetRelativePath(_currentPreviewRoot, currentPath);
+            relativePath = NormalizeRelativeDisplayPath(relativePath, currentPath);
+
+            node = new EmptyFolderNode(segment, currentPath, relativePath, depth);
+            RegisterNode(node, parent);
+            parent = node;
+            lastNode = node;
+        }
+
+        return lastNode!;
+    }
+
+    private void RegisterNode(EmptyFolderNode node, EmptyFolderNode? parent)
+    {
+        _emptyFolderLookup[node.FullPath] = node;
+        node.IsVisible = true;
+        node.IsSearchMatch = false;
+        node.ExclusionChanged += OnInlineExclusionChanged;
+
+        if (parent is null)
+        {
+            _emptyFolderRoots.Add(node);
+        }
+        else
+        {
+            parent.AddChild(node);
+        }
+    }
+
+    private void SortPreviewTree()
+    {
+        if (_emptyFolderRoots.Count == 0)
+        {
+            return;
+        }
+
+        Comparison<EmptyFolderNode> comparison = _currentResultSort switch
+        {
+            EmptyFolderSortOption.NameDescending => (a, b) => StringComparer.CurrentCultureIgnoreCase.Compare(b.Name, a.Name),
+            EmptyFolderSortOption.DepthDescending => (a, b) =>
+            {
+                var lengthComparison = b.RelativePath.Length.CompareTo(a.RelativePath.Length);
+                return lengthComparison != 0
+                    ? lengthComparison
+                    : StringComparer.CurrentCultureIgnoreCase.Compare(a.Name, b.Name);
+            },
+            _ => (a, b) => StringComparer.CurrentCultureIgnoreCase.Compare(a.Name, b.Name),
+        };
+
+        foreach (var root in _emptyFolderRoots)
+        {
+            SortNode(root, comparison);
+        }
+    }
+
+    private void SortNode(EmptyFolderNode node, Comparison<EmptyFolderNode> comparison)
+    {
+        foreach (var child in node.AllChildren)
+        {
+            SortNode(child, comparison);
+        }
+
+        node.SortChildren(comparison);
+    }
+
+    private int ApplyPreviewFilters()
+    {
+        _filteredEmptyFolderRoots.Clear();
+
+        foreach (var root in _emptyFolderRoots)
+        {
+            if (ApplyPreviewFiltersRecursive(root))
+            {
+                _filteredEmptyFolderRoots.Add(root);
+            }
+        }
+
+        var visibleIncludedCount = CountVisibleNodes(_filteredEmptyFolderRoots, includeExcluded: false);
+        UpdateResultsSummary(visibleIncludedCount, null, _totalPreviewCount == 0 ? null : _totalPreviewCount);
+        UpdateResultBadgeValue(visibleIncludedCount);
+        UpdatePreviewCandidatesFromTree();
+        UpdateInlineExclusionSummary();
+        UpdateResultFilterControls();
+        UpdateResultsActionState();
+        return visibleIncludedCount;
+    }
+
+    private bool ApplyPreviewFiltersRecursive(EmptyFolderNode node)
+    {
+        var visibleChildren = new List<EmptyFolderNode>();
+        foreach (var child in node.AllChildren)
+        {
+            if (ApplyPreviewFiltersRecursive(child))
+            {
+                visibleChildren.Add(child);
+            }
+        }
+
+        var hasSearch = !string.IsNullOrWhiteSpace(_currentResultSearch);
+        var matchesSearch = !hasSearch || node.FullPath.Contains(_currentResultSearch, StringComparison.CurrentCultureIgnoreCase);
+        node.IsSearchMatch = hasSearch && matchesSearch;
+
+        var include = matchesSearch || visibleChildren.Count > 0;
+        if (_hideExcludedResults && node.IsEffectivelyExcluded)
+        {
+            include = false;
+        }
+
+        node.UpdateVisibleChildren(visibleChildren);
+        node.IsVisible = include;
+        return include;
+    }
+
+    private static int CountVisibleNodes(IEnumerable<EmptyFolderNode> nodes, bool includeExcluded)
+    {
+        var total = 0;
+        foreach (var node in nodes)
+        {
+            if (!node.IsVisible)
+            {
+                continue;
+            }
+
+            if (includeExcluded || !node.IsEffectivelyExcluded)
+            {
+                total++;
+            }
+
+            total += CountVisibleNodes(node.Children, includeExcluded);
+        }
+
+        return total;
+    }
+
+    private void UpdatePreviewCandidatesFromTree()
+    {
+        _previewCandidates.Clear();
+
+        foreach (var node in EnumeratePreviewNodes())
+        {
+            if (!node.IsEffectivelyExcluded)
+            {
+                _previewCandidates.Add(node.FullPath);
+            }
+        }
+    }
+
+    private IEnumerable<EmptyFolderNode> EnumeratePreviewNodes()
+    {
+        foreach (var root in _emptyFolderRoots)
+        {
+            foreach (var node in root.EnumerateSelfAndDescendants())
+            {
+                yield return node;
+            }
+        }
+    }
+
+    private void UpdateInlineExclusionSummary()
+    {
+        InlineExclusionSummary.Text = _inlineExcludedPaths.Count > 0
+            ? LocalizeFormat("InlineExclusionSummaryCount", "Inline exclusions: {0} folder(s).", _inlineExcludedPaths.Count)
+            : Localize("InlineExclusionSummaryNone", "No inline exclusions applied.");
+    }
+
+    private void UpdateResultFilterControls()
+    {
+        var hasFilters = HasActiveFilters();
+        ResultsSearchBox.IsEnabled = !_isBusy;
+        ResultsSortBox.IsEnabled = !_isBusy;
+        HideExcludedToggle.IsEnabled = !_isBusy;
+        ClearFiltersBtn.IsEnabled = !_isBusy && hasFilters;
+        CandidatesTree.IsEnabled = !_isBusy;
+    }
+
+    private static string GetNodeName(string fullPath)
+    {
+        var name = Path.GetFileName(fullPath);
+        if (string.IsNullOrEmpty(name))
+        {
+            name = fullPath;
+        }
+
+        return name;
+    }
+
+    private static string NormalizeRelativeDisplayPath(string relative, string fullPath)
+    {
+        if (string.IsNullOrEmpty(relative) || relative == ".")
+        {
+            return GetNodeName(fullPath);
+        }
+
+        return relative.Replace('/', Path.DirectorySeparatorChar);
+    }
+
+    private void RefreshPreviewTree()
+    {
+        SortPreviewTree();
+        ApplyPreviewFilters();
+    }
+
+    private void OnResultSearchChanged(object sender, TextChangedEventArgs e)
+    {
+        _currentResultSearch = ResultsSearchBox.Text?.Trim() ?? string.Empty;
+        RefreshPreviewTree();
+    }
+
+    private void OnResultSortChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (ResultsSortBox.SelectedItem is ComboBoxItem { Tag: string tag })
+        {
+            _currentResultSort = tag switch
+            {
+                "NameDescending" => EmptyFolderSortOption.NameDescending,
+                "DepthDescending" => EmptyFolderSortOption.DepthDescending,
+                _ => EmptyFolderSortOption.NameAscending,
+            };
+
+            RefreshPreviewTree();
+        }
+    }
+
+    private void OnHideExcludedToggled(object sender, RoutedEventArgs e)
+    {
+        _hideExcludedResults = HideExcludedToggle.IsOn;
+        UpdateResultFilterControls();
+        RefreshPreviewTree();
+    }
+
+    private void OnClearResultFilters(object sender, RoutedEventArgs e)
+    {
+        var previousSearch = _currentResultSearch;
+        var previousHide = _hideExcludedResults;
+
+        ResultsSearchBox.Text = string.Empty;
+        _currentResultSearch = string.Empty;
+
+        if (HideExcludedToggle.IsOn)
+        {
+            HideExcludedToggle.IsOn = false;
+        }
+        else if (previousHide)
+        {
+            _hideExcludedResults = false;
+        }
+
+        if (!previousHide)
+        {
+            RefreshPreviewTree();
+        }
+    }
+
+    private void OnExcludeSelected(object sender, RoutedEventArgs e)
+    {
+        foreach (var node in GetSelectedNodes().Where(n => n is { IsInlineToggleEnabled: true, IsDirectlyExcluded: false }))
+        {
+            node.IsDirectlyExcluded = true;
+        }
+    }
+
+    private void OnIncludeSelected(object sender, RoutedEventArgs e)
+    {
+        foreach (var node in GetSelectedNodes().Where(n => n.IsDirectlyExcluded))
+        {
+            node.IsDirectlyExcluded = false;
+        }
+    }
+
+    private void OnClearInlineExclusions(object sender, RoutedEventArgs e)
+    {
+        foreach (var node in EnumeratePreviewNodes().Where(n => n.IsDirectlyExcluded))
+        {
+            node.IsDirectlyExcluded = false;
+        }
+    }
+
+    private void OnCandidatesSelectionChanged(TreeView sender, TreeViewSelectionChangedEventArgs args)
+    {
+        UpdateResultsActionState();
+    }
+
+    private IEnumerable<EmptyFolderNode> GetSelectedNodes()
+    {
+        if (CandidatesTree.SelectedItems is null)
+        {
+            return [];
+        }
+
+        return CandidatesTree.SelectedItems.OfType<EmptyFolderNode>();
+    }
+
+    private void OnInlineExclusionChanged(object? sender, EventArgs e)
+    {
+        if (sender is not EmptyFolderNode node)
+        {
+            return;
+        }
+
+        if (node.IsDirectlyExcluded)
+        {
+            _inlineExcludedPaths.Add(node.FullPath);
+        }
+        else
+        {
+            _inlineExcludedPaths.Remove(node.FullPath);
+        }
+
+        RefreshPreviewTree();
+    }
+
+    private void UpdateResultsActionState()
+    {
+        var isReady = !_isBusy;
+        var selectedNodes = GetSelectedNodes().ToList();
+        var canExclude = isReady && selectedNodes.Any(n => n is { IsInlineToggleEnabled: true, IsDirectlyExcluded: false });
+        var canInclude = isReady && selectedNodes.Any(n => n.IsDirectlyExcluded);
+
+        ExcludeSelectedBtn.IsEnabled = canExclude;
+        IncludeSelectedBtn.IsEnabled = canInclude;
+        ClearInlineExclusionsBtn.IsEnabled = isReady && _inlineExcludedPaths.Count > 0;
+        DeleteBtn.IsEnabled = isReady && _previewCandidates.Count > 0;
+    }
+
+    private bool HasActiveFilters()
+    {
+        return !string.IsNullOrWhiteSpace(_currentResultSearch) || _hideExcludedResults;
     }
 }
