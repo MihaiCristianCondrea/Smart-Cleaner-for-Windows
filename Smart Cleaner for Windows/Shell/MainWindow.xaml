@@ -27,10 +27,6 @@
 
             <NavigationView.Resources>
                 <CornerRadius x:Key="CardCornerRadius">20</CornerRadius>
-                <LinearGradientBrush x:Key="HeroCardBrush" StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="{StaticResource Color.BrandPrimary}" Offset="0" />
-                    <GradientStop Color="{StaticResource Color.BrandSecondary}" Offset="1" />
-                </LinearGradientBrush>
                 <SolidColorBrush x:Key="HeroCardOverlayBrush" Color="{StaticResource Color.BrandOverlay}" />
                 <Style x:Key="CardStyle" TargetType="Border">
                     <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}" />
@@ -141,16 +137,16 @@
                                                     <ColumnDefinition Width="160" />
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel Spacing="{StaticResource Spacing.Size40}">
-                                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" /><!--FIXME: Constructor must be public-->
                                                     <TextBlock
-                                                        Text="{Binding Details}"
+                                                        Text="{Binding Details}" <!--FIXME: Constructor must be public-->
                                                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                         TextWrapping="Wrap" />
                                                 </StackPanel>
                                                 <StackPanel Grid.Column="1" Spacing="{StaticResource Spacing.Size40}" VerticalAlignment="Center">
-                                                    <ProgressBar Minimum="0" Maximum="100" Value="{Binding UsedPercentage}" Height="6" />
+                                                    <ProgressBar Minimum="0" Maximum="100" Value="{Binding UsedPercentage}" Height="6" /><!--FIXME: Constructor must be public-->
                                                     <TextBlock
-                                                        Text="{Binding UsageSummary}"
+                                                        Text="{Binding UsageSummary}"<!--FIXME: Constructor must be public-->
                                                         HorizontalAlignment="Right"
                                                         Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                                 </StackPanel>
@@ -371,14 +367,14 @@
                             </Grid>
                         </Border>
 
-                        <Grid x:Name="EmptyFoldersLayout" Grid.Row="1" ColumnSpacing="{StaticResource Spacing.Size240}">
+                        <Grid Grid.Row="1" ColumnSpacing="{StaticResource Spacing.Size240}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition x:Name="EmptyFoldersPrimaryColumn" Width="*" />
-                                <ColumnDefinition x:Name="EmptyFoldersSecondaryColumn" Width="360" />
+                                <ColumnDefinition x:Name="EmptyFoldersPrimaryColumn" Width="*" x:FieldModifier="public" />
+                                <ColumnDefinition Width="360" />
                             </Grid.ColumnDefinitions>
 
                             <VisualStateManager.VisualStateGroups>
@@ -421,7 +417,7 @@
                                 </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>
 
-                            <StackPanel x:Name="EmptyFoldersPrimaryPanel" Grid.Column="0" Spacing="{StaticResource Spacing.Size160}">
+                            <StackPanel Grid.Column="0" Spacing="{StaticResource Spacing.Size160}">
                                 <Border Style="{StaticResource CardStyle}">
                                     <Grid RowSpacing="{StaticResource Spacing.Size200}">
                                         <Grid.RowDefinitions>
@@ -546,7 +542,7 @@
                                 </Border>
                             </StackPanel>
 
-                            <StackPanel x:Name="EmptyFoldersDetailsPanel" Grid.Column="1" Spacing="{StaticResource Spacing.Size160}">
+                            <StackPanel Grid.Row="0" Grid.Column="1" Spacing="{StaticResource Spacing.Size160}">
                                 <Border Style="{StaticResource CardStyle}">
                                     <StackPanel Spacing="{StaticResource Spacing.Size160}">
                                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
@@ -760,7 +756,7 @@
                       Background="{ThemeResource LayerFillColorDefaultBrush}"
                       CornerRadius="8"
                       ToolTipService.ToolTip="{x:Bind FullPath}"
-                      Opacity="{Binding IsEffectivelyExcluded, Converter={StaticResource BoolToOpacityConverter}}">
+                      Opacity="{Binding IsEffectivelyExcluded, Converter={StaticResource BoolToOpacityConverter}}"><!--FIXME: Constructor must be public-->
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
@@ -789,7 +785,7 @@
                         VerticalAlignment="Center">
                         <InfoBadge
                             Value="{x:Bind PathLength}"
-                            Visibility="{x:Bind IsPathLengthWarning, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            Visibility="{x:Bind IsPathLengthWarning, Converter={StaticResource BooleanToVisibilityConverter}}"<!--FIXME: Resource 'BooleanToVisibilityConverter' is not found-->
                             ToolTipService.ToolTip="{x:Bind PathLengthIndicatorTooltip}" />
                     </StackPanel>
 
@@ -880,7 +876,6 @@
                         </Border>
 
                         <Grid
-                            x:Name="LargeFilesLayout"
                             Grid.Row="1"
                             ColumnSpacing="{StaticResource Spacing.Size240}">
                             <Grid.RowDefinitions>
@@ -888,8 +883,8 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition x:Name="LargeFilesResultsColumn" Width="*" />
-                                <ColumnDefinition x:Name="LargeFilesOptionsColumn" Width="360" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="360" />
                             </Grid.ColumnDefinitions>
 
                             <VisualStateManager.VisualStateGroups>
@@ -923,7 +918,7 @@
                                 </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>
 
-                            <StackPanel x:Name="LargeFilesResultsPanel" Grid.Column="0" Spacing="{StaticResource Spacing.Size160}">
+                            <StackPanel Grid.Column="0" Spacing="{StaticResource Spacing.Size160}">
                                 <Border Style="{StaticResource CardStyle}">
                                     <StackPanel Spacing="{StaticResource Spacing.Size160}">
                                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
@@ -963,14 +958,14 @@
                                                                 <ColumnDefinition Width="*" />
                                                                 <ColumnDefinition Width="Auto" />
                                                             </Grid.ColumnDefinitions>
-                                                            <TextBlock Text="{Binding DisplayName}" FontSize="18" FontWeight="SemiBold" />
+                                                            <TextBlock Text="{Binding DisplayName}" FontSize="18" FontWeight="SemiBold" /><!--FIXME: Constructor must be public-->
                                                             <TextBlock
                                                                 Grid.Column="1"
-                                                                Text="{Binding Summary}"
+                                                                Text="{Binding Summary}"<!--FIXME: Constructor must be public-->
                                                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                                 HorizontalAlignment="Right" />
                                                         </Grid>
-                                                        <ItemsControl ItemsSource="{Binding Items}">
+                                                        <ItemsControl ItemsSource="{Binding Items}"><!--FIXME: Constructor must be public-->
                                                             <ItemsControl.ItemsPanel>
                                                                 <ItemsPanelTemplate>
                                                                     <StackPanel Spacing="{StaticResource Spacing.Size120}" />
@@ -993,15 +988,15 @@
                                                                                     <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
                                                                                     <TextBlock
                                                                                         Grid.Column="1"
-                                                                                        Text="{Binding SizeDisplay}"
+                                                                                        Text="{Binding SizeDisplay}"<!--FIXME: Constructor must be public-->
                                                                                         Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                                                                 </Grid>
                                                                                 <TextBlock
-                                                                                    Text="{Binding Directory}"
+                                                                                    Text="{Binding Directory}"<!--FIXME: Constructor must be public-->
                                                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                                                     TextWrapping="Wrap"
                                                                                     TextTrimming="CharacterEllipsis"
-                                                                                    ToolTipService.ToolTip="{Binding Directory}" />
+                                                                                    ToolTipService.ToolTip="{Binding Directory}" /><!--FIXME: Constructor must be public-->
                                                                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
                                                                                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
                                                                                         <Border
@@ -1010,11 +1005,11 @@
                                                                                             Padding="8,2"
                                                                                             VerticalAlignment="Center">
                                                                                             <TextBlock
-                                                                                                Text="{Binding ExtensionDisplay}"
+                                                                                                Text="{Binding ExtensionDisplay}"<!--FIXME: Constructor must be public-->
                                                                                                 Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
                                                                                         </Border>
                                                                                         <TextBlock
-                                                                                            Text="{Binding TypeName}"
+                                                                                            Text="{Binding TypeName}"<!--FIXME: Constructor must be public-->
                                                                                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                                                             TextTrimming="CharacterEllipsis" />
                                                                                     </StackPanel>
@@ -1053,7 +1048,7 @@
                                 </Border>
                             </StackPanel>
 
-                            <StackPanel x:Name="LargeFilesOptionsPanel" Grid.Column="1" Spacing="{StaticResource Spacing.Size160}">
+                            <StackPanel Grid.Row="0" Grid.Column="1" Spacing="{StaticResource Spacing.Size160}">
                                 <Border Style="{StaticResource CardStyle}">
                                     <StackPanel Spacing="{StaticResource Spacing.Size200}">
                                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
@@ -1330,7 +1325,6 @@
                         </Border>
 
                         <Grid
-                            x:Name="InternetRepairLayout"
                             Grid.Row="1"
                             ColumnSpacing="{StaticResource Spacing.Size240}">
                             <Grid.RowDefinitions>
@@ -1338,8 +1332,8 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition x:Name="InternetRepairPrimaryColumn" Width="*" />
-                                <ColumnDefinition x:Name="InternetRepairSecondaryColumn" Width="360" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="360" />
                             </Grid.ColumnDefinitions>
 
                             <VisualStateManager.VisualStateGroups>
@@ -1373,7 +1367,7 @@
                                 </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>
 
-                            <StackPanel x:Name="InternetRepairPrimaryPanel" Grid.Column="0" Spacing="{StaticResource Spacing.Size160}">
+                            <StackPanel Grid.Column="0" Spacing="{StaticResource Spacing.Size160}">
                                 <Border Style="{StaticResource CardStyle}">
                                     <StackPanel Spacing="{StaticResource Spacing.Size200}">
                                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
@@ -1480,162 +1474,160 @@
                                 </Border>
                             </StackPanel>
 
-                            <StackPanel x:Name="InternetRepairSecondaryPanel" Grid.Column="1" Spacing="{StaticResource Spacing.Size160}">
-                                <Border Style="{StaticResource CardStyle}">
-                                    <StackPanel Spacing="{StaticResource Spacing.Size200}">
-                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
-                                            <Border
-                                                Width="40"
-                                                Height="40"
-                                                CornerRadius="14"
-                                                Background="{ThemeResource AccentFillColorTertiaryBrush}"
-                                                VerticalAlignment="Center">
-                                                <SymbolIcon
-                                                    Symbol="Setting"
-                                                    Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
-                                                    HorizontalAlignment="Center"
-                                                    VerticalAlignment="Center" />
-                                            </Border>
-                                            <StackPanel>
-                                                <TextBlock Text="Common fixes" FontSize="22" FontWeight="SemiBold" />
-                                                <TextBlock
-                                                    Text="Select the repairs that match your symptoms."
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    TextWrapping="Wrap" />
-                                            </StackPanel>
-                                        </StackPanel>
-
-                                        <StackPanel Spacing="{StaticResource Spacing.Size160}">
-                                            <CheckBox
-                                                x:Name="InternetRepairWinsockChk"
-                                                Tag="winsock"
-                                                Checked="OnInternetRepairActionSelectionChanged"
-                                                Unchecked="OnInternetRepairActionSelectionChanged">
-                                                <StackPanel Spacing="{StaticResource Spacing.Size40}">
-                                                    <TextBlock Text="Reset Winsock catalog" FontWeight="SemiBold" />
-                                                    <TextBlock
-                                                        Text="Repairs socket corruption that can break connectivity."
-                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                        TextWrapping="WrapWholeWords" />
-                                                </StackPanel>
-                                            </CheckBox>
-
-                                            <CheckBox
-                                                x:Name="InternetRepairTcpIpChk"
-                                                Tag="ipreset"
-                                                Checked="OnInternetRepairActionSelectionChanged"
-                                                Unchecked="OnInternetRepairActionSelectionChanged">
-                                                <StackPanel Spacing="{StaticResource Spacing.Size40}">
-                                                    <TextBlock Text="Reset TCP/IP stack" FontWeight="SemiBold" />
-                                                    <TextBlock
-                                                        Text="Rebuilds the IP stack and reverts advanced network tweaks."
-                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                        TextWrapping="WrapWholeWords" />
-                                                </StackPanel>
-                                            </CheckBox>
-
-                                            <CheckBox
-                                                x:Name="InternetRepairDnsChk"
-                                                Tag="dnsflush"
-                                                Checked="OnInternetRepairActionSelectionChanged"
-                                                Unchecked="OnInternetRepairActionSelectionChanged">
-                                                <StackPanel Spacing="{StaticResource Spacing.Size40}">
-                                                    <TextBlock Text="Flush DNS cache" FontWeight="SemiBold" />
-                                                    <TextBlock
-                                                        Text="Clears cached DNS records to resolve name lookup issues."
-                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                        TextWrapping="WrapWholeWords" />
-                                                </StackPanel>
-                                            </CheckBox>
-
-                                            <CheckBox
-                                                x:Name="InternetRepairReleaseChk"
-                                                Tag="iprelease"
-                                                Checked="OnInternetRepairActionSelectionChanged"
-                                                Unchecked="OnInternetRepairActionSelectionChanged">
-                                                <StackPanel Spacing="{StaticResource Spacing.Size40}">
-                                                    <TextBlock Text="Release IP address" FontWeight="SemiBold" />
-                                                    <TextBlock
-                                                        Text="Drops the current lease so you can request a fresh address."
-                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                        TextWrapping="WrapWholeWords" />
-                                                </StackPanel>
-                                            </CheckBox>
-
-                                            <CheckBox
-                                                x:Name="InternetRepairRenewChk"
-                                                Tag="iprenew"
-                                                Checked="OnInternetRepairActionSelectionChanged"
-                                                Unchecked="OnInternetRepairActionSelectionChanged">
-                                                <StackPanel Spacing="{StaticResource Spacing.Size40}">
-                                                    <TextBlock Text="Renew IP address" FontWeight="SemiBold" />
-                                                    <TextBlock
-                                                        Text="Requests a new DHCP lease from the network."
-                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                        TextWrapping="WrapWholeWords" />
-                                                </StackPanel>
-                                            </CheckBox>
-
-                                            <CheckBox
-                                                x:Name="InternetRepairProxyChk"
-                                                Tag="proxy"
-                                                Checked="OnInternetRepairActionSelectionChanged"
-                                                Unchecked="OnInternetRepairActionSelectionChanged">
-                                                <StackPanel Spacing="{StaticResource Spacing.Size40}">
-                                                    <TextBlock Text="Reset WinHTTP proxy" FontWeight="SemiBold" />
-                                                    <TextBlock
-                                                        Text="Clears system proxy settings that might block traffic."
-                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                        TextWrapping="WrapWholeWords" />
-                                                </StackPanel>
-                                            </CheckBox>
+                            <Border Grid.Row="0" Grid.Column="0" Style="{StaticResourceExtension CardStyle}">
+                                <StackPanel Spacing="{StaticResourceExtension Spacing.Size200}">
+                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResourceExtension Spacing.Size120}">
+                                        <Border
+                                            Width="40"
+                                            Height="40"
+                                            CornerRadius="14"
+                                            Background="{ThemeResourceExtension AccentFillColorTertiaryBrush}"
+                                            VerticalAlignment="Center">
+                                            <SymbolIcon
+                                                Symbol="Setting"
+                                                Foreground="{ThemeResourceExtension TextOnAccentFillColorPrimaryBrush}"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center" />
+                                        </Border>
+                                        <StackPanel>
+                                            <TextBlock Text="Common fixes" FontSize="22" FontWeight="SemiBold" />
+                                            <TextBlock
+                                                Text="Select the repairs that match your symptoms."
+                                                Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}"
+                                                TextWrapping="Wrap" />
                                         </StackPanel>
                                     </StackPanel>
-                                </Border>
 
-                                <Border Style="{StaticResource CardStyle}">
-                                    <StackPanel Spacing="{StaticResource Spacing.Size200}">
-                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
-                                            <Border
-                                                Width="40"
-                                                Height="40"
-                                                CornerRadius="14"
-                                                Background="{ThemeResource AccentFillColorTertiaryBrush}"
-                                                VerticalAlignment="Center">
-                                                <SymbolIcon
-                                                    Symbol="Important"
-                                                    Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
-                                                    HorizontalAlignment="Center"
-                                                    VerticalAlignment="Center" />
-                                            </Border>
-                                            <StackPanel>
-                                                <TextBlock Text="Before you run" FontSize="22" FontWeight="SemiBold" />
+                                    <StackPanel Spacing="{StaticResourceExtension Spacing.Size160}">
+                                        <CheckBox
+                                            x:Name="InternetRepairWinsockChk"
+                                            Tag="winsock"
+                                            Checked="OnInternetRepairActionSelectionChanged"
+                                            Unchecked="OnInternetRepairActionSelectionChanged">
+                                            <StackPanel Spacing="{StaticResourceExtension Spacing.Size40}">
+                                                <TextBlock Text="Reset Winsock catalog" FontWeight="SemiBold" />
                                                 <TextBlock
-                                                    Text="Most repairs require administrator privileges and may momentarily disrupt connectivity."
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    TextWrapping="Wrap" />
+                                                    Text="Repairs socket corruption that can break connectivity."
+                                                    Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}"
+                                                    TextWrapping="WrapWholeWords" />
                                             </StackPanel>
-                                        </StackPanel>
+                                        </CheckBox>
 
-                                        <StackPanel Spacing="{StaticResource Spacing.Size120}">
-                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
-                                                <SymbolIcon Symbol="Shop" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        <CheckBox
+                                            x:Name="InternetRepairTcpIpChk"
+                                            Tag="ipreset"
+                                            Checked="OnInternetRepairActionSelectionChanged"
+                                            Unchecked="OnInternetRepairActionSelectionChanged">
+                                            <StackPanel Spacing="{StaticResourceExtension Spacing.Size40}">
+                                                <TextBlock Text="Reset TCP/IP stack" FontWeight="SemiBold" />
                                                 <TextBlock
-                                                    Text="Run Smart Cleaner as an administrator for the best results."
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    TextWrapping="Wrap" />
+                                                    Text="Rebuilds the IP stack and reverts advanced network tweaks."
+                                                    Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}"
+                                                    TextWrapping="WrapWholeWords" />
                                             </StackPanel>
-                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
-                                                <SymbolIcon Symbol="Refresh" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        </CheckBox>
+
+                                        <CheckBox
+                                            x:Name="InternetRepairDnsChk"
+                                            Tag="dnsflush"
+                                            Checked="OnInternetRepairActionSelectionChanged"
+                                            Unchecked="OnInternetRepairActionSelectionChanged">
+                                            <StackPanel Spacing="{StaticResourceExtension Spacing.Size40}">
+                                                <TextBlock Text="Flush DNS cache" FontWeight="SemiBold" />
                                                 <TextBlock
-                                                    Text="Restart Windows after applying repairs if you still have trouble."
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    TextWrapping="Wrap" />
+                                                    Text="Clears cached DNS records to resolve name lookup issues."
+                                                    Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}"
+                                                    TextWrapping="WrapWholeWords" />
                                             </StackPanel>
+                                        </CheckBox>
+
+                                        <CheckBox
+                                            x:Name="InternetRepairReleaseChk"
+                                            Tag="iprelease"
+                                            Checked="OnInternetRepairActionSelectionChanged"
+                                            Unchecked="OnInternetRepairActionSelectionChanged">
+                                            <StackPanel Spacing="{StaticResourceExtension Spacing.Size40}">
+                                                <TextBlock Text="Release IP address" FontWeight="SemiBold" />
+                                                <TextBlock
+                                                    Text="Drops the current lease so you can request a fresh address."
+                                                    Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}"
+                                                    TextWrapping="WrapWholeWords" />
+                                            </StackPanel>
+                                        </CheckBox>
+
+                                        <CheckBox
+                                            x:Name="InternetRepairRenewChk"
+                                            Tag="iprenew"
+                                            Checked="OnInternetRepairActionSelectionChanged"
+                                            Unchecked="OnInternetRepairActionSelectionChanged">
+                                            <StackPanel Spacing="{StaticResourceExtension Spacing.Size40}">
+                                                <TextBlock Text="Renew IP address" FontWeight="SemiBold" />
+                                                <TextBlock
+                                                    Text="Requests a new DHCP lease from the network."
+                                                    Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}"
+                                                    TextWrapping="WrapWholeWords" />
+                                            </StackPanel>
+                                        </CheckBox>
+
+                                        <CheckBox
+                                            x:Name="InternetRepairProxyChk"
+                                            Tag="proxy"
+                                            Checked="OnInternetRepairActionSelectionChanged"
+                                            Unchecked="OnInternetRepairActionSelectionChanged">
+                                            <StackPanel Spacing="{StaticResourceExtension Spacing.Size40}">
+                                                <TextBlock Text="Reset WinHTTP proxy" FontWeight="SemiBold" />
+                                                <TextBlock
+                                                    Text="Clears system proxy settings that might block traffic."
+                                                    Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}"
+                                                    TextWrapping="WrapWholeWords" />
+                                            </StackPanel>
+                                        </CheckBox>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Row="0" Grid.Column="0" Style="{StaticResourceExtension CardStyle}">
+                                <StackPanel Spacing="{StaticResourceExtension Spacing.Size200}">
+                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResourceExtension Spacing.Size120}">
+                                        <Border
+                                            Width="40"
+                                            Height="40"
+                                            CornerRadius="14"
+                                            Background="{ThemeResourceExtension AccentFillColorTertiaryBrush}"
+                                            VerticalAlignment="Center">
+                                            <SymbolIcon
+                                                Symbol="Important"
+                                                Foreground="{ThemeResourceExtension TextOnAccentFillColorPrimaryBrush}"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center" />
+                                        </Border>
+                                        <StackPanel>
+                                            <TextBlock Text="Before you run" FontSize="22" FontWeight="SemiBold" />
+                                            <TextBlock
+                                                Text="Most repairs require administrator privileges and may momentarily disrupt connectivity."
+                                                Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}"
+                                                TextWrapping="Wrap" />
                                         </StackPanel>
                                     </StackPanel>
-                                </Border>
-                            </StackPanel>
+
+                                    <StackPanel Spacing="{StaticResourceExtension Spacing.Size120}">
+                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResourceExtension Spacing.Size80}">
+                                            <SymbolIcon Symbol="Shop" Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}" />
+                                            <TextBlock
+                                                Text="Run Smart Cleaner as an administrator for the best results."
+                                                Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}"
+                                                TextWrapping="Wrap" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResourceExtension Spacing.Size80}">
+                                            <SymbolIcon Symbol="Refresh" Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}" />
+                                            <TextBlock
+                                                Text="Restart Windows after applying repairs if you still have trouble."
+                                                Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}"
+                                                TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
                         </Grid>
                     </Grid>
                 </ScrollViewer>
@@ -1750,8 +1742,8 @@
                                             <CheckBox
                                                 Padding="0"
                                                 HorizontalContentAlignment="Stretch"
-                                                IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                                IsEnabled="{Binding CanSelect}">
+                                                IsChecked="{Binding IsSelected, Mode=TwoWay}"<!--FIXME: Constructor must be public-->
+                                                IsEnabled="{Binding CanSelect}"><!--FIXME: Constructor must be public-->
                                                 <Grid ColumnSpacing="12">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="Auto" />
@@ -1774,21 +1766,21 @@
                                                     </Border>
                                                     <StackPanel Grid.Column="1" Spacing="2">
                                                         <TextBlock
-                                                            Text="{Binding Name}"
+                                                            Text="{Binding Name}"<!--FIXME: Constructor must be public-->
                                                             FontWeight="SemiBold"
                                                             TextWrapping="Wrap" />
                                                         <TextBlock
-                                                            Text="{Binding Description}"
+                                                            Text="{Binding Description}"<!--FIXME: Constructor must be public-->
                                                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                             TextWrapping="Wrap" />
                                                         <TextBlock
-                                                            Text="{Binding ErrorMessage}"
+                                                            Text="{Binding ErrorMessage}"<!--FIXME: Constructor must be public-->
                                                             Foreground="{ThemeResource SystemFillColorCriticalBrush}"
                                                             TextWrapping="Wrap" />
                                                     </StackPanel>
                                                     <TextBlock
                                                         Grid.Column="2"
-                                                        Text="{Binding FormattedSize}"
+                                                        Text="{Binding FormattedSize}"<!--FIXME: Constructor must be public-->
                                                         HorizontalAlignment="Right"
                                                         VerticalAlignment="Center"
                                                         FontWeight="SemiBold" />
