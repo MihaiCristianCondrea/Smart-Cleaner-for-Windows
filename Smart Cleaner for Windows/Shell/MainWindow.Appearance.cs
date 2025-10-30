@@ -14,7 +14,7 @@ using GdiImageType = Windows.Win32.UI.WindowsAndMessaging.GDI_IMAGE_TYPE; // FIX
 using LoadImageFlags = Windows.Win32.UI.WindowsAndMessaging.IMAGE_FLAGS; // FIXME: Cannot resolve symbol 'Win32'
 using XamlSystemBackdrop = Microsoft.UI.Xaml.Media.SystemBackdrop;
 
-namespace Smart_Cleaner_for_Windows.Shell; // FIXME: Namespace does not correspond to file location, must be: 'Smart_Cleaner_for_Windows.Shell.Themes'
+namespace Smart_Cleaner_for_Windows.Shell;
 
 public sealed partial class MainWindow
 {

@@ -4,19 +4,12 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Smart_Cleaner_for_Windows.Modules.InternetRepair.ViewModels;
 
-public sealed class InternetRepairLogEntry : INotifyPropertyChanged
+public sealed class InternetRepairLogEntry(string title) : INotifyPropertyChanged
 {
-    private Symbol _icon;
-    private string _description;
+    private Symbol _icon = Symbol.Sync;
+    private string _description = string.Empty;
 
-    public InternetRepairLogEntry(string title)
-    {
-        Title = title;
-        _description = string.Empty;
-        _icon = Symbol.Sync;
-    }
-
-    public string Title { get; }
+    public string Title { get; } = title;
 
     public Symbol Icon
     {

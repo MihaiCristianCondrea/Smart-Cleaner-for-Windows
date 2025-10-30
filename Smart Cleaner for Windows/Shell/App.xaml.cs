@@ -2,7 +2,7 @@ using Microsoft.UI.Xaml;
 
 namespace Smart_Cleaner_for_Windows.Shell;
 
-public partial class App : Application // FIXME: Base type 'Application' is already specified in other parts
+public partial class App
 {
     private Window? _window;
 

@@ -11,53 +11,76 @@ namespace Smart_Cleaner_for_Windows.Shell;
 
 public sealed partial class MainWindow
 {
-    private async void OnPreview(object sender, RoutedEventArgs e) // FIXME: Avoid using 'async' for method with the 'void' return type or catch all exceptions in it: any exceptions unhandled by the method might lead to the process crash
+    private async void OnPreview(object sender, RoutedEventArgs e)
     {
-        _emptyFolderController.DismissInfo();
-
-        if (!TryGetRootPath(out var root))
-        {
-            _emptyFolderController.HandleInvalidRoot();
-            return;
-        }
-
-        CancelActiveOperation();
-        _cts = new CancellationTokenSource();
-
         try
         {
-            var options = CreateOptions(dryRun: true);
-            await _emptyFolderController.PreviewAsync(root, options, _cts.Token);
+            _emptyFolderController.DismissInfo();
+
+            if (!TryGetRootPath(out var root))
+            {
+                _emptyFolderController.HandleInvalidRoot();
+                return;
+            }
+
+            CancelActiveOperation();
+            _cts = new CancellationTokenSource();
+
+            try
+            {
+                var options = CreateOptions(dryRun: true);
+                await _emptyFolderController.PreviewAsync(root, options, _cts.Token).ConfigureAwait(true);
+            }
+            finally
+            {
+                _cts?.Dispose();
+                _cts = null;
+            }
         }
-        finally
+        catch (Exception ex)
         {
-            _cts?.Dispose();
-            _cts = null;
+            ShowInfo(string.Format(
+                    System.Globalization.CultureInfo.CurrentCulture,
+                    Localize("InfoPreviewUnexpectedError", "Preview failed: {0}"),
+                    ex.Message),
+                InfoBarSeverity.Error);
         }
     }
 
-    private async void OnDelete(object sender, RoutedEventArgs e) // FIXME: Avoid using 'async' for method with the 'void' return type or catch all exceptions in it: any exceptions unhandled by the method might lead to the process crash
+    private async void OnDelete(object sender, RoutedEventArgs e)
     {
-        _emptyFolderController.DismissInfo();
-
-        if (!TryGetRootPath(out var root))
-        {
-            _emptyFolderController.HandleInvalidRoot();
-            return;
-        }
-
-        CancelActiveOperation();
-        _cts = new CancellationTokenSource();
-
         try
         {
-            var options = CreateOptions(dryRun: false);
-            await _emptyFolderController.CleanupAsync(root, options, _previewCandidates.Count, _cts.Token);
+            _emptyFolderController.DismissInfo();
+
+            if (!TryGetRootPath(out var root))
+            {
+                _emptyFolderController.HandleInvalidRoot();
+                return;
+            }
+
+            CancelActiveOperation();
+            _cts = new CancellationTokenSource();
+
+            try
+            {
+                var options = CreateOptions(dryRun: false);
+                await _emptyFolderController.CleanupAsync(root, options, _previewCandidates.Count, _cts.Token)
+                    .ConfigureAwait(true);
+            }
+            finally
+            {
+                _cts?.Dispose();
+                _cts = null;
+            }
         }
-        finally
+        catch (Exception ex)
         {
-            _cts?.Dispose();
-            _cts = null;
+            ShowInfo(string.Format(
+                    System.Globalization.CultureInfo.CurrentCulture,
+                    Localize("InfoCleanupUnexpectedError", "Cleanup failed: {0}"),
+                    ex.Message),
+                InfoBarSeverity.Error);
         }
     }
 

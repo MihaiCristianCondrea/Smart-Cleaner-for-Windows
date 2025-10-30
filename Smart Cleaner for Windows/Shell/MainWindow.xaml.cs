@@ -578,21 +578,37 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     }
 
 
-    private async void OnBrowse(object sender, RoutedEventArgs e) // FIXME: Avoid using 'async' for method with the 'void' return type or catch all exceptions in it: any exceptions unhandled by the method might lead to the process crash
+    private async void OnBrowse(object sender, RoutedEventArgs e)
     {
-        var picker = new FolderPicker();
-        picker.FileTypeFilter.Add("*");
-        InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
-        var folder = await picker.PickSingleFolderAsync();
-        if (folder is null) return;
-        RootPathBox.Text = folder.Path;
-        DeleteBtn.IsEnabled = !_isBusy && _previewCandidates.Count > 0;
-        SetStatus(
-            Symbol.Folder,
-            Localize("StatusFolderSelectedTitle", "Folder selected"),
-            Localize("StatusFolderSelectedDescription", "Run Preview to identify empty directories."));
-        SetActivity(Localize("ActivityReadyToScan", "Ready to scan the selected folder."));
-        UpdateResultsSummary(0, Localize("ResultsPlaceholder", "Preview results will appear here once you run a scan."));
+        try
+        {
+            var picker = new FolderPicker();
+            picker.FileTypeFilter.Add("*");
+            InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
+            var folder = await picker.PickSingleFolderAsync();
+            if (folder is null)
+            {
+                return;
+            }
+
+            RootPathBox.Text = folder.Path;
+            DeleteBtn.IsEnabled = !_isBusy && _previewCandidates.Count > 0;
+            SetStatus(
+                Symbol.Folder,
+                Localize("StatusFolderSelectedTitle", "Folder selected"),
+                Localize("StatusFolderSelectedDescription", "Run Preview to identify empty directories."));
+            SetActivity(Localize("ActivityReadyToScan", "Ready to scan the selected folder."));
+            UpdateResultsSummary(0, Localize("ResultsPlaceholder", "Preview results will appear here once you run a scan."));
+        }
+        catch (Exception ex)
+        {
+            ShowInfo(
+                string.Format(
+                    CultureInfo.CurrentCulture,
+                    Localize("InfoBrowseFailed", "Couldn't select a folder: {0}"),
+                    ex.Message),
+                InfoBarSeverity.Error);
+        }
     }
 
     private void RootPathBox_TextChanged(object sender, TextChangedEventArgs e)

@@ -76,23 +76,21 @@ public sealed class InternetRepairService : IInternetRepairService
             CreateNoWindow = true,
         };
 
-        using var process = new Process // FIXME: Initialize object properties inside the 'using' statement to ensure that the object is disposed if an exception is thrown during initialization
-        {
-            StartInfo = startInfo,
-            EnableRaisingEvents = true,
-        };
+        using var process = new Process();
+        process.StartInfo = startInfo;
+        process.EnableRaisingEvents = true;
 
         if (!process.Start())
         {
             throw new InvalidOperationException($"Failed to start '{action.Command}'.");
         }
 
-        var outputTask = process.StandardOutput.ReadToEndAsync(); // FIXME: Method has overload with cancellation support
-        var errorTask = process.StandardError.ReadToEndAsync();
+        var outputTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
+        var errorTask = process.StandardError.ReadToEndAsync(cancellationToken);
 
         try
         {
-            await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false); // FIXME: Method has overload with cancellation support
+            await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -135,7 +133,7 @@ public sealed class InternetRepairService : IInternetRepairService
         }
 
         var line = text
-            .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries) // FIXME: Use collection expression
+            .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
             .FirstOrDefault();
 
         return string.IsNullOrWhiteSpace(line) ? null : line.Trim();

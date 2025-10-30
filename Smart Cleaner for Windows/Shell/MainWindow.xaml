@@ -1522,7 +1522,7 @@
 
                                         <StackPanel Spacing="{StaticResource Spacing.Size120}">
                                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
-                                                <SymbolIcon Symbol="Shield" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <SymbolIcon Symbol="Shop" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                                 <TextBlock
                                                     Text="Run Smart Cleaner as an administrator for the best results."
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"

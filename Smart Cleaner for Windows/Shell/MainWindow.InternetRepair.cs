@@ -158,73 +158,101 @@ public sealed partial class MainWindow
         return selected;
     }
 
-    private async void OnInternetRepairRun(object sender, RoutedEventArgs e) // FIXME: Avoid using 'async' for method with the 'void' return type or catch all exceptions in it: any exceptions unhandled by the method might lead to the process crash
+    private async void OnInternetRepairRun(object sender, RoutedEventArgs e)
     {
-        DismissInternetRepairInfo();
-
-        var actions = GetSelectedInternetRepairActions();
-        if (actions.Count == 0)
-        {
-            ShowInternetRepairInfo(
-                Localize("InternetRepairInfoNoSelection", "Select at least one repair before running."),
-                InfoBarSeverity.Warning);
-            return;
-        }
-
-        if (_internetRepairCts is { IsCancellationRequested: false })
-        {
-            _internetRepairCts.Cancel(); // FIXME: Method has async overload
-        }
-
-        _internetRepairCts = new CancellationTokenSource();
-        _internetRepairLogLookup.Clear();
-        _internetRepairLog.Clear();
-        InternetRepairProgress.Value = 0;
-        InternetRepairProgress.IsIndeterminate = true;
-
-        SetInternetRepairBusy(true);
-        SetInternetRepairStatus(
-            Symbol.Sync,
-            Localize("InternetRepairStatusRunningTitle", "Applying fixes…"),
-            Localize("InternetRepairStatusRunningDescription", "Hang tight while we apply the selected network repairs."));
-        SetInternetRepairActivity(Localize("InternetRepairActivityRunning", "Running network repair actions…"));
-        InternetRepairSummaryText.Text = LocalizeFormat(
-            "InternetRepairSummaryRunning",
-            "Running {0} repair action(s)…",
-            actions.Count);
-
         try
         {
-            var progress = new Progress<InternetRepairStepUpdate>(OnInternetRepairProgress);
-            var result = await _internetRepairService.RunAsync(actions, progress, _internetRepairCts.Token); // FIXME: Argument type 'System.Progress<Smart_Cleaner_for_Windows.Core.Networking.InternetRepairStepUpdate>' is not assignable to parameter type 'IProgress<InternetRepairStepUpdate>?'
-            HandleInternetRepairCompletion(result);
-        }
-        catch (OperationCanceledException)
-        {
-            HandleInternetRepairCancelled();
+            DismissInternetRepairInfo();
+
+            var actions = GetSelectedInternetRepairActions();
+            if (actions.Count == 0)
+            {
+                ShowInternetRepairInfo(
+                    Localize("InternetRepairInfoNoSelection", "Select at least one repair before running."),
+                    InfoBarSeverity.Warning);
+                return;
+            }
+
+            if (_internetRepairCts is { IsCancellationRequested: false } previousCts)
+            {
+                try
+                {
+                    await previousCts.CancelAsync().ConfigureAwait(true);
+                }
+                catch (Exception ex)
+                {
+                    ShowInternetRepairInfo($"Error: {ex.Message}", InfoBarSeverity.Error);
+                }
+            }
+
+            _internetRepairCts = new CancellationTokenSource();
+            _internetRepairLogLookup.Clear();
+            _internetRepairLog.Clear();
+            InternetRepairProgress.Value = 0;
+            InternetRepairProgress.IsIndeterminate = true;
+
+            SetInternetRepairBusy(true);
+            SetInternetRepairStatus(
+                Symbol.Sync,
+                Localize("InternetRepairStatusRunningTitle", "Applying fixes…"),
+                Localize("InternetRepairStatusRunningDescription", "Hang tight while we apply the selected network repairs."));
+            SetInternetRepairActivity(Localize("InternetRepairActivityRunning", "Running network repair actions…"));
+            InternetRepairSummaryText.Text = LocalizeFormat(
+                "InternetRepairSummaryRunning",
+                "Running {0} repair action(s)…",
+                actions.Count);
+
+            try
+            {
+                IProgress<InternetRepairStepUpdate> progress = new Progress<InternetRepairStepUpdate>(OnInternetRepairProgress);
+                var result = await _internetRepairService.RunAsync(actions, progress, _internetRepairCts.Token)
+                    .ConfigureAwait(true);
+                HandleInternetRepairCompletion(result);
+            }
+            catch (OperationCanceledException)
+            {
+                HandleInternetRepairCancelled();
+            }
+            catch (Exception ex)
+            {
+                ShowInternetRepairInfo($"Error: {ex.Message}", InfoBarSeverity.Error);
+                SetInternetRepairStatus(
+                    Symbol.Important,
+                    Localize("InternetRepairStatusWarningsTitle", "Repairs completed with issues"),
+                    Localize("InternetRepairStatusWarningsDescription", "Some repairs failed. Review the log for details."));
+                InternetRepairSummaryText.Text = Localize("InternetRepairSummaryError", "The last run encountered issues.");
+                SetInternetRepairActivity(Localize("ActivitySomethingWentWrong", "Something went wrong."));
+            }
+            finally
+            {
+                _internetRepairCts?.Dispose();
+                _internetRepairCts = null;
+                InternetRepairProgress.IsIndeterminate = false;
+                InternetRepairProgress.Value = 0;
+                SetInternetRepairBusy(false);
+                UpdateInternetRepairSelectionState();
+            }
         }
         catch (Exception ex)
         {
             ShowInternetRepairInfo($"Error: {ex.Message}", InfoBarSeverity.Error);
-            SetInternetRepairStatus(
-                Symbol.Important,
-                Localize("InternetRepairStatusWarningsTitle", "Repairs completed with issues"),
-                Localize("InternetRepairStatusWarningsDescription", "Some repairs failed. Review the log for details."));
-            InternetRepairSummaryText.Text = Localize("InternetRepairSummaryError", "The last run encountered issues.");
-            SetInternetRepairActivity(Localize("ActivitySomethingWentWrong", "Something went wrong."));
-        }
-        finally
-        {
-            _internetRepairCts?.Dispose();
-            _internetRepairCts = null;
-            InternetRepairProgress.IsIndeterminate = false;
-            InternetRepairProgress.Value = 0;
-            SetInternetRepairBusy(false);
-            UpdateInternetRepairSelectionState();
         }
     }
 
-    private void OnInternetRepairCancel(object sender, RoutedEventArgs e) => _internetRepairCts?.Cancel();
+    private async void OnInternetRepairCancel(object sender, RoutedEventArgs e)
+    {
+        if (_internetRepairCts is { IsCancellationRequested: false } cts)
+        {
+            try
+            {
+                await cts.CancelAsync().ConfigureAwait(true);
+            }
+            catch (Exception ex)
+            {
+                ShowInternetRepairInfo($"Error: {ex.Message}", InfoBarSeverity.Error);
+            }
+        }
+    }
 
     private void SetInternetRepairBusy(bool isBusy)
     {

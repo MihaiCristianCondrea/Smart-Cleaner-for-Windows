@@ -17,21 +17,32 @@ namespace Smart_Cleaner_for_Windows.Shell;
 
 public sealed partial class MainWindow
 {
-    private async void OnLargeFilesBrowse(object sender, RoutedEventArgs e) // FIXME: Avoid using 'async' for method with the 'void' return type or catch all exceptions in it: any exceptions unhandled by the method might lead to the process crash
+    private async void OnLargeFilesBrowse(object sender, RoutedEventArgs e)
     {
-        var picker = new FolderPicker();
-        picker.FileTypeFilter.Add("*");
-        InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
-        var folder = await picker.PickSingleFolderAsync();
-        if (folder is not null)
+        try
         {
-            LargeFilesRootPathBox.Text = folder.Path;
-            ClearLargeFilesResults();
-            SetLargeFilesStatus(
-                Symbol.SaveLocal,
-                Localize("LargeFilesStatusFolderSelectedTitle", "Folder selected"),
-                Localize("LargeFilesStatusFolderSelectedDescription", "Run Scan to find the largest files in this location."));
-            SetLargeFilesActivity(Localize("ActivityReadyToScan", "Ready to scan the selected folder."));
+            var picker = new FolderPicker();
+            picker.FileTypeFilter.Add("*");
+            InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
+            var folder = await picker.PickSingleFolderAsync();
+            if (folder is not null)
+            {
+                LargeFilesRootPathBox.Text = folder.Path;
+                ClearLargeFilesResults();
+                SetLargeFilesStatus(
+                    Symbol.SaveLocal,
+                    Localize("LargeFilesStatusFolderSelectedTitle", "Folder selected"),
+                    Localize("LargeFilesStatusFolderSelectedDescription", "Run Scan to find the largest files in this location."));
+                SetLargeFilesActivity(Localize("ActivityReadyToScan", "Ready to scan the selected folder."));
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowLargeFilesInfo(string.Format(
+                    CultureInfo.CurrentCulture,
+                    Localize("LargeFilesInfoBrowseFailed", "Couldn't select a folder: {0}"),
+                    ex.Message),
+                InfoBarSeverity.Error);
         }
     }
 
@@ -61,112 +72,136 @@ public sealed partial class MainWindow
         }
     }
 
-    private async void OnLargeFilesScan(object sender, RoutedEventArgs e) // FIXME: Avoid using 'async' for method with the 'void' return type or catch all exceptions in it: any exceptions unhandled by the method might lead to the process crash
+    private async void OnLargeFilesScan(object sender, RoutedEventArgs e)
     {
-        if (_isLargeFilesBusy)
-        {
-            ShowLargeFilesInfo(Localize("LargeFilesInfoScanInProgress", "Finish the current scan before starting a new one."), InfoBarSeverity.Warning);
-            return;
-        }
-
-        LargeFilesInfoBar.IsOpen = false;
-
-        if (!TryGetLargeFilesRoot(out var root))
-        {
-            ShowLargeFilesInfo(Localize("LargeFilesInfoSelectValidFolder", "Select a valid folder to scan."), InfoBarSeverity.Warning);
-            SetLargeFilesStatus(
-                Symbol.Important,
-                Localize("LargeFilesStatusSelectValidFolderTitle", "Select a valid folder"),
-                Localize("LargeFilesStatusSelectValidFolderDescription", "Choose a folder before running the scan."));
-            SetLargeFilesResultsCaption(Localize("LargeFilesResultsNeedValidFolder", "Select a valid folder to run a scan."));
-            return;
-        }
-
-        await _largeFilesCts?.CancelAsync(); // FIXME: Dereference of a possibly null reference
-        _largeFilesCts?.Dispose();
-        _largeFilesCts = new CancellationTokenSource();
-
-        ClearLargeFilesResults();
-
-        SetLargeFilesBusy(true);
-        SetLargeFilesActivity(Localize("LargeFilesActivityScanning", "Scanning for large files…"));
-        SetLargeFilesResultsCaption(Localize("LargeFilesResultsScanning", "Scanning for large files…"));
-        SetLargeFilesStatus(
-            Symbol.Sync,
-            Localize("LargeFilesStatusScanningTitle", "Scanning for large files…"),
-            Localize("LargeFilesStatusScanningDescription", "Looking for the largest files. You can cancel the scan if needed."));
-
         try
         {
-            var options = CreateLargeFileOptions();
-            var result = await _largeFileExplorer.ScanAsync(root, options, _largeFilesCts.Token);
-
-            ApplyLargeFileScanResult(result);
-
-            var rootLabel = Path.GetFileName(root);
-            if (string.IsNullOrEmpty(rootLabel))
+            if (_isLargeFilesBusy)
             {
-                rootLabel = root;
+                ShowLargeFilesInfo(Localize("LargeFilesInfoScanInProgress", "Finish the current scan before starting a new one."), InfoBarSeverity.Warning);
+                return;
             }
 
-            if (result.FileCount > 0)
+            LargeFilesInfoBar.IsOpen = false;
+
+            if (!TryGetLargeFilesRoot(out var root))
             {
+                ShowLargeFilesInfo(Localize("LargeFilesInfoSelectValidFolder", "Select a valid folder to scan."), InfoBarSeverity.Warning);
                 SetLargeFilesStatus(
-                    Symbol.Accept,
-                    Localize("LargeFilesStatusResultsTitle", "Review the largest files"),
-                    LocalizeFormat("LargeFilesStatusResultsDescription", "Top {0} files found in {1}.", FormatFileCount(result.FileCount), rootLabel),
-                    result.FileCount);
-                UpdateLargeFilesResultsCaption(result.FileCount, result.HasFailures);
-            }
-            else
-            {
-                SetLargeFilesStatus(
-                    Symbol.Library,
-                    Localize("LargeFilesStatusNoResultsTitle", "No large files detected"),
-                    Localize("LargeFilesStatusNoResultsDescription", "Try adjusting the filters or scanning another location."));
-                SetLargeFilesResultsCaption(Localize("LargeFilesResultsNone", "No large files were detected for this location."));
+                    Symbol.Important,
+                    Localize("LargeFilesStatusSelectValidFolderTitle", "Select a valid folder"),
+                    Localize("LargeFilesStatusSelectValidFolderDescription", "Choose a folder before running the scan."));
+                SetLargeFilesResultsCaption(Localize("LargeFilesResultsNeedValidFolder", "Select a valid folder to run a scan."));
+                return;
             }
 
-            if (result.HasFailures)
+            if (_largeFilesCts is { } previousCts)
             {
-                var message = LocalizeFormat("LargeFilesInfoFailures", "Encountered {0} issue(s) while scanning.", result.Failures.Count);
-                var failureSummaries = result.Failures
-                    .Take(3)
-                    .Select(failure => string.Format(CultureInfo.CurrentCulture, "• {0}: {1}", failure.Path, failure.Exception.Message));
-                var details = string.Join(Environment.NewLine, failureSummaries);
-                if (!string.IsNullOrEmpty(details))
+                try
                 {
-                    message += Environment.NewLine + details;
+                    if (!previousCts.IsCancellationRequested)
+                    {
+                        await previousCts.CancelAsync().ConfigureAwait(true);
+                    }
                 }
-                ShowLargeFilesInfo(message, InfoBarSeverity.Warning);
+                catch (Exception ex)
+                {
+                    ShowLargeFilesInfo(string.Format(CultureInfo.CurrentCulture, Localize("LargeFilesInfoCancelFailed", "Couldn't cancel the previous scan: {0}"), ex.Message), InfoBarSeverity.Error);
+                }
+                finally
+                {
+                    previousCts.Dispose();
+                }
             }
 
-            SetLargeFilesActivity(Localize("LargeFilesActivityScanComplete", "Large file scan complete."));
-        }
-        catch (OperationCanceledException)
-        {
-            SetLargeFilesActivity(Localize("ActivityScanCancelled", "Scan cancelled."));
+            _largeFilesCts = new CancellationTokenSource();
+
+            ClearLargeFilesResults();
+
+            SetLargeFilesBusy(true);
+            SetLargeFilesActivity(Localize("LargeFilesActivityScanning", "Scanning for large files…"));
+            SetLargeFilesResultsCaption(Localize("LargeFilesResultsScanning", "Scanning for large files…"));
             SetLargeFilesStatus(
-                Symbol.Cancel,
-                Localize("LargeFilesStatusCancelledTitle", "Scan cancelled"),
-                Localize("LargeFilesStatusCancelledDescription", "The large files scan was cancelled. Run it again when you're ready."));
-            SetLargeFilesResultsCaption(Localize("LargeFilesResultsCancelled", "Scan cancelled. Run Scan again to refresh the list."));
+                Symbol.Sync,
+                Localize("LargeFilesStatusScanningTitle", "Scanning for large files…"),
+                Localize("LargeFilesStatusScanningDescription", "Looking for the largest files. You can cancel the scan if needed."));
+
+            try
+            {
+                var options = CreateLargeFileOptions();
+                var result = await _largeFileExplorer.ScanAsync(root, options, _largeFilesCts.Token).ConfigureAwait(true);
+
+                ApplyLargeFileScanResult(result);
+
+                var rootLabel = Path.GetFileName(root);
+                if (string.IsNullOrEmpty(rootLabel))
+                {
+                    rootLabel = root;
+                }
+
+                if (result.FileCount > 0)
+                {
+                    SetLargeFilesStatus(
+                        Symbol.Accept,
+                        Localize("LargeFilesStatusResultsTitle", "Review the largest files"),
+                        LocalizeFormat("LargeFilesStatusResultsDescription", "Top {0} files found in {1}.", FormatFileCount(result.FileCount), rootLabel),
+                        result.FileCount);
+                    UpdateLargeFilesResultsCaption(result.FileCount, result.HasFailures);
+                }
+                else
+                {
+                    SetLargeFilesStatus(
+                        Symbol.Library,
+                        Localize("LargeFilesStatusNoResultsTitle", "No large files detected"),
+                        Localize("LargeFilesStatusNoResultsDescription", "Try adjusting the filters or scanning another location."));
+                    SetLargeFilesResultsCaption(Localize("LargeFilesResultsNone", "No large files were detected for this location."));
+                }
+
+                if (result.HasFailures)
+                {
+                    var message = LocalizeFormat("LargeFilesInfoFailures", "Encountered {0} issue(s) while scanning.", result.Failures.Count);
+                    var failureSummaries = result.Failures
+                        .Take(3)
+                        .Select(failure => string.Format(CultureInfo.CurrentCulture, "• {0}: {1}", failure.Path, failure.Exception.Message));
+                    var details = string.Join(Environment.NewLine, failureSummaries);
+                    if (!string.IsNullOrEmpty(details))
+                    {
+                        message += Environment.NewLine + details;
+                    }
+                    ShowLargeFilesInfo(message, InfoBarSeverity.Warning);
+                }
+
+                SetLargeFilesActivity(Localize("LargeFilesActivityScanComplete", "Large file scan complete."));
+            }
+            catch (OperationCanceledException)
+            {
+                SetLargeFilesActivity(Localize("ActivityScanCancelled", "Scan cancelled."));
+                SetLargeFilesStatus(
+                    Symbol.Cancel,
+                    Localize("LargeFilesStatusCancelledTitle", "Scan cancelled"),
+                    Localize("LargeFilesStatusCancelledDescription", "The large files scan was cancelled. Run it again when you're ready."));
+                SetLargeFilesResultsCaption(Localize("LargeFilesResultsCancelled", "Scan cancelled. Run Scan again to refresh the list."));
+            }
+            catch (Exception ex)
+            {
+                SetLargeFilesActivity(Localize("ActivitySomethingWentWrong", "Something went wrong."));
+                SetLargeFilesStatus(
+                    Symbol.Important,
+                    Localize("LargeFilesStatusErrorTitle", "Scan failed"),
+                    Localize("LargeFilesStatusErrorDescription", "Something went wrong. Review the details below and try again."));
+                SetLargeFilesResultsCaption(Localize("LargeFilesResultsError", "Scan failed. Review the details below."));
+                ShowLargeFilesInfo(string.Format(CultureInfo.CurrentCulture, Localize("LargeFilesInfoScanFailed", "Scan failed: {0}"), ex.Message), InfoBarSeverity.Error);
+            }
+            finally
+            {
+                SetLargeFilesBusy(false);
+                _largeFilesCts?.Dispose();
+                _largeFilesCts = null;
+            }
         }
         catch (Exception ex)
         {
-            SetLargeFilesActivity(Localize("ActivitySomethingWentWrong", "Something went wrong."));
-            SetLargeFilesStatus(
-                Symbol.Important,
-                Localize("LargeFilesStatusErrorTitle", "Scan failed"),
-                Localize("LargeFilesStatusErrorDescription", "Something went wrong. Review the details below and try again."));
-            SetLargeFilesResultsCaption(Localize("LargeFilesResultsError", "Scan failed. Review the details below."));
-            ShowLargeFilesInfo(string.Format(CultureInfo.CurrentCulture, Localize("LargeFilesInfoScanFailed", "Scan failed: {0}"), ex.Message), InfoBarSeverity.Error);
-        }
-        finally
-        {
-            SetLargeFilesBusy(false);
-            _largeFilesCts?.Dispose();
-            _largeFilesCts = null;
+            ShowLargeFilesInfo(string.Format(CultureInfo.CurrentCulture, Localize("LargeFilesInfoUnexpected", "Unexpected error: {0}"), ex.Message), InfoBarSeverity.Error);
         }
     }
 
@@ -341,10 +376,10 @@ public sealed partial class MainWindow
             var viewModel = new LargeFileGroupViewModel(group.Name, FormatFileCount, ValueFormatting.FormatBytes);
             foreach (var entry in group.Entries)
             {
-                var extensionLabel = string.IsNullOrEmpty(entry.Extension) // FIXME: Local variable 'extensionLabel' is never used
+                var extensionLabel = string.IsNullOrEmpty(entry.Extension)
                     ? Localize("LargeFilesNoExtensionLabel", "No extension")
                     : entry.Extension.ToUpperInvariant();
-                var item = new LargeFileItemViewModel(entry);
+                var item = new LargeFileItemViewModel(entry, extensionLabel, ValueFormatting.FormatBytes);
                 viewModel.AddItem(item);
             }
 
