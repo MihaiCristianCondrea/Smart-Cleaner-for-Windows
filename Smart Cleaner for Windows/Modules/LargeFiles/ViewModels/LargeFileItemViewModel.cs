@@ -1,6 +1,7 @@
 using System;
 using Smart_Cleaner_for_Windows.Core.LargeFiles;
 using Smart_Cleaner_for_Windows.Core.Storage;
+using IOPath = System.IO.Path;
 
 namespace Smart_Cleaner_for_Windows.Modules.LargeFiles.ViewModels;
 
@@ -22,7 +23,7 @@ public sealed class LargeFileItemViewModel
         Size = entry.Size;
         Name = string.IsNullOrWhiteSpace(entry.Path)
             ? string.Empty
-            : Path.GetFileName(entry.Path); // FIXME: Cannot resolve symbol 'GetFileName'
+            : IOPath.GetFileName(entry.Path);
         Directory = entry.Directory;
         ExtensionDisplay = string.IsNullOrWhiteSpace(extensionDisplay)
             ? string.Empty

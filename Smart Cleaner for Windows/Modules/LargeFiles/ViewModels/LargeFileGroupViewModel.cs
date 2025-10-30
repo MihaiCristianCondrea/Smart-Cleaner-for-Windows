@@ -18,7 +18,7 @@ public sealed class LargeFileGroupViewModel(
     private readonly Func<long, string> _formatBytes = formatBytes ?? ValueFormatting.FormatBytes;
     private long _totalBytes;
 
-    public ObservableCollection<LargeFileItemViewModel> Items { get; } = new();
+    private ObservableCollection<LargeFileItemViewModel> Items { get; } = [];
 
     public long TotalBytes => _totalBytes;
 
