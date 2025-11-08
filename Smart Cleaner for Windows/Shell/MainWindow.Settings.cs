@@ -64,44 +64,44 @@ public sealed partial class MainWindow
             min: HistoryRetentionMinDays,
             max: HistoryRetentionMaxDays);
 
-        if (CleanerRecycleToggle is not null)/*FIXME: Cannot resolve symbol 'CleanerRecycleToggle'*/
+        if (SettingsView.CleanerRecycleToggle is not null)
         {
-            CleanerRecycleToggle.IsOn = _cleanerSendToRecycleBin;/*FIXME: Cannot resolve symbol 'CleanerRecycleToggle'*/
+            SettingsView.CleanerRecycleToggle.IsOn = _cleanerSendToRecycleBin;
         }
 
-        if (CleanerDepthPreferenceBox is not null)/*FIXME: Cannot resolve symbol 'CleanerDepthPreferenceBox'*/
+        if (SettingsView.CleanerDepthPreferenceBox is not null)
         {
-            CleanerDepthPreferenceBox.Value = _cleanerDepthLimit;/*FIXME: Cannot resolve symbol 'CleanerDepthPreferenceBox'*/
+            SettingsView.CleanerDepthPreferenceBox.Value = _cleanerDepthLimit;
         }
 
-        if (CleanerExclusionsPreferenceBox is not null)/*FIXME: Cannot resolve symbol 'CleanerExclusionsPreferenceBox'*/
+        if (SettingsView.CleanerExclusionsPreferenceBox is not null)
         {
-            CleanerExclusionsPreferenceBox.Text = _cleanerExclusions;/*FIXME: Cannot resolve symbol 'CleanerExclusionsPreferenceBox'*/
+            SettingsView.CleanerExclusionsPreferenceBox.Text = _cleanerExclusions;
         }
 
-        if (AutomationAutoPreviewToggle is not null)/*FIXME: Cannot resolve symbol 'AutomationAutoPreviewToggle'*/
+        if (SettingsView.AutomationAutoPreviewToggle is not null)
         {
-            AutomationAutoPreviewToggle.IsOn = _automationAutoPreview;/*FIXME: Cannot resolve symbol 'AutomationAutoPreviewToggle'*/
+            SettingsView.AutomationAutoPreviewToggle.IsOn = _automationAutoPreview;
         }
 
-        if (AutomationReminderToggle is not null)/*FIXME: Cannot resolve symbol 'AutomationReminderToggle'*/
+        if (SettingsView.AutomationReminderToggle is not null)
         {
-            AutomationReminderToggle.IsOn = _automationWeeklyReminder;/*FIXME: Cannot resolve symbol 'AutomationReminderToggle'*/
+            SettingsView.AutomationReminderToggle.IsOn = _automationWeeklyReminder;
         }
 
-        if (NotificationCompletionToggle is not null)/*FIXME: Cannot resolve symbol 'NotificationCompletionToggle'*/
+        if (SettingsView.NotificationCompletionToggle is not null)
         {
-            NotificationCompletionToggle.IsOn = _notificationShowCompletion;/*FIXME: Cannot resolve symbol 'NotificationCompletionToggle'*/
+            SettingsView.NotificationCompletionToggle.IsOn = _notificationShowCompletion;
         }
 
-        if (NotificationDesktopToggle is not null)/*FIXME: Cannot resolve symbol 'NotificationDesktopToggle'*/
+        if (SettingsView.NotificationDesktopToggle is not null)
         {
-            NotificationDesktopToggle.IsOn = _notificationDesktopAlerts;/*FIXME: Cannot resolve symbol 'NotificationDesktopToggle'*/
+            SettingsView.NotificationDesktopToggle.IsOn = _notificationDesktopAlerts;
         }
 
-        if (HistoryRetentionNumberBox is not null)/*FIXME: Cannot resolve symbol 'HistoryRetentionNumberBox'*/
+        if (SettingsView.HistoryRetentionNumberBox is not null)
         {
-            HistoryRetentionNumberBox.Value = _historyRetentionDays;/*FIXME: Cannot resolve symbol 'HistoryRetentionNumberBox'*/
+            SettingsView.HistoryRetentionNumberBox.Value = _historyRetentionDays;
         }
 
         UpdateCleanerDefaultsSummary();
@@ -160,9 +160,9 @@ public sealed partial class MainWindow
             };
         }
 
-        if (ThemeSummaryText is not null)/*FIXME: Cannot resolve symbol 'ThemeSummaryText'*/
+        if (SettingsView.ThemeSummaryText is not null)
         {
-            ThemeSummaryText.Text = normalized switch/*FIXME: Cannot resolve symbol 'ThemeSummaryText'*/
+            SettingsView.ThemeSummaryText.Text = normalized switch
             {
                 ThemePreferenceLight => "Light",
                 ThemePreferenceDark => "Dark",
@@ -190,9 +190,9 @@ public sealed partial class MainWindow
 
     private void SelectThemeOption(string preference)
     {
-        if (ThemeRadioButtons is null) return;/*FIXME: Cannot resolve symbol 'ThemeRadioButtons'*/
+        if (SettingsView.ThemeRadioButtons is null) return;
 
-        ThemeRadioButtons.SelectedIndex = preference switch/*FIXME: Cannot resolve symbol 'ThemeRadioButtons'*/
+        SettingsView.ThemeRadioButtons.SelectedIndex = preference switch
         {
             ThemePreferenceLight => 0,
             ThemePreferenceDark => 1,
@@ -223,9 +223,9 @@ public sealed partial class MainWindow
             _accentPreference = AccentPreferenceDefault;
         }
 
-        if (AccentSummaryText is not null)/*FIXME: Cannot resolve symbol 'AccentSummaryText'*/
+        if (SettingsView.AccentSummaryText is not null)
         {
-            AccentSummaryText.Text = FormatAccentSummary(_accentPreference);/*FIXME: Cannot resolve symbol 'AccentSummaryText'*/
+            SettingsView.AccentSummaryText.Text = FormatAccentSummary(_accentPreference);
         }
 
         if (save)
@@ -260,9 +260,9 @@ public sealed partial class MainWindow
 
     private void SelectAccentOption(string preference)
     {
-        if (AccentColorRadioButtons is null) return;/*FIXME: Cannot resolve symbol 'AccentColorRadioButtons'*/
+        if (SettingsView.AccentColorRadioButtons is null) return;
 
-        AccentColorRadioButtons.SelectedIndex = preference switch/*FIXME: Cannot resolve symbol 'AccentColorRadioButtons'*/
+        SettingsView.AccentColorRadioButtons.SelectedIndex = preference switch
         {
             AccentPreferenceZest => 0,
             AccentPreferenceDefault => 1,
@@ -349,16 +349,16 @@ public sealed partial class MainWindow
         if (_isInitializingSettings) return;
         if (sender is not ToggleSwitch source) return;
 
-        if (AutomationAutoPreviewToggle is not null && ReferenceEquals(source, AutomationAutoPreviewToggle))/*FIXME: Cannot resolve symbol 'AutomationAutoPreviewToggle'*/
+        if (SettingsView.AutomationAutoPreviewToggle is not null && ReferenceEquals(source, SettingsView.AutomationAutoPreviewToggle))
         {
-            _automationAutoPreview = AutomationAutoPreviewToggle.IsOn;/*FIXME: Cannot resolve symbol 'AutomationAutoPreviewToggle'*/
+            _automationAutoPreview = SettingsView.AutomationAutoPreviewToggle.IsOn;
             SaveSetting(
                 AutomationAutoPreviewKey,
                 _automationAutoPreview.ToString(CultureInfo.InvariantCulture));
         }
-        else if (AutomationReminderToggle is not null && ReferenceEquals(source, AutomationReminderToggle))/*FIXME: Cannot resolve symbol 'AutomationReminderToggle'*/
+        else if (SettingsView.AutomationReminderToggle is not null && ReferenceEquals(source, SettingsView.AutomationReminderToggle))
         {
-            _automationWeeklyReminder = AutomationReminderToggle.IsOn;
+            _automationWeeklyReminder = SettingsView.AutomationReminderToggle.IsOn;
             SaveSetting(
                 AutomationReminderKey,
                 _automationWeeklyReminder.ToString(CultureInfo.InvariantCulture));
@@ -372,16 +372,16 @@ public sealed partial class MainWindow
         if (_isInitializingSettings) return;
         if (sender is not ToggleSwitch source) return;
 
-        if (NotificationCompletionToggle is not null && ReferenceEquals(source, NotificationCompletionToggle))/*FIXME: Cannot resolve symbol 'NotificationCompletionToggle'*/
+        if (SettingsView.NotificationCompletionToggle is not null && ReferenceEquals(source, SettingsView.NotificationCompletionToggle))
         {
-            _notificationShowCompletion = NotificationCompletionToggle.IsOn;/*FIXME: Cannot resolve symbol 'NotificationCompletionToggle'*/
+            _notificationShowCompletion = SettingsView.NotificationCompletionToggle.IsOn;
             SaveSetting(
                 NotificationShowCompletionKey,
                 _notificationShowCompletion.ToString(CultureInfo.InvariantCulture));
         }
-        else if (NotificationDesktopToggle is not null && ReferenceEquals(source, NotificationDesktopToggle))/*FIXME: Cannot resolve symbol 'NotificationCompletionToggle'*/
+        else if (SettingsView.NotificationDesktopToggle is not null && ReferenceEquals(source, SettingsView.NotificationDesktopToggle))
         {
-            _notificationDesktopAlerts = NotificationDesktopToggle.IsOn;/*FIXME: Cannot resolve symbol 'NotificationCompletionToggle'*/
+            _notificationDesktopAlerts = SettingsView.NotificationDesktopToggle.IsOn;
             SaveSetting(
                 NotificationDesktopAlertsKey,
                 _notificationDesktopAlerts.ToString(CultureInfo.InvariantCulture));
