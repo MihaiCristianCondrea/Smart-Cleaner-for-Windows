@@ -193,7 +193,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         EmptyFoldersView.BrowseRequested += OnBrowse;
         EmptyFoldersView.CancelRequested += OnCancel;
         EmptyFoldersView.CandidatesSelectionChanged +=
-            new TypedEventHandler<TreeView, TreeViewSelectionChangedEventArgs>(OnCandidatesSelectionChanged);
+            new TypedEventHandler<TreeView, TreeViewSelectionChangedEventArgs>(OnCandidatesSelectionChanged); // FIXME: Cannot create an instance of the static class 'ABI.Windows.Foundation.TypedEventHandler<TSender,TResult>'
         EmptyFoldersView.InlineExclusionsCleared += OnClearInlineExclusions;
         EmptyFoldersView.ResultFiltersCleared += OnClearResultFilters;
         EmptyFoldersView.DeleteRequested += OnDelete;
@@ -229,10 +229,10 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         SettingsView.CleanerRecyclePreferenceToggled += OnCleanerRecyclePreferenceToggled;
         SettingsView.CleanerExclusionsPreferenceChanged += OnCleanerExclusionsPreferenceChanged;
         SettingsView.CleanerDepthPreferenceChanged +=
-            new NumberBoxValueChangedEventHandler(OnCleanerDepthPreferenceChanged);
+            new NumberBoxValueChangedEventHandler(OnCleanerDepthPreferenceChanged); // FIXME: Cannot resolve symbol 'NumberBoxValueChangedEventHandler'
         SettingsView.AutomationPreferenceToggled += OnAutomationPreferenceToggled;
         SettingsView.NotificationPreferenceToggled += OnNotificationPreferenceToggled;
-        SettingsView.HistoryRetentionChanged += new NumberBoxValueChangedEventHandler(OnHistoryRetentionChanged);
+        SettingsView.HistoryRetentionChanged += new NumberBoxValueChangedEventHandler(OnHistoryRetentionChanged); // FIXME: Cannot resolve symbol 'NumberBoxValueChangedEventHandler'
 
         CaptureDefaultAccentColors();
         LoadPreferences();
