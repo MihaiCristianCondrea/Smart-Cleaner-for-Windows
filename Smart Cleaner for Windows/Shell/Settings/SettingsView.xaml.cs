@@ -1,6 +1,5 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
 
 namespace Smart_Cleaner_for_Windows.Shell.Settings;
 
@@ -21,13 +20,13 @@ public sealed partial class SettingsView : UserControl
 
     public event TextChangedEventHandler? CleanerExclusionsPreferenceChanged;
 
-    public event NumberBoxValueChangedEventHandler? CleanerDepthPreferenceChanged;
+    public event NumberBoxValueChangedEventHandler? CleanerDepthPreferenceChanged; // FIXME: Cannot resolve symbol 'NumberBoxValueChangedEventHandler'
 
     public event RoutedEventHandler? AutomationPreferenceToggled;
 
     public event RoutedEventHandler? NotificationPreferenceToggled;
 
-    public event NumberBoxValueChangedEventHandler? HistoryRetentionChanged;
+    public event NumberBoxValueChangedEventHandler? HistoryRetentionChanged; // FIXME: Cannot resolve symbol 'NumberBoxValueChangedEventHandler'
 
     private void OnThemeSelectionChanged(object sender, SelectionChangedEventArgs e) => ThemeSelectionChanged?.Invoke(sender, e);
 

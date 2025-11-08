@@ -3,7 +3,8 @@
     x:Class="Smart_Cleaner_for_Windows.Shell.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Smart_Cleaner_for_Windows.Shell">
+    xmlns:local="using:Smart_Cleaner_for_Windows.Shell"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -17,7 +18,7 @@
             <SolidColorBrush x:Key="WindowCaptionForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="WindowCaptionForegroundDisabled" Color="#66FFFFFF" />
             <local:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
-            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" /><!--FIXME: Unable to resolve symbol 'BooleanToVisibilityConverter'-->
+            <controls:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Light">
                     <SolidColorBrush x:Key="WindowCaptionBackground" Color="Transparent" />

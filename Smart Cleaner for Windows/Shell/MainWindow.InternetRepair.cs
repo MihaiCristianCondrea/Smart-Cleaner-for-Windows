@@ -14,9 +14,9 @@ public sealed partial class MainWindow
 {
     private void InitializeInternetRepair()
     {
-        if (InternetRepairLogList is not null)/*FIXME: Cannot resolve symbol 'InternetRepairLogList'*/
+        if (InternetRepairView.InternetRepairLogList is not null)
         {
-            InternetRepairLogList.ItemsSource = _internetRepairLog;/*FIXME: Cannot resolve symbol 'InternetRepairLogList'*/
+            InternetRepairView.InternetRepairLogList.ItemsSource = _internetRepairLog;
         }
 
         _internetRepairLog.CollectionChanged += OnInternetRepairLogChanged;
@@ -33,11 +33,11 @@ public sealed partial class MainWindow
             Localize("InternetRepairStatusReadyTitle", "Ready to fix common issues"),
             Localize("InternetRepairStatusReadyDescription", "Select the repairs you want to run, then choose Fix now."));
         SetInternetRepairActivity(Localize("InternetRepairActivityIdle", "Waiting to start a repair."));
-        InternetRepairSummaryText.Text = Localize("InternetRepairSummaryReady", "Select the repairs you want to run.");/*FIXME: Cannot resolve symbol 'InternetRepairSummaryText'*/
-        InternetRepairProgress.IsIndeterminate = false;/*FIXME: Cannot resolve symbol 'InternetRepairProgress'*/
-        InternetRepairProgress.Value = 0;/*FIXME: Cannot resolve symbol 'InternetRepairProgress'*/
-        InternetRepairCancelBtn.Visibility = Visibility.Collapsed;/*FIXME: Cannot resolve symbol 'InternetRepairCancelBtn'*/
-        InternetRepairCancelBtn.IsEnabled = false;/*FIXME: Cannot resolve symbol 'InternetRepairCancelBtn'*/
+        InternetRepairView.InternetRepairSummaryText.Text = Localize("InternetRepairSummaryReady", "Select the repairs you want to run.");
+        InternetRepairView.InternetRepairProgress.IsIndeterminate = false;
+        InternetRepairView.InternetRepairProgress.Value = 0;
+        InternetRepairView.InternetRepairCancelBtn.Visibility = Visibility.Collapsed;
+        InternetRepairView.InternetRepairCancelBtn.IsEnabled = false;
         DismissInternetRepairInfo();
         UpdateInternetRepairSelectionState();
     }
@@ -99,22 +99,22 @@ public sealed partial class MainWindow
 
     private void UpdateInternetRepairLogPlaceholder()
     {
-        if (InternetRepairLogPlaceholder is null)/*FIXME: Cannot resolve symbol 'InternetRepairLogPlaceholder'*/
+        if (InternetRepairView.InternetRepairLogPlaceholder is null)
         {
             return;
         }
 
-        InternetRepairLogPlaceholder.Visibility = _internetRepairLog.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        InternetRepairView.InternetRepairLogPlaceholder.Visibility = _internetRepairLog.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private IEnumerable<CheckBox> EnumerateInternetRepairActionCheckBoxes()
     {
-        yield return InternetRepairWinsockChk;/*FIXME: Cannot resolve symbol 'InternetRepairWinsockChk'*/
-        yield return InternetRepairTcpIpChk;/*FIXME: Cannot resolve symbol 'InternetRepairTcpIpChk'*/
-        yield return InternetRepairDnsChk;/*FIXME: Cannot resolve symbol 'InternetRepairDnsChk'*/
-        yield return InternetRepairReleaseChk;/*FIXME: Cannot resolve symbol 'InternetRepairReleaseChk'*/
-        yield return InternetRepairRenewChk;/*FIXME: Cannot resolve symbol 'InternetRepairRenewChk'*/
-        yield return InternetRepairProxyChk;/*FIXME: Cannot resolve symbol 'InternetRepairProxyChk'*/
+        yield return InternetRepairView.InternetRepairWinsockChk;
+        yield return InternetRepairView.InternetRepairTcpIpChk;
+        yield return InternetRepairView.InternetRepairDnsChk;
+        yield return InternetRepairView.InternetRepairReleaseChk;
+        yield return InternetRepairView.InternetRepairRenewChk;
+        yield return InternetRepairView.InternetRepairProxyChk;
     }
 
     private void OnInternetRepairActionSelectionChanged(object sender, RoutedEventArgs e) => UpdateInternetRepairSelectionState();
@@ -124,23 +124,23 @@ public sealed partial class MainWindow
         var count = EnumerateInternetRepairActionCheckBoxes().Count(cb => cb.IsChecked == true);
         if (count > 0)
         {
-            InternetRepairResultBadge.Value = count;
-            InternetRepairResultBadge.Visibility = Visibility.Visible;
-            InternetRepairSummaryText.Text = LocalizeFormat(
+            InternetRepairView.InternetRepairResultBadge.Value = count;
+            InternetRepairView.InternetRepairResultBadge.Visibility = Visibility.Visible;
+            InternetRepairView.InternetRepairSummaryText.Text = LocalizeFormat(
                 "InternetRepairSummarySelection",
                 "Ready to run {0} selected repair(s).",
                 count);
         }
         else
         {
-            InternetRepairResultBadge.ClearValue(InfoBadge.ValueProperty);
-            InternetRepairResultBadge.Visibility = Visibility.Collapsed;
-            InternetRepairSummaryText.Text = Localize("InternetRepairSummaryReady", "Select the repairs you want to run.");
+            InternetRepairView.InternetRepairResultBadge.ClearValue(InfoBadge.ValueProperty);
+            InternetRepairView.InternetRepairResultBadge.Visibility = Visibility.Collapsed;
+            InternetRepairView.InternetRepairSummaryText.Text = Localize("InternetRepairSummaryReady", "Select the repairs you want to run.");
         }
 
         if (!_isInternetRepairBusy)
         {
-            InternetRepairRunBtn.IsEnabled = count > 0;
+            InternetRepairView.InternetRepairRunBtn.IsEnabled = count > 0;
         }
     }
 
@@ -188,8 +188,8 @@ public sealed partial class MainWindow
             _internetRepairCts = new CancellationTokenSource();
             _internetRepairLogLookup.Clear();
             _internetRepairLog.Clear();
-            InternetRepairProgress.Value = 0;
-            InternetRepairProgress.IsIndeterminate = true;
+            InternetRepairView.InternetRepairProgress.Value = 0;
+            InternetRepairView.InternetRepairProgress.IsIndeterminate = true;
 
             SetInternetRepairBusy(true);
             SetInternetRepairStatus(
@@ -197,7 +197,7 @@ public sealed partial class MainWindow
                 Localize("InternetRepairStatusRunningTitle", "Applying fixes…"),
                 Localize("InternetRepairStatusRunningDescription", "Hang tight while we apply the selected network repairs."));
             SetInternetRepairActivity(Localize("InternetRepairActivityRunning", "Running network repair actions…"));
-            InternetRepairSummaryText.Text = LocalizeFormat(
+            InternetRepairView.InternetRepairSummaryText.Text = LocalizeFormat(
                 "InternetRepairSummaryRunning",
                 "Running {0} repair action(s)…",
                 actions.Count);
@@ -220,15 +220,15 @@ public sealed partial class MainWindow
                     Symbol.Important,
                     Localize("InternetRepairStatusWarningsTitle", "Repairs completed with issues"),
                     Localize("InternetRepairStatusWarningsDescription", "Some repairs failed. Review the log for details."));
-                InternetRepairSummaryText.Text = Localize("InternetRepairSummaryError", "The last run encountered issues.");
+                InternetRepairView.InternetRepairSummaryText.Text = Localize("InternetRepairSummaryError", "The last run encountered issues.");
                 SetInternetRepairActivity(Localize("ActivitySomethingWentWrong", "Something went wrong."));
             }
             finally
             {
                 _internetRepairCts?.Dispose();
                 _internetRepairCts = null;
-                InternetRepairProgress.IsIndeterminate = false;
-                InternetRepairProgress.Value = 0;
+                InternetRepairView.InternetRepairProgress.IsIndeterminate = false;
+                InternetRepairView.InternetRepairProgress.Value = 0;
                 SetInternetRepairBusy(false);
                 UpdateInternetRepairSelectionState();
             }
@@ -262,35 +262,35 @@ public sealed partial class MainWindow
             check.IsEnabled = !isBusy;
         }
 
-        InternetRepairRunBtn.IsEnabled = !isBusy && GetSelectedInternetRepairActions().Count > 0;
-        InternetRepairCancelBtn.Visibility = isBusy ? Visibility.Visible : Visibility.Collapsed;
-        InternetRepairCancelBtn.IsEnabled = isBusy;
+        InternetRepairView.InternetRepairRunBtn.IsEnabled = !isBusy && GetSelectedInternetRepairActions().Count > 0;
+        InternetRepairView.InternetRepairCancelBtn.Visibility = isBusy ? Visibility.Visible : Visibility.Collapsed;
+        InternetRepairView.InternetRepairCancelBtn.IsEnabled = isBusy;
     }
 
     private void SetInternetRepairStatus(Symbol symbol, string title, string description)
     {
-        InternetRepairStatusGlyph.Symbol = symbol;
-        InternetRepairStatusTitle.Text = title;
-        InternetRepairStatusDescription.Text = description;
-        InternetRepairStatusHero.Background = GetStatusHeroBrush(symbol);
-        InternetRepairStatusGlyph.Foreground = GetStatusGlyphBrush(symbol);
+        InternetRepairView.InternetRepairStatusGlyph.Symbol = symbol;
+        InternetRepairView.InternetRepairStatusTitle.Text = title;
+        InternetRepairView.InternetRepairStatusDescription.Text = description;
+        InternetRepairView.InternetRepairStatusHero.Background = GetStatusHeroBrush(symbol);
+        InternetRepairView.InternetRepairStatusGlyph.Foreground = GetStatusGlyphBrush(symbol);
     }
 
     private void SetInternetRepairActivity(string message)
     {
-        InternetRepairActivityText.Text = message;
+        InternetRepairView.InternetRepairActivityText.Text = message;
     }
 
     private void ShowInternetRepairInfo(string message, InfoBarSeverity severity)
     {
-        InternetRepairInfoBar.Message = message;
-        InternetRepairInfoBar.Severity = severity;
-        InternetRepairInfoBar.IsOpen = true;
+        InternetRepairView.InternetRepairInfoBar.Message = message;
+        InternetRepairView.InternetRepairInfoBar.Severity = severity;
+        InternetRepairView.InternetRepairInfoBar.IsOpen = true;
     }
 
     private void DismissInternetRepairInfo()
     {
-        InternetRepairInfoBar.IsOpen = false;
+        InternetRepairView.InternetRepairInfoBar.IsOpen = false;
     }
 
     private void OnInternetRepairProgress(InternetRepairStepUpdate update)
@@ -352,7 +352,7 @@ public sealed partial class MainWindow
                 Symbol.Accept,
                 Localize("InternetRepairStatusCompleteTitle", "Repairs completed"),
                 Localize("InternetRepairStatusCompleteDescription", "Network repairs finished. Test your connection."));
-            InternetRepairSummaryText.Text = LocalizeFormat(
+            InternetRepairView.InternetRepairSummaryText.Text = LocalizeFormat(
                 "InternetRepairSummaryCompleted",
                 "Last run: {0} action(s) completed without issues.",
                 success);
@@ -370,7 +370,7 @@ public sealed partial class MainWindow
                 Symbol.Important,
                 Localize("InternetRepairStatusWarningsTitle", "Repairs completed with issues"),
                 Localize("InternetRepairStatusWarningsDescription", "Some repairs failed. Review the log for details."));
-            InternetRepairSummaryText.Text = LocalizeFormat(
+            InternetRepairView.InternetRepairSummaryText.Text = LocalizeFormat(
                 "InternetRepairSummaryPartial",
                 "Last run: {0} succeeded, {1} failed.",
                 success,
@@ -389,7 +389,7 @@ public sealed partial class MainWindow
             Symbol.Cancel,
             Localize("InternetRepairStatusCancelledTitle", "Repairs cancelled"),
             Localize("InternetRepairStatusCancelledDescription", "The selected actions were cancelled. Adjust your selection and try again."));
-        InternetRepairSummaryText.Text = Localize(
+        InternetRepairView.InternetRepairSummaryText.Text = Localize(
             "InternetRepairSummaryCancelled",
             "Repairs were cancelled before completion.");
         SetInternetRepairActivity(Localize("InternetRepairActivityCancelled", "Repair run cancelled."));

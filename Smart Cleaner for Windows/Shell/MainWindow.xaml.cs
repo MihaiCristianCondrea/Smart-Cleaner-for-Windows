@@ -30,6 +30,7 @@ using Windows.Storage.Pickers;
 using Windows.UI;
 using WinRT.Interop;
 using System.Security.Principal;
+using ABI.Windows.Foundation;
 
 namespace Smart_Cleaner_for_Windows.Shell;
 
@@ -191,7 +192,8 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
         EmptyFoldersView.BrowseRequested += OnBrowse;
         EmptyFoldersView.CancelRequested += OnCancel;
-        EmptyFoldersView.CandidatesSelectionChanged += OnCandidatesSelectionChanged;/*FIXME: Argument type 'method group' is not assignable to parameter type 'ABI.Windows.Foundation.TypedEventHandler<Microsoft.UI.Xaml.Controls.TreeView,Microsoft.UI.Xaml.Controls.TreeViewSelectionChangedEventArgs>?'*/
+        EmptyFoldersView.CandidatesSelectionChanged +=
+            new TypedEventHandler<TreeView, TreeViewSelectionChangedEventArgs>(OnCandidatesSelectionChanged);
         EmptyFoldersView.InlineExclusionsCleared += OnClearInlineExclusions;
         EmptyFoldersView.ResultFiltersCleared += OnClearResultFilters;
         EmptyFoldersView.DeleteRequested += OnDelete;
@@ -226,10 +228,11 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         SettingsView.CleanerDefaultsApplied += OnApplyCleanerDefaults;
         SettingsView.CleanerRecyclePreferenceToggled += OnCleanerRecyclePreferenceToggled;
         SettingsView.CleanerExclusionsPreferenceChanged += OnCleanerExclusionsPreferenceChanged;
-        SettingsView.CleanerDepthPreferenceChanged += OnCleanerDepthPreferenceChanged;/*FIXME: Argument type 'method group' is not assignable to parameter type 'NumberBoxValueChangedEventHandler?'*/
+        SettingsView.CleanerDepthPreferenceChanged +=
+            new NumberBoxValueChangedEventHandler(OnCleanerDepthPreferenceChanged);
         SettingsView.AutomationPreferenceToggled += OnAutomationPreferenceToggled;
         SettingsView.NotificationPreferenceToggled += OnNotificationPreferenceToggled;
-        SettingsView.HistoryRetentionChanged += OnHistoryRetentionChanged;/*FIXMEL: Argument type 'method group' is not assignable to parameter type 'NumberBoxValueChangedEventHandler?'*/
+        SettingsView.HistoryRetentionChanged += new NumberBoxValueChangedEventHandler(OnHistoryRetentionChanged);
 
         CaptureDefaultAccentColors();
         LoadPreferences();

@@ -15,7 +15,7 @@ public sealed partial class EmptyFoldersView : UserControl
 
     public event RoutedEventHandler? CancelRequested;
 
-    public event TypedEventHandler<TreeView, TreeViewSelectionChangedEventArgs>? CandidatesSelectionChanged;
+    public event TypedEventHandler<TreeView, TreeViewSelectionChangedEventArgs>? CandidatesSelectionChanged; // FIXME: Event must be of a delegate type && Cannot resolve symbol 'Invoke'
 
     public event RoutedEventHandler? InlineExclusionsCleared;
 
@@ -42,7 +42,7 @@ public sealed partial class EmptyFoldersView : UserControl
     private void OnCancel(object sender, RoutedEventArgs e) => CancelRequested?.Invoke(sender, e);
 
     private void OnCandidatesSelectionChanged(TreeView sender, TreeViewSelectionChangedEventArgs args) =>
-        CandidatesSelectionChanged?.Invoke(sender, args);
+        CandidatesSelectionChanged?.Invoke(sender, args); // FIXME: Cannot resolve symbol 'Invoke'
 
     private void OnHideExcludedToggled(object sender, RoutedEventArgs e) => HideExcludedToggled?.Invoke(sender, e);
 
