@@ -30,7 +30,6 @@ using Windows.Storage.Pickers;
 using Windows.UI;
 using WinRT.Interop;
 using System.Security.Principal;
-using ABI.Windows.Foundation;
 
 namespace Smart_Cleaner_for_Windows.Shell;
 
@@ -192,8 +191,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
         EmptyFoldersView.BrowseRequested += OnBrowse;
         EmptyFoldersView.CancelRequested += OnCancel;
-        EmptyFoldersView.CandidatesSelectionChanged +=
-            new TypedEventHandler<TreeView, TreeViewSelectionChangedEventArgs>(OnCandidatesSelectionChanged); // FIXME: Cannot create an instance of the static class 'ABI.Windows.Foundation.TypedEventHandler<TSender,TResult>'
+        EmptyFoldersView.CandidatesSelectionChanged += OnCandidatesSelectionChanged;
         EmptyFoldersView.InlineExclusionsCleared += OnClearInlineExclusions;
         EmptyFoldersView.ResultFiltersCleared += OnClearResultFilters;
         EmptyFoldersView.DeleteRequested += OnDelete;
@@ -228,11 +226,10 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         SettingsView.CleanerDefaultsApplied += OnApplyCleanerDefaults;
         SettingsView.CleanerRecyclePreferenceToggled += OnCleanerRecyclePreferenceToggled;
         SettingsView.CleanerExclusionsPreferenceChanged += OnCleanerExclusionsPreferenceChanged;
-        SettingsView.CleanerDepthPreferenceChanged +=
-            new NumberBoxValueChangedEventHandler(OnCleanerDepthPreferenceChanged); // FIXME: Cannot resolve symbol 'NumberBoxValueChangedEventHandler'
+        SettingsView.CleanerDepthPreferenceChanged += OnCleanerDepthPreferenceChanged;
         SettingsView.AutomationPreferenceToggled += OnAutomationPreferenceToggled;
         SettingsView.NotificationPreferenceToggled += OnNotificationPreferenceToggled;
-        SettingsView.HistoryRetentionChanged += new NumberBoxValueChangedEventHandler(OnHistoryRetentionChanged); // FIXME: Cannot resolve symbol 'NumberBoxValueChangedEventHandler'
+        SettingsView.HistoryRetentionChanged += OnHistoryRetentionChanged;
 
         CaptureDefaultAccentColors();
         LoadPreferences();
