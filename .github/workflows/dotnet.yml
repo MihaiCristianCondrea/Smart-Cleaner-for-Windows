@@ -19,7 +19,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ['6.0', '7.0', '8.0', '9.0']
+          dotnet-version: 9.0.x
       - name: Restore
         run: dotnet restore "$env:SOLUTION_PATH" -p:Configuration=Release
       - name: Build
