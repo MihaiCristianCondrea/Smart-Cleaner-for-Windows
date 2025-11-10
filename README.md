@@ -1,6 +1,6 @@
 # Smart Cleaner for Windows (WinUI 3)
 
-Smart Cleaner for Windows is a modern WinUI 3 desktop utility that helps you tidy up empty folders, analyze built-in Windows Disk Cleanup handlers, and keep storage usage in check. The app is built with **.NET 8** and the **Windows App SDK 1.8** to deliver Fluent visuals, Mica materials, and responsive layouts that respect your accent color and theme preferences.
+Smart Cleaner for Windows is a modern WinUI 3 desktop utility that helps you tidy up empty folders, analyze built-in Windows Disk Cleanup handlers, and keep storage usage in check. The app is built with **.NET 9** and the **Windows App SDK 1.8** to deliver Fluent visuals, Mica materials, and responsive layouts that respect your accent color and theme preferences.
 
 ## Highlights
 - **Dashboard overview** – review drive usage at a glance and jump directly into the cleanup tools from a Fluent NavigationView.
@@ -9,8 +9,8 @@ Smart Cleaner for Windows is a modern WinUI 3 desktop utility that helps you tid
 - **Personal and polished** – supports English (United States) and Spanish (Spain), includes theme/accent controls, and keeps all operations on-device with no telemetry.
 
 ## Requirements
-- Windows 10 version 1809 (build 17763) or later. The project targets `net8.0-windows10.0.19041.0` while maintaining a minimum platform version of 17763 in the package manifest.
-- [.NET 8.0 SDK](https://dotnet.microsoft.com/download) for command-line builds.
+- Windows 10 version 1809 (build 17763) or later. The project targets `net9.0-windows10.0.19041.0` while maintaining a minimum platform version of 17763 in the package manifest.
+- [.NET 9.0 SDK](https://dotnet.microsoft.com/download) for command-line builds. The repository includes a `global.json` file that pins builds to the latest .NET 9 feature band so every developer uses the supported toolchain.
 - (Optional) [Visual Studio 2022](https://visualstudio.microsoft.com/) 17.10 or later with the **Windows App SDK C#** workload for an IDE experience.
 
 ## Repository layout
@@ -45,6 +45,16 @@ dotnet run --project "Smart Cleaner for Windows/Smart Cleaner for Windows.csproj
 ```
 Alternatively, open `Smart Cleaner for Windows.sln` in Visual Studio and press **F5**.
 
+### Use JetBrains Rider or other IDEs
+If your IDE discovers an older .NET 8 SDK first, the WinUI XAML compiler can run into tooling mismatches. Ensure Rider (or any other external tool) points to the .NET 9 SDK specified in `global.json`:
+
+1. Install the latest .NET 9 SDK if it is not already available on your machine.
+2. In Rider, navigate to **File → Settings → Build, Execution, Deployment → Toolset and Build**.
+3. Under **.NET CLI executable**, browse to the `dotnet.exe` that ships with .NET 9 (for example, `C:\Program Files\dotnet\sdk\9.0.x\dotnet.exe`).
+4. Click **Apply** and rebuild the solution.
+
+Rider will now respect the pinned SDK version and the build will succeed on all targets (x86/x64/ARM64).
+
 ## Publish a self-contained build
 Use the supplied publish profiles to create portable outputs that do not require the .NET runtime on the target machine:
 
@@ -54,7 +64,7 @@ dotnet publish "Smart Cleaner for Windows/Smart Cleaner for Windows.csproj" -c R
 
 The resulting files live in:
 ```
-Smart Cleaner for Windows/bin/Release/net8.0-windows10.0.19041.0/win-x64/publish/
+Smart Cleaner for Windows/bin/Release/net9.0-windows10.0.19041.0/win-x64/publish/
 ```
 Distribute the entire **publish** folder (zipping it works well). Switch to `win-x86` or `win-arm64` to generate binaries for other architectures.
 

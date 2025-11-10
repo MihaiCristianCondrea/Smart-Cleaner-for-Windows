@@ -224,18 +224,18 @@
                                 </Border>
                             </StackPanel>
 
-                            <Border Grid.Row="0" Grid.Column="0" Style="{StaticResourceExtension CardStyle}">
-                                <StackPanel Spacing="{StaticResourceExtension Spacing.Size200}">
-                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResourceExtension Spacing.Size120}">
+                            <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource CardStyle}">
+                                <StackPanel Spacing="{StaticResource Spacing.Size200}">
+                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
                                         <Border
                                             Width="40"
                                             Height="40"
                                             CornerRadius="14"
-                                            Background="{ThemeResourceExtension AccentFillColorTertiaryBrush}"
+                                            Background="{ThemeResource AccentFillColorTertiaryBrush}"
                                             VerticalAlignment="Center">
                                             <SymbolIcon
                                                 Symbol="Setting"
-                                                Foreground="{ThemeResourceExtension TextOnAccentFillColorPrimaryBrush}"
+                                                Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
                                                 HorizontalAlignment="Center"
                                                 VerticalAlignment="Center" />
                                         </Border>
@@ -243,22 +243,22 @@
                                             <TextBlock Text="Common fixes" FontSize="22" FontWeight="SemiBold" />
                                             <TextBlock
                                                 Text="Select the repairs that match your symptoms."
-                                                Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                 TextWrapping="Wrap" />
                                         </StackPanel>
                                     </StackPanel>
 
-                                    <StackPanel Spacing="{StaticResourceExtension Spacing.Size160}">
+                                    <StackPanel Spacing="{StaticResource Spacing.Size160}">
                                         <CheckBox
                                             x:Name="InternetRepairWinsockChk" x:FieldModifier="internal"
                                             Tag="winsock"
                                             Checked="OnInternetRepairActionSelectionChanged"
                                             Unchecked="OnInternetRepairActionSelectionChanged">
-                                            <StackPanel Spacing="{StaticResourceExtension Spacing.Size40}">
+                                            <StackPanel Spacing="{StaticResource Spacing.Size40}">
                                                 <TextBlock Text="Reset Winsock catalog" FontWeight="SemiBold" />
                                                 <TextBlock
                                                     Text="Repairs socket corruption that can break connectivity."
-                                                    Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                     TextWrapping="WrapWholeWords" />
                                             </StackPanel>
                                         </CheckBox>
@@ -268,11 +268,11 @@
                                             Tag="ipreset"
                                             Checked="OnInternetRepairActionSelectionChanged"
                                             Unchecked="OnInternetRepairActionSelectionChanged">
-                                            <StackPanel Spacing="{StaticResourceExtension Spacing.Size40}">
+                                            <StackPanel Spacing="{StaticResource Spacing.Size40}">
                                                 <TextBlock Text="Reset TCP/IP stack" FontWeight="SemiBold" />
                                                 <TextBlock
                                                     Text="Rebuilds the IP stack and reverts advanced network tweaks."
-                                                    Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                     TextWrapping="WrapWholeWords" />
                                             </StackPanel>
                                         </CheckBox>
@@ -282,11 +282,11 @@
                                             Tag="dnsflush"
                                             Checked="OnInternetRepairActionSelectionChanged"
                                             Unchecked="OnInternetRepairActionSelectionChanged">
-                                            <StackPanel Spacing="{StaticResourceExtension Spacing.Size40}">
+                                            <StackPanel Spacing="{StaticResource Spacing.Size40}">
                                                 <TextBlock Text="Flush DNS cache" FontWeight="SemiBold" />
                                                 <TextBlock
                                                     Text="Clears cached DNS records to resolve name lookup issues."
-                                                    Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                     TextWrapping="WrapWholeWords" />
                                             </StackPanel>
                                         </CheckBox>
@@ -296,11 +296,11 @@
                                             Tag="iprelease"
                                             Checked="OnInternetRepairActionSelectionChanged"
                                             Unchecked="OnInternetRepairActionSelectionChanged">
-                                            <StackPanel Spacing="{StaticResourceExtension Spacing.Size40}">
+                                            <StackPanel Spacing="{StaticResource Spacing.Size40}">
                                                 <TextBlock Text="Release IP address" FontWeight="SemiBold" />
                                                 <TextBlock
                                                     Text="Drops the current lease so you can request a fresh address."
-                                                    Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                     TextWrapping="WrapWholeWords" />
                                             </StackPanel>
                                         </CheckBox>
@@ -310,11 +310,11 @@
                                             Tag="iprenew"
                                             Checked="OnInternetRepairActionSelectionChanged"
                                             Unchecked="OnInternetRepairActionSelectionChanged">
-                                            <StackPanel Spacing="{StaticResourceExtension Spacing.Size40}">
+                                            <StackPanel Spacing="{StaticResource Spacing.Size40}">
                                                 <TextBlock Text="Renew IP address" FontWeight="SemiBold" />
                                                 <TextBlock
                                                     Text="Requests a new DHCP lease from the network."
-                                                    Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                     TextWrapping="WrapWholeWords" />
                                             </StackPanel>
                                         </CheckBox>
@@ -324,11 +324,11 @@
                                             Tag="proxy"
                                             Checked="OnInternetRepairActionSelectionChanged"
                                             Unchecked="OnInternetRepairActionSelectionChanged">
-                                            <StackPanel Spacing="{StaticResourceExtension Spacing.Size40}">
+                                            <StackPanel Spacing="{StaticResource Spacing.Size40}">
                                                 <TextBlock Text="Reset WinHTTP proxy" FontWeight="SemiBold" />
                                                 <TextBlock
                                                     Text="Clears system proxy settings that might block traffic."
-                                                    Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                     TextWrapping="WrapWholeWords" />
                                             </StackPanel>
                                         </CheckBox>
@@ -336,18 +336,18 @@
                                 </StackPanel>
                             </Border>
 
-                            <Border Grid.Row="0" Grid.Column="0" Style="{StaticResourceExtension CardStyle}">
-                                <StackPanel Spacing="{StaticResourceExtension Spacing.Size200}">
-                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResourceExtension Spacing.Size120}">
+                            <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource CardStyle}">
+                                <StackPanel Spacing="{StaticResource Spacing.Size200}">
+                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
                                         <Border
                                             Width="40"
                                             Height="40"
                                             CornerRadius="14"
-                                            Background="{ThemeResourceExtension AccentFillColorTertiaryBrush}"
+                                            Background="{ThemeResource AccentFillColorTertiaryBrush}"
                                             VerticalAlignment="Center">
                                             <SymbolIcon
                                                 Symbol="Important"
-                                                Foreground="{ThemeResourceExtension TextOnAccentFillColorPrimaryBrush}"
+                                                Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
                                                 HorizontalAlignment="Center"
                                                 VerticalAlignment="Center" />
                                         </Border>
@@ -355,24 +355,24 @@
                                             <TextBlock Text="Before you run" FontSize="22" FontWeight="SemiBold" />
                                             <TextBlock
                                                 Text="Most repairs require administrator privileges and may momentarily disrupt connectivity."
-                                                Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                 TextWrapping="Wrap" />
                                         </StackPanel>
                                     </StackPanel>
 
-                                    <StackPanel Spacing="{StaticResourceExtension Spacing.Size120}">
-                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResourceExtension Spacing.Size80}">
-                                            <SymbolIcon Symbol="Shop" Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}" />
+                                    <StackPanel Spacing="{StaticResource Spacing.Size120}">
+                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
+                                            <SymbolIcon Symbol="Shop" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                             <TextBlock
                                                 Text="Run Smart Cleaner as an administrator for the best results."
-                                                Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                 TextWrapping="Wrap" />
                                         </StackPanel>
-                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResourceExtension Spacing.Size80}">
-                                            <SymbolIcon Symbol="Refresh" Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}" />
+                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
+                                            <SymbolIcon Symbol="Refresh" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                             <TextBlock
                                                 Text="Restart Windows after applying repairs if you still have trouble."
-                                                Foreground="{ThemeResourceExtension TextFillColorSecondaryBrush}"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                 TextWrapping="Wrap" />
                                         </StackPanel>
                                     </StackPanel>
