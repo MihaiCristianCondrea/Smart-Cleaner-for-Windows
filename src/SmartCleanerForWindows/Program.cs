@@ -92,20 +92,25 @@ public abstract class Program
 
     private static bool TryInitializeBootstrap()
     {
-        Exception? channelFailure = null;
         var configuration = WindowsAppSdk;
+        var failures = new List<(string Stage, Exception? Failure)>();
 
-        try
+        if (configuration.ShouldPreferBundledRuntime())
         {
-            InitializeBootstrap(configuration);
-            LogEvent("Bootstrap", configuration.BuildInitializationMessage());
+            if (TryInitializeSelfContained(out var bundledFailure))
+            {
+                return true;
+            }
+
+            failures.Add(("bundled runtime", bundledFailure));
+        }
+
+        if (TryInitializeConfiguredChannel(configuration, out var channelFailure))
+        {
             return true;
         }
-        catch (Exception ex)
-        {
-            channelFailure = ex;
-            LogEvent("Bootstrap", configuration.BuildFailureMessage(ex));
-        }
+
+        failures.Add(("configured channel", channelFailure));
 
         try
         {
@@ -115,16 +120,52 @@ public abstract class Program
         }
         catch (Exception fallbackFailure)
         {
-            ReportBootstrapFailure(channelFailure, fallbackFailure);
+            failures.Add(("machine-wide runtime", fallbackFailure));
+            ReportBootstrapFailure(failures.ToArray());
             return false;
         }
     }
 
-    private static void ReportBootstrapFailure(Exception? channelFailure, Exception fallbackFailure)
+    private static bool TryInitializeSelfContained(out Exception? failure)
     {
-        var primaryMessage = FormatBootstrapError("channel", channelFailure);
-        var fallbackMessage = FormatBootstrapError("fallback", fallbackFailure);
-        var message = string.Join(Environment.NewLine, primaryMessage, fallbackMessage);
+        try
+        {
+            Bootstrap.Initialize(WindowsAppSdkMajorMinor);
+            LogEvent("Bootstrap", "Initialized Windows App SDK using app-bundled runtime.");
+            failure = null;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            failure = ex;
+            LogEvent("Bootstrap", $"Failed to initialize Windows App SDK using the app-bundled runtime ({ex.GetType().Name}, 0x{ex.HResult:X8}). Attempting configured channel.");
+            return false;
+        }
+    }
+
+    private static bool TryInitializeConfiguredChannel(WindowsAppSdkConfiguration configuration, out Exception? failure)
+    {
+        try
+        {
+            InitializeBootstrap(configuration);
+            LogEvent("Bootstrap", configuration.BuildInitializationMessage());
+            failure = null;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            failure = ex;
+            LogEvent("Bootstrap", configuration.BuildFailureMessage(ex));
+            return false;
+        }
+    }
+
+    private static void ReportBootstrapFailure(params (string Stage, Exception? Failure)[] failures)
+    {
+        var messages = failures
+            .Select(failure => FormatBootstrapError(failure.Stage, failure.Failure))
+            .ToArray();
+        var message = string.Join(Environment.NewLine, messages);
 
         try
         {
@@ -252,6 +293,9 @@ public abstract class Program
 
         public bool TryGetPackageVersion(out DynamicDependencyPackageVersion packageVersion)
             => TryGetPackageVersion(Version, out packageVersion);
+
+        public bool ShouldPreferBundledRuntime()
+            => string.IsNullOrEmpty(Channel) || Channel.Equals("stable", StringComparison.OrdinalIgnoreCase);
 
         private string DescribeChannel()
             => string.IsNullOrEmpty(DisplayChannel) ? "the configured channel" : $"channel '{DisplayChannel}'";
