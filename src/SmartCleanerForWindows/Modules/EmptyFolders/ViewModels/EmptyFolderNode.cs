@@ -24,6 +24,8 @@ public sealed class EmptyFolderNode(string name, string fullPath, string relativ
 
     private readonly List<EmptyFolderNode> _allChildren = new();
     private readonly ObservableCollection<EmptyFolderNode> _visibleChildren = new();
+    private const double IncludedOpacity = 1.0;
+    private const double ExcludedOpacity = 0.35;
     private bool _isDirectlyExcluded;
     private bool _hasExcludedAncestor;
     private bool _isVisible = true;
@@ -82,6 +84,7 @@ public sealed class EmptyFolderNode(string name, string fullPath, string relativ
             OnPropertyChanged();
             OnPropertyChanged(nameof(IsEffectivelyExcluded));
             OnPropertyChanged(nameof(IsInlineToggleEnabled));
+            OnPropertyChanged(nameof(ExclusionOpacity));
 
             foreach (var child in _allChildren)
             {
@@ -95,6 +98,8 @@ public sealed class EmptyFolderNode(string name, string fullPath, string relativ
     public bool IsEffectivelyExcluded => _isDirectlyExcluded || _hasExcludedAncestor;
 
     public bool IsInlineToggleEnabled => !_hasExcludedAncestor;
+
+    public double ExclusionOpacity => IsEffectivelyExcluded ? ExcludedOpacity : IncludedOpacity;
 
     public bool IsVisible
     {
@@ -211,6 +216,7 @@ public sealed class EmptyFolderNode(string name, string fullPath, string relativ
         OnPropertyChanged(nameof(HasExcludedAncestor));
         OnPropertyChanged(nameof(IsEffectivelyExcluded));
         OnPropertyChanged(nameof(IsInlineToggleEnabled));
+        OnPropertyChanged(nameof(ExclusionOpacity));
 
         foreach (var child in _allChildren)
         {

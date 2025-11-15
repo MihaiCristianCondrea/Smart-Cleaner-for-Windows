@@ -17,8 +17,6 @@
             <SolidColorBrush x:Key="WindowCaptionBackgroundDisabled" Color="Transparent" />
             <SolidColorBrush x:Key="WindowCaptionForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="WindowCaptionForegroundDisabled" Color="#66FFFFFF" />
-            <local:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
-            <controls:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Light">
                     <SolidColorBrush x:Key="WindowCaptionBackground" Color="Transparent" />

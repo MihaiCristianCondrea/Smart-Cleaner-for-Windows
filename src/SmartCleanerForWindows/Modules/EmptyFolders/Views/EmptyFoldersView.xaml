@@ -471,7 +471,7 @@
                       Background="{ThemeResource LayerFillColorDefaultBrush}"
                       CornerRadius="8"
                       ToolTipService.ToolTip="{x:Bind FullPath}"
-                      Opacity="{Binding IsEffectivelyExcluded, Converter={StaticResource BoolToOpacityConverter}}">
+                      Opacity="{x:Bind ExclusionOpacity, Mode=OneWay}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />

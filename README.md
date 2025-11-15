@@ -85,6 +85,10 @@ Smart Cleaner for Windows enables the single-project MSIX tooling. To produce an
 
 Advanced users can also run `dotnet publish ... -p:WindowsPackageType=Msix` from PowerShell to create an unsigned MSIX for sideloading.
 
+## Troubleshooting XAML build failures
+
+If the build stops with `XamlCompiler.exe exited with code 1`, capture the real error by running the compiler manually and inspecting its `output.json` diagnostics. Detailed instructions live in [`docs/winui-xaml-compiler-troubleshooting.md`](docs/winui-xaml-compiler-troubleshooting.md).
+
 ## Using Smart Cleaner
 ### Empty folders cleaner
 1. Select **Empty folders** from the navigation menu.
