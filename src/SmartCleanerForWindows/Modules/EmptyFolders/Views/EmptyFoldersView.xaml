@@ -72,14 +72,17 @@
                             </Grid>
                         </Border>
 
-                        <Grid Grid.Row="1" ColumnSpacing="{StaticResource Spacing.Size240}">
+                        <Grid
+                            x:Name="EmptyFoldersLayout"
+                            Grid.Row="1"
+                            ColumnSpacing="{StaticResource Spacing.Size240}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition x:Name="EmptyFoldersPrimaryColumn" Width="*" x:FieldModifier="public" />
-                                <ColumnDefinition Width="360" />
+                                <ColumnDefinition x:Name="EmptyFoldersSecondaryColumn" Width="360" />
                             </Grid.ColumnDefinitions>
 
                             <VisualStateManager.VisualStateGroups>
@@ -122,7 +125,10 @@
                                 </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>
 
-                            <StackPanel Grid.Column="0" Spacing="{StaticResource Spacing.Size160}">
+                            <StackPanel
+                                x:Name="EmptyFoldersPrimaryPanel"
+                                Grid.Column="0"
+                                Spacing="{StaticResource Spacing.Size160}">
                                 <Border Style="{StaticResource CardStyle}">
                                     <Grid RowSpacing="{StaticResource Spacing.Size200}">
                                         <Grid.RowDefinitions>
@@ -247,7 +253,11 @@
                                 </Border>
                             </StackPanel>
 
-                            <StackPanel Grid.Row="0" Grid.Column="1" Spacing="{StaticResource Spacing.Size160}">
+                            <StackPanel
+                                x:Name="EmptyFoldersDetailsPanel"
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Spacing="{StaticResource Spacing.Size160}">
                                 <Border Style="{StaticResource CardStyle}">
                                     <StackPanel Spacing="{StaticResource Spacing.Size160}">
                                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">

@@ -74,6 +74,7 @@
                         </Border>
 
                         <Grid
+                            x:Name="LargeFilesLayout"
                             Grid.Row="1"
                             ColumnSpacing="{StaticResource Spacing.Size240}">
                             <Grid.RowDefinitions>
@@ -82,7 +83,7 @@
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="360" />
+                                <ColumnDefinition x:Name="LargeFilesOptionsColumn" Width="360" />
                             </Grid.ColumnDefinitions>
 
                             <VisualStateManager.VisualStateGroups>
@@ -116,7 +117,10 @@
                                 </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>
 
-                            <StackPanel Grid.Column="0" Spacing="{StaticResource Spacing.Size160}">
+                            <StackPanel
+                                x:Name="LargeFilesResultsPanel"
+                                Grid.Column="0"
+                                Spacing="{StaticResource Spacing.Size160}">
                                 <Border Style="{StaticResource CardStyle}">
                                     <StackPanel Spacing="{StaticResource Spacing.Size160}">
                                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
@@ -246,7 +250,11 @@
                                 </Border>
                             </StackPanel>
 
-                            <StackPanel Grid.Row="0" Grid.Column="1" Spacing="{StaticResource Spacing.Size160}">
+                            <StackPanel
+                                x:Name="LargeFilesOptionsPanel"
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Spacing="{StaticResource Spacing.Size160}">
                                 <Border Style="{StaticResource CardStyle}">
                                     <StackPanel Spacing="{StaticResource Spacing.Size200}">
                                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
