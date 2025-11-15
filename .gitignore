@@ -108,6 +108,7 @@ Smart Cleaner for Windows/Packaging/Images/**
 # Win32 .manifest (NOT the Package.appxmanifest)
 # (WinUI 3 single-project uses Package.appxmanifest; this keeps stray .manifest out)
 *.manifest
+!src/SmartCleanerForWindows/app.manifest
 !**/Package.appxmanifest
 
 # ---- Secrets / signing / misc ----------------------------------------------
