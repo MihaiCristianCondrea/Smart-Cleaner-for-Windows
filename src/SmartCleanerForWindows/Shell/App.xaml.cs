@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
+using Smart_Cleaner_for_Windows.Diagnostics;
 
 namespace Smart_Cleaner_for_Windows.Shell;
 
@@ -37,12 +38,7 @@ public partial class App : Application
 
         try
         {
-            var directory = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "SmartCleanerForWindows");
-            Directory.CreateDirectory(directory);
-
-            var logPath = Path.Combine(directory, "crash.log");
+            var logPath = AppDataPaths.GetCrashLogPath();
             File.AppendAllText(logPath,
                 $"{DateTime.Now:u} [{source}]\r\n{exception}\r\n\r\n");
         }

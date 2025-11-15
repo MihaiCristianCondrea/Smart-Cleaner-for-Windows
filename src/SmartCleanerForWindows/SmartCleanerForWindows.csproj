@@ -15,11 +15,29 @@
         <DefaultLanguage>en-US</DefaultLanguage>
         <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
         <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+        <ProjectPriFileName>SmartCleanerForWindows.pri</ProjectPriFileName>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x64</RuntimeIdentifier>
+        <SelfContained Condition="'$(SelfContained)' == '' and '$(RuntimeIdentifier)' != ''">true</SelfContained>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Platform)' == 'x86' and '$(RuntimeIdentifier)' == ''">
+        <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Platform)' == 'x64' and '$(RuntimeIdentifier)' == ''">
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Platform)' == 'ARM64' and '$(RuntimeIdentifier)' == ''">
+        <RuntimeIdentifier>win-arm64</RuntimeIdentifier>
     </PropertyGroup>
 
     <PropertyGroup>
         <WindowsAppSdkChannel Condition="'$(WindowsAppSdkChannel)'==''">stable</WindowsAppSdkChannel>
-        <WindowsAppSdkStableVersion>1.8.250916003</WindowsAppSdkStableVersion>
+        <WindowsAppSdkStableVersion>1.8.251003001</WindowsAppSdkStableVersion>
         <WindowsAppSdkPreviewVersion>1.8.250814004-preview</WindowsAppSdkPreviewVersion>
         <WindowsAppSdkExperimentalVersion>1.8.250610002-experimental3</WindowsAppSdkExperimentalVersion>
     </PropertyGroup>
@@ -47,6 +65,14 @@
     <ItemGroup>
         <AdditionalFiles Include="NativeMethods.txt"/>
     </ItemGroup>
+
+    <Target Name="CopyPriToOutput" AfterTargets="Build">
+        <ItemGroup>
+            <PriFiles Include="$(OutDir)**\$(ProjectPriFileName)" Exclude="$(OutDir)$(ProjectPriFileName)" />
+        </ItemGroup>
+
+        <Copy SourceFiles="@(PriFiles)" DestinationFolder="$(OutDir)" Condition="@(PriFiles) != ''" SkipUnchangedFiles="true" />
+    </Target>
 
     <ItemGroup>
       <Folder Include="Core\DiskCleanup\" />
