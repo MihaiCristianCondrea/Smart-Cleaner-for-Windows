@@ -88,7 +88,7 @@
 
                             <VisualStateManager.VisualStateGroups>
                                 <VisualStateGroup>
-                                    <VisualState x:Name="LargeFilesCompactState" x:FieldModifier="internal">
+                                    <VisualState x:Name="LargeFilesCompactState">
                                         <VisualState.StateTriggers>
                                             <AdaptiveTrigger MinWindowWidth="0" />
                                         </VisualState.StateTriggers>
@@ -101,7 +101,7 @@
                                             <Setter Target="LargeFilesOptionsPanel.(Grid.ColumnSpan)" Value="2" />
                                         </VisualState.Setters>
                                     </VisualState>
-                                    <VisualState x:Name="LargeFilesWideState" x:FieldModifier="internal">
+                                    <VisualState x:Name="LargeFilesWideState">
                                         <VisualState.StateTriggers>
                                             <AdaptiveTrigger MinWindowWidth="960" />
                                         </VisualState.StateTriggers>

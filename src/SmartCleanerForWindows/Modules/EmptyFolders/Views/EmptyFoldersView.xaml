@@ -81,13 +81,13 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition x:Name="EmptyFoldersPrimaryColumn" Width="*" x:FieldModifier="public" />
+                                <ColumnDefinition x:Name="EmptyFoldersPrimaryColumn" Width="*" />
                                 <ColumnDefinition x:Name="EmptyFoldersSecondaryColumn" Width="360" />
                             </Grid.ColumnDefinitions>
 
                             <VisualStateManager.VisualStateGroups>
                                 <VisualStateGroup>
-                                    <VisualState x:Name="EmptyFoldersCompactState" x:FieldModifier="internal">
+                                    <VisualState x:Name="EmptyFoldersCompactState">
                                         <VisualState.StateTriggers>
                                             <AdaptiveTrigger MinWindowWidth="0" />
                                         </VisualState.StateTriggers>
@@ -100,7 +100,7 @@
                                             <Setter Target="EmptyFoldersDetailsPanel.(Grid.ColumnSpan)" Value="2" />
                                         </VisualState.Setters>
                                     </VisualState>
-                                    <VisualState x:Name="EmptyFoldersMediumState" x:FieldModifier="internal">
+                                    <VisualState x:Name="EmptyFoldersMediumState">
                                         <VisualState.StateTriggers>
                                             <AdaptiveTrigger MinWindowWidth="840" />
                                         </VisualState.StateTriggers>
@@ -113,7 +113,7 @@
                                             <Setter Target="EmptyFoldersDetailsPanel.(Grid.ColumnSpan)" Value="1" />
                                         </VisualState.Setters>
                                     </VisualState>
-                                    <VisualState x:Name="EmptyFoldersWideState" x:FieldModifier="internal">
+                                    <VisualState x:Name="EmptyFoldersWideState">
                                         <VisualState.StateTriggers>
                                             <AdaptiveTrigger MinWindowWidth="1024" />
                                         </VisualState.StateTriggers>
