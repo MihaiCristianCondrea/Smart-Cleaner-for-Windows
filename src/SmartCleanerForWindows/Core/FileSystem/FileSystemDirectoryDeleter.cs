@@ -5,21 +5,21 @@ using System.Runtime.Versioning;
 
 namespace Smart_Cleaner_for_Windows.Core.FileSystem
 {
-    public sealed class FileSystemDirectoryDeleter : IDirectoryDeleter // FIXME: Cannot resolve symbol 'IDirectoryDeleter'
+    public sealed class FileSystemDirectoryDeleter : IDirectoryDeleter
     {
-        public void Delete(string path, DirectoryDeletionMode mode) // FIXME: Cannot resolve symbol 'DirectoryDeletionMode'
+        public void Delete(string path, DirectoryDeletionMode mode)
         {
             if (string.IsNullOrWhiteSpace(path))
                 throw new ArgumentException("Path cannot be null or whitespace.", nameof(path));
 
             switch (mode)
             {
-                case DirectoryDeletionMode.Permanent: //FIXME: Cannot resolve symbol 'DirectoryDeletionMode'
+                case DirectoryDeletionMode.Permanent:
                     // Matches your original behavior (non-recursive); change to true if desired.
                     Directory.Delete(path, recursive: false);
                     break;
 
-                case DirectoryDeletionMode.RecycleBin: //FIXME: Cannot resolve symbol 'DirectoryDeletionMode'
+                case DirectoryDeletionMode.RecycleBin:
                     DeleteToRecycleBin(path);
                     break;
 

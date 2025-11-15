@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Smart_Cleaner_for_Windows.Core.FileSystem;
 
-public sealed class FileSystemDirectorySystem : IDirectorySystem // FIXME: Cannot resolve symbol 'IDirectorySystem'
+public sealed class FileSystemDirectorySystem : IDirectorySystem
 {
     public bool Exists(string path) => Directory.Exists(path);
 

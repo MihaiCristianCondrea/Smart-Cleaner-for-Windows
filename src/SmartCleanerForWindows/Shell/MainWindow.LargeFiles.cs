@@ -356,14 +356,14 @@ public sealed partial class MainWindow
         _largeFileGroups.Clear();
 
         var groups = result.Files
-            .GroupBy(file => file.Type) // FIXME: The type arguments for method 'IEnumerable<IGrouping<TKey,TSource>> System.Linq.Enumerable.GroupBy<TSource,TKey>(this IEnumerable<TSource>, Func<TSource,TKey>)' cannot be inferred from the usage. Try specifying the type arguments explicitly.
-            .Select(group => new // FIXME: The type arguments for method 'IEnumerable<TResult> System.Linq.Enumerable.Select<TSource,TResult>(this IEnumerable<TSource>, Func<TSource,TResult>)' cannot be inferred from the usage. Try specifying the type arguments explicitly.
+            .GroupBy(file => file.Type)
+            .Select(group => new
             {
                 Name = group.Key,
-                Entries = group.OrderByDescending(entry => entry.Size).ToList(), // FIXME: The type arguments for method 'IOrderedEnumerable<TSource> System.Linq.Enumerable.OrderByDescending<TSource,TKey>(this IEnumerable<TSource>, Func<TSource,TKey>)' cannot be inferred from the usage. Try specifying the type arguments explicitly.
-                Total = group.Aggregate(0L, (current, entry) => current + Math.Max(0L, entry.Size)) // FIXME: <html>Ambiguous invocation.<br/>Candidates are:<br/>Max(decimal, decimal) : decimal<br/>Max(double, double) : double<br/>Max(float, float) : float<br/>Max(long, long) : long<br/>Max(ulong, ulong) : ulong<br/>all from class Math
+                Entries = group.OrderByDescending(entry => entry.Size).ToList(),
+                Total = group.Aggregate(0L, (current, entry) => current + Math.Max(0L, entry.Size))
             })
-            .OrderByDescending(group => group.Total) // FIXME: The type arguments for method 'IOrderedEnumerable<TSource> System.Linq.Enumerable.OrderByDescending<TSource,TKey>(this IEnumerable<TSource>, Func<TSource,TKey>)' cannot be inferred from the usage. Try specifying the type arguments explicitly.
+            .OrderByDescending(group => group.Total)
             .ThenBy(group => group.Name, StringComparer.CurrentCultureIgnoreCase);
 
         foreach (var group in groups)

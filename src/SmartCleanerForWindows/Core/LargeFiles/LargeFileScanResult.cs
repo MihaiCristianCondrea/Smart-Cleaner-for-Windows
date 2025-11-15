@@ -12,7 +12,7 @@ public sealed class LargeFileScanResult
     {
     }
 
-    public LargeFileScanResult(IEnumerable<LargeFileEntry> files, IEnumerable<LargeFileScanFailure> failures) // FIXME: Cannot resolve symbol 'LargeFileEntry'
+    public LargeFileScanResult(IEnumerable<LargeFileEntry> files, IEnumerable<LargeFileScanFailure> failures)
     {
         if (files is null)
         {
@@ -27,12 +27,12 @@ public sealed class LargeFileScanResult
         var fileList = files.ToList();
         var failureList = failures.ToList();
 
-        Files = new ReadOnlyCollection<LargeFileEntry>(fileList); // FIXME: Cannot resolve symbol 'LargeFileEntry'
+        Files = new ReadOnlyCollection<LargeFileEntry>(fileList);
         Failures = new ReadOnlyCollection<LargeFileScanFailure>(failureList);
-        fileList.Aggregate(0L, (current, entry) => current + Math.Max(0L, entry.Size)); // FIXME: <html>Ambiguous invocation.<br/>Candidates are:<br/>Max(decimal, decimal) : decimal<br/>Max(double, double) : double<br/>Max(float, float) : float<br/>Max(long, long) : long<br/>Max(ulong, ulong) : ulong<br/>all from class Math
+        fileList.Aggregate(0L, (current, entry) => current + Math.Max(0L, entry.Size));
     }
 
-    public IReadOnlyList<LargeFileEntry> Files { get; } // FIXME: Cannot resolve symbol 'LargeFileEntry'
+    public IReadOnlyList<LargeFileEntry> Files { get; }
 
     public IReadOnlyList<LargeFileScanFailure> Failures { get; }
 

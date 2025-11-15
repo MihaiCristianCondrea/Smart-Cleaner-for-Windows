@@ -4,11 +4,11 @@ using System.IO;
 
 namespace Smart_Cleaner_for_Windows.Core.FileSystem;
 
-internal sealed class DirectoryDeletionService(IDirectoryDeleter directoryDeleter) : IDirectoryDeletionService // FIXME: Cannot resolve symbol 'IDirectoryDeleter' && Cannot resolve symbol 'IDirectoryDeletionService'
+internal sealed class DirectoryDeletionService(IDirectoryDeleter directoryDeleter) : IDirectoryDeletionService
 {
-    private readonly IDirectoryDeleter _directoryDeleter = directoryDeleter ?? throw new ArgumentNullException(nameof(directoryDeleter)); // FIXME: Cannot resolve symbol 'IDirectoryDeleter'
+    private readonly IDirectoryDeleter _directoryDeleter = directoryDeleter ?? throw new ArgumentNullException(nameof(directoryDeleter));
 
-    public bool TryDelete(string directory, DirectoryDeletionMode mode, ICollection<DirectoryCleanFailure> failures) // FIXME: Cannot resolve symbol 'DirectoryDeletionMode'
+    public bool TryDelete(string directory, DirectoryDeletionMode mode, ICollection<DirectoryCleanFailure> failures)
     {
         try
         {

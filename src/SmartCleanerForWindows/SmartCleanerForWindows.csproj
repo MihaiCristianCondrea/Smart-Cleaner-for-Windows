@@ -44,30 +44,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Remove="Core\DiskCleanup\DiskCleanupService.cs" />
-      <Compile Remove="Core\DiskCleanup\DiskCleanupServiceFactory.cs" />
-      <Compile Remove="Core\DiskCleanup\DiskCleanupVolumeService.cs" />
-      <Compile Remove="Core\DiskCleanup\IDiskCleanupExecutor.cs" />
-      <Compile Remove="Core\DiskCleanup\IDiskCleanupService.cs" />
-      <Compile Remove="Core\DiskCleanup\IRegistryDiskCleanupInterop.cs" />
-      <Compile Remove="Core\DiskCleanup\IStaTaskScheduler.cs" />
-      <Compile Remove="Core\DiskCleanup\RegistryDiskCleanupAnalyzer.cs" />
-      <Compile Remove="Core\FileSystem\DirectoryCleaner.cs" />
-      <Compile Remove="Core\FileSystem\DirectoryCleanerFactory.cs" />
-      <Compile Remove="Core\FileSystem\DirectoryCleanOptions.cs" />
-      <Compile Remove="Core\FileSystem\DirectoryDeletionMode.cs" />
-      <Compile Remove="Core\FileSystem\DirectoryTraversalRequest.cs" />
-      <Compile Remove="Core\FileSystem\IDirectoryCleaner.cs" />
-      <Compile Remove="Core\FileSystem\IDirectoryDeleter.cs" />
-      <Compile Remove="Core\FileSystem\IDirectoryDeletionService.cs" />
-      <Compile Remove="Core\FileSystem\IDirectorySystem.cs" />
-      <Compile Remove="Core\FileSystem\IDirectoryTraversalService.cs" />
-      <Compile Remove="Core\FileSystem\IEmptyDirectoryDetector.cs" />
-      <Compile Remove="Core\LargeFiles\LargeFileEntry.cs" />
-      <Compile Remove="Modules\Dashboard\Views\DashboardView.xaml.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Folder Include="Core\DiskCleanup\" />
       <Folder Include="Core\FileSystem\" />
       <Folder Include="inspiration\Source\Includes\" />
