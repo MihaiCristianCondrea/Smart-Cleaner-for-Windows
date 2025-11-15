@@ -14,7 +14,6 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.Windows.ApplicationModel.Resources;
 using Smart_Cleaner_for_Windows.Core.FileSystem;
-using Smart_Cleaner_for_Windows.Core.DiskCleanup;
 using Smart_Cleaner_for_Windows.Core.Storage;
 using Smart_Cleaner_for_Windows.Core.LargeFiles;
 using Smart_Cleaner_for_Windows.Core.Networking;
@@ -35,7 +34,7 @@ namespace Smart_Cleaner_for_Windows.Shell;
 
 public sealed partial class MainWindow : IEmptyFolderCleanupView
 {
-    private readonly IDiskCleanupService _diskCleanupService;
+    private readonly IDiskCleanupService _diskCleanupService; // FIXME: Cannot resolve symbol 'IDiskCleanupService'
     private readonly IStorageOverviewService _storageOverviewService;
     private readonly ILargeFileExplorer _largeFileExplorer;
     private readonly IInternetRepairService _internetRepairService;
@@ -132,40 +131,40 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
     public MainWindow()
         : this(
-            DirectoryCleanerFactory.CreateDefault(),
-            DiskCleanupServiceFactory.CreateDefault(),
+            DirectoryCleanerFactory.CreateDefault(), // FIXME: Cannot resolve symbol 'DirectoryCleanerFactory'
+            DiskCleanupServiceFactory.CreateDefault(), // FIXME: Cannot resolve symbol 'DiskCleanupServiceFactory'
             new StorageOverviewService(),
             LargeFileExplorer.Default,
             InternetRepairServiceFactory.CreateDefault())
     {
     }
 
-    public MainWindow(IDirectoryCleaner directoryCleaner)
+    public MainWindow(IDirectoryCleaner directoryCleaner) // FIXME: Cannot resolve symbol 'IDirectoryCleaner'
         : this(
             directoryCleaner,
-            DiskCleanupServiceFactory.CreateDefault(),
+            DiskCleanupServiceFactory.CreateDefault(), //FIXME: Cannot resolve symbol 'DiskCleanupServiceFactory'
             new StorageOverviewService(),
             LargeFileExplorer.Default,
             InternetRepairServiceFactory.CreateDefault())
     {
     }
 
-    public MainWindow(IDirectoryCleaner directoryCleaner, IDiskCleanupService diskCleanupService)
+    public MainWindow(IDirectoryCleaner directoryCleaner, IDiskCleanupService diskCleanupService) // FIXME: Cannot resolve symbol 'IDirectoryCleaner' && Cannot resolve symbol 'IDiskCleanupService'
         : this(directoryCleaner, diskCleanupService, new StorageOverviewService(), LargeFileExplorer.Default, InternetRepairServiceFactory.CreateDefault())
     {
     }
 
     public MainWindow(
-        IDirectoryCleaner directoryCleaner,
-        IDiskCleanupService diskCleanupService,
+        IDirectoryCleaner directoryCleaner, //FIXME: Cannot resolve symbol 'IDirectoryCleaner'
+        IDiskCleanupService diskCleanupService, // FIXME: Cannot resolve symbol 'IDiskCleanupService'
         IStorageOverviewService storageOverviewService)
         : this(directoryCleaner, diskCleanupService, storageOverviewService, LargeFileExplorer.Default, InternetRepairServiceFactory.CreateDefault())
     {
     }
 
     private MainWindow(
-        IDirectoryCleaner directoryCleaner,
-        IDiskCleanupService diskCleanupService,
+        IDirectoryCleaner directoryCleaner, // FIXME: Cannot resolve symbol 'IDirectoryCleaner'
+        IDiskCleanupService diskCleanupService, // FIXME: Cannot resolve symbol 'IDiskCleanupService'
         IStorageOverviewService storageOverviewService,
         ILargeFileExplorer largeFileExplorer,
         IInternetRepairService internetRepairService)
@@ -184,9 +183,9 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
         LargeFilesView.LargeFilesGroupList.ItemsSource = _largeFileGroups;
 
-        DashboardView.NavigateToEmptyFoldersRequested += (_, _) => NavigateTo(EmptyFoldersItem);
-        DashboardView.NavigateToLargeFilesRequested += (_, _) => NavigateTo(LargeFilesItem);
-        DashboardView.NavigateToDiskCleanupRequested += (_, _) => NavigateTo(DiskCleanupItem);
+        DashboardView.NavigateToEmptyFoldersRequested += (_, _) => NavigateTo(EmptyFoldersItem); // FIXME: Cannot resolve symbol 'NavigateToEmptyFoldersRequested'
+        DashboardView.NavigateToLargeFilesRequested += (_, _) => NavigateTo(LargeFilesItem); // FIXME: Cannot resolve symbol 'NavigateToLargeFilesRequested'
+        DashboardView.NavigateToDiskCleanupRequested += (_, _) => NavigateTo(DiskCleanupItem); // FIXME: Cannot resolve symbol 'NavigateToDiskCleanupRequested'
         DashboardView.NavigateToInternetRepairRequested += (_, _) => NavigateTo(InternetRepairItem);
 
         EmptyFoldersView.BrowseRequested += OnBrowse;
@@ -247,7 +246,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         UpdateLargeFilesSummary();
         UpdateLargeFilesExclusionState();
 
-        DashboardView.DriveUsageListControl.ItemsSource = _driveUsage;
+        DashboardView.DriveUsageListControl.ItemsSource = _driveUsage; // FIXME: Cannot resolve symbol 'DriveUsageListControl'
         _ = UpdateStorageOverviewAsync();
 
         if (Application.Current.Resources.TryGetValue("AccentButtonStyle", out var accentStyleObj) &&
@@ -477,8 +476,8 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
             if (result.ReadyDriveCount == 0)
             {
-                DashboardView.StorageSummaryTextBlock.Text = "No ready drives detected.";
-                DashboardView.StorageTipTextBlock.Text = "Connect or unlock a drive to view usage details.";
+                DashboardView.StorageSummaryTextBlock.Text = "No ready drives detected."; // FIXME: Cannot resolve symbol 'StorageSummaryTextBlock'
+                DashboardView.StorageTipTextBlock.Text = "Connect or unlock a drive to view usage details."; // FIXME: Cannot resolve symbol 'StorageTipTextBlock'
                 return;
             }
 

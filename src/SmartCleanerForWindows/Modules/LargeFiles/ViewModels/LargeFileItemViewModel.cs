@@ -1,5 +1,4 @@
 using System;
-using Smart_Cleaner_for_Windows.Core.LargeFiles;
 using Smart_Cleaner_for_Windows.Core.Storage;
 using IOPath = System.IO.Path;
 
@@ -8,7 +7,7 @@ namespace Smart_Cleaner_for_Windows.Modules.LargeFiles.ViewModels;
 public sealed class LargeFileItemViewModel
 {
     public LargeFileItemViewModel(
-        LargeFileEntry entry,
+        LargeFileEntry entry, // FIXME: Cannot resolve symbol 'LargeFileEntry'
         string extensionDisplay,
         Func<ulong, string>? formatBytes = null)
     {
@@ -23,13 +22,13 @@ public sealed class LargeFileItemViewModel
         Size = entry.Size;
         Name = string.IsNullOrWhiteSpace(entry.Path)
             ? string.Empty
-            : IOPath.GetFileName(entry.Path);
+            : IOPath.GetFileName(entry.Path); // FIXME: <html>Ambiguous invocation.<br/>Candidates are:<br/>GetFileName(ReadOnlySpan&lt;char&gt;) : ReadOnlySpan&lt;char&gt;<br/>GetFileName(string?) : string?<br/>all from class Path
         Directory = entry.Directory;
         ExtensionDisplay = string.IsNullOrWhiteSpace(extensionDisplay)
             ? string.Empty
             : extensionDisplay;
         TypeName = entry.Type;
-        SizeDisplay = sizeFormatter((ulong)Math.Max(0L, entry.Size));
+        SizeDisplay = sizeFormatter(Math.Max(0L, entry.Size)); // FIXME: <html>Ambiguous invocation.<br/>Candidates are:<br/>Max(decimal, decimal) : decimal<br/>Max(double, double) : double<br/>Max(float, float) : float<br/>Max(long, long) : long<br/>Max(ulong, ulong) : ulong<br/>all from class Math
     }
 
     public string Path { get; }

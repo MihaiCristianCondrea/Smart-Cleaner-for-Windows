@@ -10,7 +10,7 @@ using Smart_Cleaner_for_Windows.Core.FileSystem;
 
 namespace Smart_Cleaner_for_Windows.Core.LargeFiles;
 
-public sealed class LargeFileExplorer(IDirectorySystem directorySystem) : ILargeFileExplorer
+public sealed class LargeFileExplorer(IDirectorySystem directorySystem) : ILargeFileExplorer // FIXME: Cannot resolve symbol 'IDirectorySystem'
 {
     private static readonly bool IgnoreCase = OperatingSystem.IsWindows();
     private static readonly StringComparer PathComparer = IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
@@ -99,12 +99,12 @@ public sealed class LargeFileExplorer(IDirectorySystem directorySystem) : ILarge
         [".xps"] = "Documents",
     };
 
-    private readonly IDirectorySystem _directorySystem = directorySystem ?? throw new ArgumentNullException(nameof(directorySystem));
+    private readonly IDirectorySystem _directorySystem = directorySystem ?? throw new ArgumentNullException(nameof(directorySystem)); // FIXME: Cannot resolve symbol 'IDirectorySystem'
 
     public static ILargeFileExplorer Default { get; } = new LargeFileExplorer();
 
     private LargeFileExplorer()
-        : this(new FileSystemDirectorySystem())
+        : this(new FileSystemDirectorySystem()) // FIXME: Argument type 'Smart_Cleaner_for_Windows.Core.FileSystem.FileSystemDirectorySystem' is not assignable to parameter type 'IDirectorySystem'
     {
     }
 
@@ -133,7 +133,7 @@ public sealed class LargeFileExplorer(IDirectorySystem directorySystem) : ILarge
         }
 
         var normalizedRoot = NormalizePath(root);
-        var files = new List<LargeFileEntry>();
+        var files = new List<LargeFileEntry>(); // FIXME: Cannot resolve symbol 'LargeFileEntry'
         var failures = new List<LargeFileScanFailure>();
         var exclusions = new PathExclusionFilter(normalizedRoot, options, failures);
 
@@ -172,7 +172,7 @@ public sealed class LargeFileExplorer(IDirectorySystem directorySystem) : ILarge
                 {
                     var info = new FileInfo(normalizedFile);
                     var type = GetFileType(normalizedFile, info.Extension);
-                    files.Add(new LargeFileEntry(normalizedFile, info.Length, type));
+                    files.Add(new LargeFileEntry(normalizedFile, info.Length, type)); // FIXME: Cannot resolve symbol 'LargeFileEntry'
                 }
                 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
                 {

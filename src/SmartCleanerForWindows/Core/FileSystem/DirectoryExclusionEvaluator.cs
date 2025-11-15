@@ -13,7 +13,7 @@ internal sealed class DirectoryExclusionEvaluator : IDirectoryExclusionEvaluator
 
     public DirectoryExclusionEvaluator(
         string root,
-        DirectoryCleanOptions options,
+        DirectoryCleanOptions options, // FIXME: Cannot resolve symbol 'DirectoryCleanOptions'
         ICollection<DirectoryCleanFailure> failures)
     {
         if (string.IsNullOrWhiteSpace(root))
@@ -35,7 +35,7 @@ internal sealed class DirectoryExclusionEvaluator : IDirectoryExclusionEvaluator
 
                 try
                 {
-                    var resolved = Path.IsPathRooted(path)
+                    var resolved = Path.IsPathRooted(path) // FIXME: <html>Ambiguous invocation.<br/>Candidates are:<br/>IsPathRooted(ReadOnlySpan&lt;char&gt;)<br/>IsPathRooted(string?)<br/>all from class Path
                         ? PathUtilities.NormalizeDirectoryPath(path)
                         : PathUtilities.NormalizeDirectoryPath(Path.Combine(root, path));
                     _fullPathExclusions.Add(resolved);

@@ -164,7 +164,7 @@ public sealed partial class MainWindow
 
             if (result.HasFailures)
             {
-                var details = string.Join(Environment.NewLine, result.Failures.Select(f => $"• {f.Name}: {f.Message}"));
+                var details = string.Join(Environment.NewLine, result.Failures.Select(f => $"• {f.Name}: {f.Message}")); // FIXME: <html>Ambiguous invocation.<br/>Candidates are:<br/>AppendFormatted(object?, int, string?)<br/>AppendFormatted(scoped ReadOnlySpan&lt;char&gt;)<br/>AppendFormatted(scoped ReadOnlySpan&lt;char&gt;, int, string?)<br/>AppendFormatted(string?)<br/>AppendFormatted(string?, int, string?)<br/>all from struct DefaultInterpolatedStringHandler
                 message += Environment.NewLine + details;
             }
 

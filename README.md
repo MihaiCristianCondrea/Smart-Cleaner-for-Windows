@@ -16,10 +16,10 @@ Smart Cleaner for Windows is a modern WinUI 3 desktop utility that helps you tid
 ## Repository layout
 | Path | Description |
 | --- | --- |
-| `Smart Cleaner for Windows/` | WinUI 3 single-project desktop application (XAML, view models, and assets). |
-| `Smart Cleaner for Windows/Core/` | Cross-platform logic for scanning directories and integrating with the Windows Disk Cleanup COM handlers. |
-| `Smart Cleaner for Windows/Strings/` | Localized resources (`en-US` and `es-ES`). |
-| `Smart Cleaner for Windows/Properties/PublishProfiles/` | Publish profiles for x86, x64, and ARM64 self-contained builds. |
+| `src/SmartCleanerForWindows/` | WinUI 3 single-project desktop application (XAML, view models, and assets). |
+| `src/SmartCleanerForWindows/Core/` | Cross-platform logic for scanning directories and integrating with the Windows Disk Cleanup COM handlers. |
+| `src/SmartCleanerForWindows/Strings/` | Localized resources (`en-US` and `es-ES`). |
+| `src/SmartCleanerForWindows/Properties/PublishProfiles/` | Publish profiles for x86, x64, and ARM64 self-contained builds. |
 | `docs/SOLID-refactoring-guide.md` | Architecture roadmap for breaking the monolithic window into SOLID-aligned modules. |
 
 ## Getting started
@@ -36,14 +36,14 @@ dotnet restore
 
 ### 3. Build the solution
 ```powershell
-dotnet build "Smart Cleaner for Windows.sln" -c Release
+dotnet build "SmartCleanerForWindows.sln" -c Release
 ```
 
 ### 4. Run from the command line
 ```powershell
-dotnet run --project "Smart Cleaner for Windows/Smart Cleaner for Windows.csproj" -c Debug
+dotnet run --project "src/SmartCleanerForWindows/SmartCleanerForWindows.csproj" -c Debug
 ```
-Alternatively, open `Smart Cleaner for Windows.sln` in Visual Studio and press **F5**.
+Alternatively, open `SmartCleanerForWindows.sln` in Visual Studio and press **F5**.
 
 ### Use JetBrains Rider or other IDEs
 If your IDE discovers an older .NET 8 SDK first, the WinUI XAML compiler can run into tooling mismatches. Ensure Rider (or any other external tool) points to the .NET 9 SDK specified in `global.json`:
@@ -59,12 +59,12 @@ Rider will now respect the pinned SDK version and the build will succeed on all 
 Use the supplied publish profiles to create portable outputs that do not require the .NET runtime on the target machine:
 
 ```powershell
-dotnet publish "Smart Cleaner for Windows/Smart Cleaner for Windows.csproj" -c Release -p:PublishProfile=win-x64
+dotnet publish "src/SmartCleanerForWindows/SmartCleanerForWindows.csproj" -c Release -p:PublishProfile=win-x64
 ```
 
 The resulting files live in:
 ```
-Smart Cleaner for Windows/bin/Release/net9.0-windows10.0.19041.0/win-x64/publish/
+src/SmartCleanerForWindows/bin/Release/net9.0-windows10.0.19041.0/win-x64/publish/
 ```
 Distribute the entire **publish** folder (zipping it works well). Switch to `win-x86` or `win-arm64` to generate binaries for other architectures.
 
@@ -72,8 +72,8 @@ Distribute the entire **publish** folder (zipping it works well). Switch to `win
 The project references stable, preview, and experimental channels. Override the default (stable) channel with an MSBuild property:
 
 ```powershell
-dotnet build "Smart Cleaner for Windows/Smart Cleaner for Windows.csproj" -p:WindowsAppSdkChannel=preview
-dotnet publish "Smart Cleaner for Windows/Smart Cleaner for Windows.csproj" -c Release -p:PublishProfile=win-x64 -p:WindowsAppSdkChannel=experimental
+dotnet build "src/SmartCleanerForWindows/SmartCleanerForWindows.csproj" -p:WindowsAppSdkChannel=preview
+dotnet publish "src/SmartCleanerForWindows/SmartCleanerForWindows.csproj" -c Release -p:PublishProfile=win-x64 -p:WindowsAppSdkChannel=experimental
 ```
 
 ### Package as MSIX
@@ -99,15 +99,3 @@ Advanced users can also run `dotnet publish ... -p:WindowsPackageType=Msix` from
 4. Choose **Clean selected** to reclaim space. Results summarize the freed space and any failures.
 
 ### Personalization
-Open **Settings** to switch between light, dark, or system theme; apply the custom “Zest” accent; and view app information.
-
-## Localization
-The app ships with resource files for **English (United States)** and **Spanish (Spain)**. Add additional `.resw` files under `Strings/` to extend localization coverage.
-
-## Privacy
-All scans and cleanups happen locally on your machine. The app does not collect telemetry or send data over the network.
-
-## Credits
-- Windows App SDK / WinUI 3
-- Windows Community Toolkit (implicit animations and helpers)
-- Fluent Design System guidance

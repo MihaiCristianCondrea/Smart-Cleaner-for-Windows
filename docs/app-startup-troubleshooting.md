@@ -16,9 +16,8 @@ This note summarises startup failures we have diagnosed so far and how to remedi
 
 ### Fix
 
-* Defer construction of the shared `DirectoryCleaner` instance with `Lazy<IDirectoryCleaner>` so that the factory only runs after the type initialiser has completed.
-* Update the class to resolve the default instance through the lazy wrapper.
-
+* Disable trimming for every configuration in `src/SmartCleanerForWindows/SmartCleanerForWindows.csproj`.
+* Rebuild and republish the MSIX package so that all WinUI runtime types remain in the bundle.
 ### Verification checklist
 
 * [ ] App launches to the dashboard when installed from MSIX and when run unpackaged.
@@ -108,7 +107,7 @@ This note summarises startup failures we have diagnosed so far and how to remedi
 
 ### Fix
 
-* Disable trimming for every configuration in `Smart Cleaner for Windows.csproj`.
+* Disable trimming for every configuration in `src/SmartCleanerForWindows/SmartCleanerForWindows.csproj`.
 * Rebuild and republish the MSIX package so that all WinUI runtime types remain in the bundle.
 
 ### Verification checklist

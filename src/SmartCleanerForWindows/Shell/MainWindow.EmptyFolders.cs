@@ -315,7 +315,7 @@ public sealed partial class MainWindow
         SetBusy(false);
     }
 
-    private DirectoryCleanOptions CreateOptions(bool dryRun)
+    private DirectoryCleanOptions CreateOptions(bool dryRun) // FIXME: Cannot resolve symbol 'DirectoryCleanOptions'
     {
         var depthValue = EmptyFoldersView.DepthBox.Value;
         int? maxDepth = null;
@@ -328,15 +328,15 @@ public sealed partial class MainWindow
             }
         }
 
-        return new DirectoryCleanOptions
+        return new DirectoryCleanOptions // FIXME: Cannot resolve symbol 'DirectoryCleanOptions'
         {
-            DryRun = dryRun,
-            SendToRecycleBin = EmptyFoldersView.RecycleChk.IsChecked == true,
-            SkipReparsePoints = true,
-            DeleteRootWhenEmpty = false,
-            MaxDepth = maxDepth,
-            ExcludedNamePatterns = ParseExclusions(EmptyFoldersView.ExcludeBox.Text),
-            ExcludedFullPaths = _inlineExcludedPaths.ToArray(),
+            DryRun = dryRun, // FIXME: Cannot resolve symbol 'DryRun'
+            SendToRecycleBin = EmptyFoldersView.RecycleChk.IsChecked == true, // FIXME: Cannot resolve symbol 'SendToRecycleBin'
+            SkipReparsePoints = true, //FIXME: Cannot resolve symbol 'SkipReparsePoints'
+            DeleteRootWhenEmpty = false, //FIXME: Cannot resolve symbol 'DeleteRootWhenEmpty'
+            MaxDepth = maxDepth, //FIXME: Cannot resolve symbol 'MaxDepth'
+            ExcludedNamePatterns = ParseExclusions(EmptyFoldersView.ExcludeBox.Text), // FIXME: Cannot resolve symbol 'ExcludedNamePatterns'
+            ExcludedFullPaths = _inlineExcludedPaths.ToArray(), // FIXME: Cannot resolve symbol 'ExcludedFullPaths'
         };
     }
 
