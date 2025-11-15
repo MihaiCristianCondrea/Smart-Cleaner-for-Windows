@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using Microsoft.UI.Dispatching;
@@ -15,8 +17,7 @@ namespace Smart_Cleaner_for_Windows;
 public abstract class Program
 {
     private const uint WindowsAppSdkMajorMinor = 0x00010008;
-    private const string WindowsAppSdkChannel = "stable";
-    private static readonly string WindowsAppSdkVersion = GetWindowsAppSdkVersion();
+    private static readonly WindowsAppSdkConfiguration WindowsAppSdk = WindowsAppSdkConfiguration.Load();
 
     [STAThread]
     public static void Main(string[] args)
@@ -92,28 +93,18 @@ public abstract class Program
     private static bool TryInitializeBootstrap()
     {
         Exception? channelFailure = null;
+        var configuration = WindowsAppSdk;
 
         try
         {
-            if (TryGetPackageVersion(WindowsAppSdkVersion, out var packageVersion))
-            {
-                Bootstrap.Initialize(WindowsAppSdkMajorMinor, WindowsAppSdkChannel, packageVersion);
-                LogEvent("Bootstrap", $"Initialized Windows App SDK using packaged runtime {WindowsAppSdkVersion}.");
-            }
-            else
-            {
-                Bootstrap.Initialize(WindowsAppSdkMajorMinor, WindowsAppSdkChannel);
-                LogEvent("Bootstrap", $"Initialized Windows App SDK using channel '{WindowsAppSdkChannel}'.");
-            }
-
+            InitializeBootstrap(configuration);
+            LogEvent("Bootstrap", configuration.BuildInitializationMessage());
             return true;
         }
         catch (Exception ex)
         {
             channelFailure = ex;
-            LogEvent(
-                "Bootstrap",
-                $"Failed to initialize Windows App SDK from channel '{WindowsAppSdkChannel}' ({ex.GetType().Name}, 0x{ex.HResult:X8}). Attempting fallback.");
+            LogEvent("Bootstrap", configuration.BuildFailureMessage(ex));
         }
 
         try
@@ -171,6 +162,17 @@ public abstract class Program
         }
     }
 
+    private static void InitializeBootstrap(WindowsAppSdkConfiguration configuration)
+    {
+        if (configuration.TryGetPackageVersion(out var packageVersion))
+        {
+            Bootstrap.Initialize(WindowsAppSdkMajorMinor, configuration.Channel, packageVersion);
+            return;
+        }
+
+        Bootstrap.Initialize(WindowsAppSdkMajorMinor, configuration.Channel);
+    }
+
     private static void LogEvent(string category, string message)
     {
         try
@@ -184,67 +186,6 @@ public abstract class Program
         }
     }
 
-    private static string GetWindowsAppSdkVersion()
-    {
-        try
-        {
-            var attribute = typeof(Bootstrap).Assembly
-                .GetCustomAttribute<AssemblyFileVersionAttribute>();
-            return attribute?.Version ?? string.Empty;
-        }
-        catch
-        {
-            return string.Empty;
-        }
-    }
-
-    private static bool TryGetPackageVersion(
-        string version,
-        out DynamicDependencyPackageVersion packageVersion)
-    {
-        packageVersion = new DynamicDependencyPackageVersion();
-
-        if (string.IsNullOrWhiteSpace(version))
-        {
-            return false;
-        }
-
-        var parts = version.Split('.', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        if (parts.Length == 0 || parts.Length > 4)
-        {
-            return false;
-        }
-
-        if (!TryReadComponent(parts, 0, out packageVersion.Major))
-        {
-            return false;
-        }
-
-        TryReadComponent(parts, 1, out packageVersion.Minor);
-        TryReadComponent(parts, 2, out packageVersion.Build);
-        TryReadComponent(parts, 3, out packageVersion.Revision);
-
-        return true;
-    }
-
-    private static bool TryReadComponent(string[] parts, int index, out ushort value)
-    {
-        value = 0;
-
-        if (index >= parts.Length)
-        {
-            return true;
-        }
-
-        if (!uint.TryParse(parts[index], out var parsed) || parsed > ushort.MaxValue)
-        {
-            return false;
-        }
-
-        value = (ushort)parsed;
-        return true;
-    }
-
     private static bool IsRunningPackaged()
     {
         try
@@ -254,6 +195,143 @@ public abstract class Program
         catch (Exception)
         {
             return false;
+        }
+    }
+
+    private sealed class WindowsAppSdkConfiguration
+    {
+        private WindowsAppSdkConfiguration(string channel, string version)
+        {
+            Channel = channel;
+            Version = version;
+        }
+
+        public string Channel { get; }
+
+        public string DisplayChannel => string.IsNullOrEmpty(Channel) ? "stable" : Channel;
+
+        public string Version { get; }
+
+        public static WindowsAppSdkConfiguration Load()
+        {
+            var metadata = typeof(Program).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>();
+            var channel = NormalizeChannel(GetMetadata(metadata, "WindowsAppSdkChannel"));
+            var stable = GetMetadata(metadata, "WindowsAppSdkStableVersion");
+            var preview = GetMetadata(metadata, "WindowsAppSdkPreviewVersion");
+            var experimental = GetMetadata(metadata, "WindowsAppSdkExperimentalVersion");
+
+            var selectedVersion = channel switch
+            {
+                var value when value.StartsWith("preview", StringComparison.OrdinalIgnoreCase) => preview,
+                var value when value.StartsWith("experimental", StringComparison.OrdinalIgnoreCase) => experimental,
+                _ => stable
+            };
+
+            if (string.IsNullOrWhiteSpace(selectedVersion))
+            {
+                selectedVersion = stable;
+            }
+
+            selectedVersion ??= string.Empty;
+
+            return new WindowsAppSdkConfiguration(channel, selectedVersion);
+        }
+
+        public string BuildInitializationMessage()
+        {
+            if (!string.IsNullOrWhiteSpace(Version))
+            {
+                return $"Initialized Windows App SDK runtime {Version}{FormatChannelSuffix()}.";
+            }
+
+            return $"Initialized Windows App SDK using {DescribeChannel()}.";
+        }
+
+        public string BuildFailureMessage(Exception ex)
+            => $"Failed to initialize Windows App SDK from {DescribeChannel()} ({ex.GetType().Name}, 0x{ex.HResult:X8}). Attempting fallback.";
+
+        public bool TryGetPackageVersion(out DynamicDependencyPackageVersion packageVersion)
+            => TryGetPackageVersion(Version, out packageVersion);
+
+        private string DescribeChannel()
+            => string.IsNullOrEmpty(DisplayChannel) ? "the configured channel" : $"channel '{DisplayChannel}'";
+
+        private string FormatChannelSuffix()
+            => string.IsNullOrEmpty(DisplayChannel) ? string.Empty : $" (channel: {DisplayChannel})";
+
+        private static string GetMetadata(IEnumerable<AssemblyMetadataAttribute> metadata, string key)
+            => metadata.FirstOrDefault(attr => string.Equals(attr.Key, key, StringComparison.OrdinalIgnoreCase))?.Value ?? string.Empty;
+
+        private static string NormalizeChannel(string? channel)
+        {
+            if (string.IsNullOrWhiteSpace(channel))
+            {
+                return "stable";
+            }
+
+            var trimmed = channel.Trim();
+            if (trimmed.Equals("release", StringComparison.OrdinalIgnoreCase))
+            {
+                return "stable";
+            }
+
+            return trimmed.ToLowerInvariant();
+        }
+
+        private static bool TryGetPackageVersion(string version, out DynamicDependencyPackageVersion packageVersion)
+        {
+            packageVersion = new DynamicDependencyPackageVersion();
+
+            if (string.IsNullOrWhiteSpace(version))
+            {
+                return false;
+            }
+
+            var dashIndex = version.IndexOf('-');
+            if (dashIndex >= 0)
+            {
+                version = version[..dashIndex];
+            }
+
+            var components = version.Split('.', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (components.Length == 0 || components.Length > 4)
+            {
+                return false;
+            }
+
+            if (!TryReadComponent(components, 0, out packageVersion.Major))
+            {
+                return false;
+            }
+
+            TryReadComponent(components, 1, out packageVersion.Minor);
+            TryReadComponent(components, 2, out packageVersion.Build);
+            TryReadComponent(components, 3, out packageVersion.Revision);
+
+            return true;
+        }
+
+        private static bool TryReadComponent(string[] components, int index, out ushort value)
+        {
+            value = 0;
+
+            if (index >= components.Length)
+            {
+                return true;
+            }
+
+            var segment = components[index];
+            if (string.IsNullOrEmpty(segment))
+            {
+                return false;
+            }
+
+            if (!ushort.TryParse(segment, out value))
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

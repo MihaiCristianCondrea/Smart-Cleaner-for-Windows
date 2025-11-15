@@ -59,6 +59,25 @@
     </ItemGroup>
 
     <ItemGroup>
+        <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+            <_Parameter1>WindowsAppSdkChannel</_Parameter1>
+            <_Parameter2>$(WindowsAppSdkChannel)</_Parameter2>
+        </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+            <_Parameter1>WindowsAppSdkStableVersion</_Parameter1>
+            <_Parameter2>$(WindowsAppSdkStableVersion)</_Parameter2>
+        </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+            <_Parameter1>WindowsAppSdkPreviewVersion</_Parameter1>
+            <_Parameter2>$(WindowsAppSdkPreviewVersion)</_Parameter2>
+        </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+            <_Parameter1>WindowsAppSdkExperimentalVersion</_Parameter1>
+            <_Parameter2>$(WindowsAppSdkExperimentalVersion)</_Parameter2>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
         <Manifest Include="$(ApplicationManifest)" />
     </ItemGroup>
 
