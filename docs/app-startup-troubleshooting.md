@@ -108,7 +108,7 @@ This note summarises startup failures we have diagnosed so far and how to remedi
 
 ### Fix
 
-* Disable trimming for every configuration in `Smart Cleaner for Windows.csproj`.
+* Disable trimming for every configuration in `src/SmartCleanerForWindows/SmartCleanerForWindows.csproj`.
 * Rebuild and republish the MSIX package so that all WinUI runtime types remain in the bundle.
 
 ### Verification checklist
