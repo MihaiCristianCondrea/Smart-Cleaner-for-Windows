@@ -10,6 +10,9 @@ using Microsoft.Windows.AppLifecycle;
 using Microsoft.Windows.ApplicationModel.DynamicDependency;
 using DynamicDependencyPackageVersion = Microsoft.Windows.ApplicationModel.DynamicDependency.PackageVersion;
 using SmartCleanerForWindows.Diagnostics;
+using SmartCleanerForWindows.Logging;
+using SmartCleanerForWindows.Shell;
+using Serilog;
 using WinRT;
 
 namespace SmartCleanerForWindows;
@@ -22,21 +25,31 @@ public abstract class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        LoggingConfiguration.Initialize(args);
+        Log.Information("Program.Main reached. DISABLE_XAML_GENERATED_MAIN entrypoint active.");
         StartupDiagnostics.Initialize();
         ComWrappersSupport.InitializeComWrappers();
 
+        Log.Information("Command line arguments: {ArgsCount} ({Args})", args?.Length ?? 0,
+            args is { Length: > 0 } ? string.Join(" ", args) : "(none)");
+
         var isPackaged = IsRunningPackaged();
+        Log.Information("Packaged detection result: {IsPackaged}", isPackaged);
+
         var bootstrapInitialized = false;
 
         if (isPackaged)
         {
-            LogEvent("Bootstrap", "Running inside packaged deployment; bootstrap not required.");
+            Log.Information("Running inside packaged deployment; bootstrap not required.");
         }
         else
         {
+            Log.Information("Unpackaged execution detected; attempting Windows App SDK bootstrap.");
             bootstrapInitialized = TryInitializeBootstrap();
             if (!bootstrapInitialized)
             {
+                Log.Error("Bootstrap initialization failed; exiting before application start.");
+                Log.CloseAndFlush();
                 return;
             }
         }
@@ -45,30 +58,48 @@ public abstract class Program
         {
             if (bootstrapInitialized)
             {
+                Log.Information("Shutting down bootstrap after failed single-instance check.");
                 Bootstrap.Shutdown();
             }
 
+            Log.Error("Another instance is running or single-instance enforcement failed; application will exit.");
+            Log.CloseAndFlush();
             return;
         }
 
-        LogEvent("Startup", $"Launching Smart Cleaner for Windows (packaged: {isPackaged})");
+        Log.Information("Launching Smart Cleaner for Windows (packaged: {IsPackaged}).", isPackaged);
         StartupDiagnostics.LogMessage("Startup", $"Main invoked (packaged: {isPackaged}, args: {args.Length}).");
 
         try
         {
+            Log.Information("Starting WinUI application host.");
             Application.Start(p =>
             {
+                Log.Information("Application.Start delegate executing on UI thread.");
                 var context = new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread());
                 SynchronizationContext.SetSynchronizationContext(context);
-                _ = new Shell.App();
+                _ = new App();
             });
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Unhandled exception during application startup.");
+            throw;
         }
         finally
         {
+            if (!App.OnLaunchedInvoked)
+            {
+                Log.Error("Program.Main completed without App.OnLaunched being invoked. This may indicate a manifest entrypoint misconfiguration.");
+            }
+
             if (bootstrapInitialized)
             {
+                Log.Information("Shutting down Windows App SDK bootstrap.");
                 Bootstrap.Shutdown();
             }
+
+            Log.CloseAndFlush();
         }
     }
 
@@ -79,15 +110,16 @@ public abstract class Program
             var instance = AppInstance.FindOrRegisterForKey("SmartCleanerForWindows");
             if (instance.IsCurrent)
             {
+                Log.Information("Current process owns the SmartCleanerForWindows AppInstance.");
                 return true;
             }
 
-            LogEvent("Startup", "Another Smart Cleaner for Windows instance is already running. Exiting.");
+            Log.Warning("Another Smart Cleaner for Windows instance is already running. Exiting.");
             return false;
         }
         catch (Exception ex)
         {
-            LogEvent("Startup", $"Failed to enforce single-instance policy ({ex.GetType().Name}): {ex.Message}");
+            Log.Error(ex, "Failed to enforce single-instance policy; continuing to run current process.");
             return true;
         }
     }
@@ -99,6 +131,7 @@ public abstract class Program
 
         if (configuration.ShouldPreferBundledRuntime())
         {
+            Log.Information("Attempting bootstrap using bundled runtime.");
             if (TryInitializeSelfContained(out var bundledFailure))
             {
                 return true;
@@ -107,6 +140,7 @@ public abstract class Program
             failures.Add(("bundled runtime", bundledFailure));
         }
 
+        Log.Information("Attempting bootstrap using configured channel.");
         if (TryInitializeConfiguredChannel(configuration, out var channelFailure))
         {
             return true;
@@ -117,7 +151,7 @@ public abstract class Program
         try
         {
             Bootstrap.Initialize(WindowsAppSdkMajorMinor);
-            LogEvent("Bootstrap", "Initialized Windows App SDK using machine-wide runtime.");
+            Log.Information("Initialized Windows App SDK using machine-wide runtime.");
             return true;
         }
         catch (Exception fallbackFailure)
@@ -133,14 +167,14 @@ public abstract class Program
         try
         {
             Bootstrap.Initialize(WindowsAppSdkMajorMinor);
-            LogEvent("Bootstrap", "Initialized Windows App SDK using app-bundled runtime.");
+            Log.Information("Initialized Windows App SDK using app-bundled runtime.");
             failure = null;
             return true;
         }
         catch (Exception ex)
         {
             failure = ex;
-            LogEvent("Bootstrap", $"Failed to initialize Windows App SDK using the app-bundled runtime ({ex.GetType().Name}, 0x{ex.HResult:X8}). Attempting configured channel.");
+            Log.Error(ex, "Failed to initialize Windows App SDK using the app-bundled runtime. Attempting configured channel.");
             return false;
         }
     }
@@ -150,14 +184,14 @@ public abstract class Program
         try
         {
             InitializeBootstrap(configuration);
-            LogEvent("Bootstrap", configuration.BuildInitializationMessage());
+            Log.Information(configuration.BuildInitializationMessage());
             failure = null;
             return true;
         }
         catch (Exception ex)
         {
             failure = ex;
-            LogEvent("Bootstrap", configuration.BuildFailureMessage(ex));
+            Log.Error(ex, configuration.BuildFailureMessage(ex));
             return false;
         }
     }
@@ -179,7 +213,7 @@ public abstract class Program
         }
 
         LogBootstrapFailure(message);
-        LogEvent("Bootstrap", message);
+        Log.Error("Bootstrap failure chain:\n{Message}", message);
     }
 
     private static string FormatBootstrapError(string stage, Exception? exception)

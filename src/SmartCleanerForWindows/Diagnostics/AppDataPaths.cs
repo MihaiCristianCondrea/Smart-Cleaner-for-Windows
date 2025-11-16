@@ -6,7 +6,7 @@ namespace SmartCleanerForWindows.Diagnostics;
 internal static class AppDataPaths
 {
     private const string RootDirectoryName = "SmartCleanerForWindows";
-    private const string LogsDirectoryName = "logs";
+    private const string LogsDirectoryName = "Logs";
 
     public static string EnsureBaseDirectory()
     {
@@ -25,6 +25,12 @@ internal static class AppDataPaths
 
     public static string GetStartupLogPath()
         => Path.Combine(EnsureLogsDirectory(), "startup.log");
+
+    public static string GetLogsDirectory()
+        => EnsureLogsDirectory();
+
+    public static string GetAppLogPath()
+        => Path.Combine(EnsureLogsDirectory(), "app.log");
 
     private static string EnsureLogsDirectory()
     {

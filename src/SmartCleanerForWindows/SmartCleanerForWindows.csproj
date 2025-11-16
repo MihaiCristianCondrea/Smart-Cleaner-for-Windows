@@ -56,6 +56,9 @@
         <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6901"/>
         <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.251003001"/>
         <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.235" PrivateAssets="all"/>
+        <PackageReference Include="Serilog" Version="4.1.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
+        <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     </ItemGroup>
 
     <ItemGroup>
