@@ -10,8 +10,7 @@
     <Identity
             Name="D4rkRekords.SmartCleanerForWindows"
             Publisher="CN=d4rk7"
-            Version="1.0.0.0"
-            ProcessorArchitecture="neutral"/>
+            Version="1.0.0.0"/>
 
     <mp:PhoneIdentity PhoneProductId="499a730b-c745-450c-aad4-7fa736fcdc39"
                       PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
@@ -34,7 +33,7 @@
     <Applications>
         <Application Id="App"
                      Executable="$targetnametoken$.exe"
-                     EntryPoint="Smart_Cleaner_for_Windows.Shell.App">
+                     EntryPoint="$targetentrypoint$">
             <uap:VisualElements
                     DisplayName="Smart Cleaner for Windows"
                     Description="Smart Cleaner for Windows"

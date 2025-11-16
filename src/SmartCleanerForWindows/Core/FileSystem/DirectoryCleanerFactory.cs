@@ -1,4 +1,4 @@
-namespace Smart_Cleaner_for_Windows.Core.FileSystem;
+namespace SmartCleanerForWindows.Core.FileSystem;
 
 /// <summary>
 /// Provides helpers for constructing <see cref="DirectoryCleaner"/> instances with the built-in file system services.

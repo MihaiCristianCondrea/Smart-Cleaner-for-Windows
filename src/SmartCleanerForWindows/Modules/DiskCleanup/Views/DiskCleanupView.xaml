@@ -1,5 +1,5 @@
 <UserControl
-    x:Class="Smart_Cleaner_for_Windows.Modules.DiskCleanup.Views.DiskCleanupView"
+    x:Class="SmartCleanerForWindows.Modules.DiskCleanup.Views.DiskCleanupView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"

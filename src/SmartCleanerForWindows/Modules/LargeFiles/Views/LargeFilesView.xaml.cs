@@ -1,7 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-namespace Smart_Cleaner_for_Windows.Modules.LargeFiles.Views;
+namespace SmartCleanerForWindows.Modules.LargeFiles.Views;
 
 public sealed partial class LargeFilesView : UserControl
 {

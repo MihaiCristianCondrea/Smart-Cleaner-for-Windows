@@ -1,6 +1,6 @@
 using System;
 
-namespace Smart_Cleaner_for_Windows.Core.LargeFiles;
+namespace SmartCleanerForWindows.Core.LargeFiles;
 
 public sealed class LargeFileScanFailure(string path, Exception exception)
 {

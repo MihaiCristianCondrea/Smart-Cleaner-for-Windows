@@ -2,7 +2,7 @@ using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
-namespace Smart_Cleaner_for_Windows.Modules.Dashboard.Views;
+namespace SmartCleanerForWindows.Modules.Dashboard.Views;
 
 public sealed partial class DashboardView : UserControl
 {

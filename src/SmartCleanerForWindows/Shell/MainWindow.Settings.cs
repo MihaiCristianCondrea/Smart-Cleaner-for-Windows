@@ -8,7 +8,7 @@ using Microsoft.Windows.ApplicationModel.Resources;
 using Windows.Storage;
 using Windows.UI;
 
-namespace Smart_Cleaner_for_Windows.Shell;
+namespace SmartCleanerForWindows.Shell;
 
 public sealed partial class MainWindow
 {

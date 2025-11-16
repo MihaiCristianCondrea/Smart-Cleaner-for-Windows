@@ -7,11 +7,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Smart_Cleaner_for_Windows.Core.DiskCleanup;
-using Smart_Cleaner_for_Windows.Core.Storage;
-using Smart_Cleaner_for_Windows.Modules.DiskCleanup.ViewModels;
+using SmartCleanerForWindows.Core.DiskCleanup;
+using SmartCleanerForWindows.Core.Storage;
+using SmartCleanerForWindows.Modules.DiskCleanup.ViewModels;
 
-namespace Smart_Cleaner_for_Windows.Shell;
+namespace SmartCleanerForWindows.Shell;
 
 public sealed partial class MainWindow
 {

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Smart_Cleaner_for_Windows.Core.Storage;
+namespace SmartCleanerForWindows.Core.Storage;
 
 /// <summary>
 /// Retrieves drive usage information using <see cref="DriveInfo"/>.

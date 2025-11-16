@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window
-    x:Class="Smart_Cleaner_for_Windows.Shell.MainWindow"
+    x:Class="SmartCleanerForWindows.Shell.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:dashboard="using:Smart_Cleaner_for_Windows.Modules.Dashboard.Views"
-    xmlns:emptyViews="using:Smart_Cleaner_for_Windows.Modules.EmptyFolders.Views"
-    xmlns:largeViews="using:Smart_Cleaner_for_Windows.Modules.LargeFiles.Views"
-    xmlns:diskViews="using:Smart_Cleaner_for_Windows.Modules.DiskCleanup.Views"
-    xmlns:internetViews="using:Smart_Cleaner_for_Windows.Modules.InternetRepair.Views"
-    xmlns:settingsViews="using:Smart_Cleaner_for_Windows.Shell.Settings"
+    xmlns:dashboard="using:SmartCleanerForWindows.Modules.Dashboard.Views"
+    xmlns:emptyViews="using:SmartCleanerForWindows.Modules.EmptyFolders.Views"
+    xmlns:largeViews="using:SmartCleanerForWindows.Modules.LargeFiles.Views"
+    xmlns:diskViews="using:SmartCleanerForWindows.Modules.DiskCleanup.Views"
+    xmlns:internetViews="using:SmartCleanerForWindows.Modules.InternetRepair.Views"
+    xmlns:settingsViews="using:SmartCleanerForWindows.Shell.Settings"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Title="Smart Cleaner for Windows">

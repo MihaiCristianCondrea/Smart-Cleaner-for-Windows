@@ -9,7 +9,7 @@ using WinRT;
 using WinRT.Interop;
 using XamlSystemBackdrop = Microsoft.UI.Xaml.Media.SystemBackdrop;
 
-namespace Smart_Cleaner_for_Windows.Shell;
+namespace SmartCleanerForWindows.Shell;
 
 public sealed partial class MainWindow
 {

@@ -6,9 +6,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Smart_Cleaner_for_Windows.Core.FileSystem;
+using SmartCleanerForWindows.Core.FileSystem;
 
-namespace Smart_Cleaner_for_Windows.Core.LargeFiles;
+namespace SmartCleanerForWindows.Core.LargeFiles;
 
 public sealed class LargeFileExplorer(IDirectorySystem directorySystem) : ILargeFileExplorer
 {

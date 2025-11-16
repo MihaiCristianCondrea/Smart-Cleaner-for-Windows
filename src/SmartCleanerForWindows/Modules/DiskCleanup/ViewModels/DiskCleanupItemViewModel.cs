@@ -1,9 +1,9 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Smart_Cleaner_for_Windows.Core.DiskCleanup;
-using Smart_Cleaner_for_Windows.Core.Storage;
+using SmartCleanerForWindows.Core.DiskCleanup;
+using SmartCleanerForWindows.Core.Storage;
 
-namespace Smart_Cleaner_for_Windows.Modules.DiskCleanup.ViewModels;
+namespace SmartCleanerForWindows.Modules.DiskCleanup.ViewModels;
 
 public sealed class DiskCleanupItemViewModel : INotifyPropertyChanged
 {

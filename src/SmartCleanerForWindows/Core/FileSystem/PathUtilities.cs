@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace Smart_Cleaner_for_Windows.Core.FileSystem;
+namespace SmartCleanerForWindows.Core.FileSystem;
 
 internal static class PathUtilities
 {

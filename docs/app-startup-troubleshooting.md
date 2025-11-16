@@ -7,7 +7,7 @@ This note summarises startup failures we have diagnosed so far and how to remedi
 ### Symptoms
 
 * MSIX package installs successfully, but the splash screen dismisses immediately and the process exits.
-* Event Viewer records a `TypeInitializationException` for `Smart_Cleaner_for_Windows.Core.FileSystem.DirectoryCleaner` thrown during `Program.Main`.
+* Event Viewer records a `TypeInitializationException` for `SmartCleanerForWindows.Core.FileSystem.DirectoryCleaner` thrown during `Program.Main`.
 
 ### Root cause
 
@@ -29,7 +29,7 @@ This note summarises startup failures we have diagnosed so far and how to remedi
 ### Symptoms
 
 * MSIX package installs successfully, but the splash screen dismisses immediately and the process exits.
-* Event Viewer records a `TypeInitializationException` for `Smart_Cleaner_for_Windows.Core.FileSystem.DirectoryCleaner` thrown during `Program.Main`.
+* Event Viewer records a `TypeInitializationException` for `SmartCleanerForWindows.Core.FileSystem.DirectoryCleaner` thrown during `Program.Main`.
 
 ### Root cause
 

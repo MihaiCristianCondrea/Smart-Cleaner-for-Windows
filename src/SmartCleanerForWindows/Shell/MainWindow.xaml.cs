@@ -13,25 +13,25 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.Windows.ApplicationModel.Resources;
-using Smart_Cleaner_for_Windows.Core.FileSystem;
-using Smart_Cleaner_for_Windows.Core.Storage;
-using Smart_Cleaner_for_Windows.Core.LargeFiles;
-using Smart_Cleaner_for_Windows.Core.Networking;
-using Smart_Cleaner_for_Windows.Modules.Dashboard.ViewModels;
-using Smart_Cleaner_for_Windows.Modules.DiskCleanup.ViewModels;
-using Smart_Cleaner_for_Windows.Modules.EmptyFolders;
-using Smart_Cleaner_for_Windows.Modules.EmptyFolders.Contracts;
-using Smart_Cleaner_for_Windows.Modules.EmptyFolders.ViewModels;
-using Smart_Cleaner_for_Windows.Modules.LargeFiles.ViewModels;
-using Smart_Cleaner_for_Windows.Modules.InternetRepair.ViewModels;
+using SmartCleanerForWindows.Core.FileSystem;
+using SmartCleanerForWindows.Core.Storage;
+using SmartCleanerForWindows.Core.LargeFiles;
+using SmartCleanerForWindows.Core.Networking;
+using SmartCleanerForWindows.Modules.Dashboard.ViewModels;
+using SmartCleanerForWindows.Modules.DiskCleanup.ViewModels;
+using SmartCleanerForWindows.Modules.EmptyFolders;
+using SmartCleanerForWindows.Modules.EmptyFolders.Contracts;
+using SmartCleanerForWindows.Modules.EmptyFolders.ViewModels;
+using SmartCleanerForWindows.Modules.LargeFiles.ViewModels;
+using SmartCleanerForWindows.Modules.InternetRepair.ViewModels;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.UI;
 using WinRT.Interop;
 using System.Security.Principal;
-using Smart_Cleaner_for_Windows.Core.DiskCleanup;
+using SmartCleanerForWindows.Core.DiskCleanup;
 
-namespace Smart_Cleaner_for_Windows.Shell;
+namespace SmartCleanerForWindows.Shell;
 
 public sealed partial class MainWindow : IEmptyFolderCleanupView
 {

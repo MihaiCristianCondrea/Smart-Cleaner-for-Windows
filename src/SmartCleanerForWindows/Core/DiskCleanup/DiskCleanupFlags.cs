@@ -1,6 +1,6 @@
 using System;
 
-namespace Smart_Cleaner_for_Windows.Core.DiskCleanup;
+namespace SmartCleanerForWindows.Core.DiskCleanup;
 
 [Flags]
 public enum DiskCleanupFlags : uint

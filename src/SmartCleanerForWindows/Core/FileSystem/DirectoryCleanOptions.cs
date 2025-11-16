@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Smart_Cleaner_for_Windows.Core.FileSystem;
+namespace SmartCleanerForWindows.Core.FileSystem;
 
 /// <summary>
 /// Represents the configuration used to scan and optionally delete empty directories.

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Smart_Cleaner_for_Windows.Core.DiskCleanup;
+namespace SmartCleanerForWindows.Core.DiskCleanup;
 
 public sealed class DiskCleanupCleanResult
 {

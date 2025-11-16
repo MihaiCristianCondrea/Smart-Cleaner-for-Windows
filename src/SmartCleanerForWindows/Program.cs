@@ -9,10 +9,10 @@ using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
 using Microsoft.Windows.ApplicationModel.DynamicDependency;
 using DynamicDependencyPackageVersion = Microsoft.Windows.ApplicationModel.DynamicDependency.PackageVersion;
-using Smart_Cleaner_for_Windows.Diagnostics;
+using SmartCleanerForWindows.Diagnostics;
 using WinRT;
 
-namespace Smart_Cleaner_for_Windows;
+namespace SmartCleanerForWindows;
 
 public abstract class Program
 {
@@ -22,6 +22,7 @@ public abstract class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        StartupDiagnostics.Initialize();
         ComWrappersSupport.InitializeComWrappers();
 
         var isPackaged = IsRunningPackaged();
@@ -51,6 +52,7 @@ public abstract class Program
         }
 
         LogEvent("Startup", $"Launching Smart Cleaner for Windows (packaged: {isPackaged})");
+        StartupDiagnostics.LogMessage("Startup", $"Main invoked (packaged: {isPackaged}, args: {args.Length}).");
 
         try
         {

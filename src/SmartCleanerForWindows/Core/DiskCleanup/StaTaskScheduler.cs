@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Smart_Cleaner_for_Windows.Core.DiskCleanup;
+namespace SmartCleanerForWindows.Core.DiskCleanup;
 
 public sealed class StaTaskScheduler : IStaTaskScheduler
 {

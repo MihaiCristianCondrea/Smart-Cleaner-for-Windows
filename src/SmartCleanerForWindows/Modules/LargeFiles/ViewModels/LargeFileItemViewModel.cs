@@ -1,9 +1,9 @@
 using System;
-using Smart_Cleaner_for_Windows.Core.LargeFiles;
-using Smart_Cleaner_for_Windows.Core.Storage;
+using SmartCleanerForWindows.Core.LargeFiles;
+using SmartCleanerForWindows.Core.Storage;
 using IOPath = System.IO.Path;
 
-namespace Smart_Cleaner_for_Windows.Modules.LargeFiles.ViewModels;
+namespace SmartCleanerForWindows.Modules.LargeFiles.ViewModels;
 
 public sealed class LargeFileItemViewModel
 {

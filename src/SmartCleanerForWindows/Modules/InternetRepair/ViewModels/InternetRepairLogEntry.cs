@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Microsoft.UI.Xaml.Controls;
 
-namespace Smart_Cleaner_for_Windows.Modules.InternetRepair.ViewModels;
+namespace SmartCleanerForWindows.Modules.InternetRepair.ViewModels;
 
 public sealed class InternetRepairLogEntry(string title) : INotifyPropertyChanged
 {

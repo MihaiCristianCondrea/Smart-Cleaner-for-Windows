@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Smart_Cleaner_for_Windows.Core.Storage;
+namespace SmartCleanerForWindows.Core.Storage;
 
 /// <summary>
 /// Provides access to drive storage usage information.

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Smart_Cleaner_for_Windows.Core.DiskCleanup;
+namespace SmartCleanerForWindows.Core.DiskCleanup;
 
 public interface IDiskCleanupAnalyzer
 {

@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.Win32;
 
-namespace Smart_Cleaner_for_Windows.Core.DiskCleanup;
+namespace SmartCleanerForWindows.Core.DiskCleanup;
 
 public sealed class RegistryDiskCleanupExecutor : IDiskCleanupExecutor
 {

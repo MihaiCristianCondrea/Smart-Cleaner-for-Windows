@@ -1,4 +1,4 @@
-namespace Smart_Cleaner_for_Windows.Core.Storage;
+namespace SmartCleanerForWindows.Core.Storage;
 
 /// <summary>
 /// Represents the usage information for a single drive.

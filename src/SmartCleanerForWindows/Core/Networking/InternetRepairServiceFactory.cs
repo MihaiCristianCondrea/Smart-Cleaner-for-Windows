@@ -1,4 +1,4 @@
-namespace Smart_Cleaner_for_Windows.Core.Networking;
+namespace SmartCleanerForWindows.Core.Networking;
 
 public static class InternetRepairServiceFactory
 {

@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Smart_Cleaner_for_Windows.Core.LargeFiles;
+namespace SmartCleanerForWindows.Core.LargeFiles;
 
 public interface ILargeFileExplorer
 {

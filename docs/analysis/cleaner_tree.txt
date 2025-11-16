@@ -1,0 +1,157 @@
+.
+├── .github
+│   └── workflows
+│       ├── dotnet-desktop.yml
+│       └── dotnet.yml
+├── .gitignore
+├── docs
+│   ├── analysis
+│   ├── app-startup-troubleshooting.md
+│   ├── SOLID-refactoring-guide.md
+│   └── winui-xaml-compiler-troubleshooting.md
+├── global.json
+├── README.md
+├── Smart Cleaner for Windows.sln
+└── src
+    └── SmartCleanerForWindows
+        ├── app.manifest
+        ├── Assets
+        │   ├── LockScreenLogo.scale-200.png
+        │   ├── SplashScreen.scale-200.png
+        │   ├── Square150x150Logo.scale-200.png
+        │   ├── Square44x44Logo.scale-200.png
+        │   ├── Square44x44Logo.targetsize-24_altform-unplated.png
+        │   ├── StoreLogo.png
+        │   └── Wide310x150Logo.scale-200.png
+        ├── Common
+        │   └── Converters
+        │       └── BooleanToVisibilityConverter.cs
+        ├── Core
+        │   ├── DiskCleanup
+        │   │   ├── DiskCleanupCleanResult.cs
+        │   │   ├── DiskCleanupFlags.cs
+        │   │   ├── DiskCleanupItem.cs
+        │   │   ├── DiskCleanupService.cs
+        │   │   ├── DiskCleanupServiceFactory.cs
+        │   │   ├── DiskCleanupVolumeService.cs
+        │   │   ├── IDiskCleanupAnalyzer.cs
+        │   │   ├── IDiskCleanupExecutor.cs
+        │   │   ├── IDiskCleanupService.cs
+        │   │   ├── IDiskCleanupVolumeService.cs
+        │   │   ├── IRegistryDiskCleanupInterop.cs
+        │   │   ├── IStaTaskScheduler.cs
+        │   │   ├── RegistryDiskCleanupAnalyzer.cs
+        │   │   ├── RegistryDiskCleanupExecutor.cs
+        │   │   ├── RegistryDiskCleanupInterop.cs
+        │   │   ├── RegistryDiskCleanupInteropFacade.cs
+        │   │   └── StaTaskScheduler.cs
+        │   ├── FileSystem
+        │   │   ├── DirectoryCleaner.cs
+        │   │   ├── DirectoryCleanerFactory.cs
+        │   │   ├── DirectoryCleanOptions.cs
+        │   │   ├── DirectoryCleanResult.cs
+        │   │   ├── DirectoryDeletionMode.cs
+        │   │   ├── DirectoryDeletionService.cs
+        │   │   ├── DirectoryExclusionEvaluator.cs
+        │   │   ├── DirectoryTraversalRequest.cs
+        │   │   ├── DirectoryTraversalService.cs
+        │   │   ├── EmptyDirectoryDetector.cs
+        │   │   ├── FileSystemDirectoryDeleter.cs
+        │   │   ├── FileSystemDirectorySystem.cs
+        │   │   ├── FileSystemPathComparer.cs
+        │   │   ├── IDirectoryCleaner.cs
+        │   │   ├── IDirectoryDeleter.cs
+        │   │   ├── IDirectoryDeletionService.cs
+        │   │   ├── IDirectoryExclusionEvaluator.cs
+        │   │   ├── IDirectorySystem.cs
+        │   │   ├── IDirectoryTraversalService.cs
+        │   │   ├── IEmptyDirectoryDetector.cs
+        │   │   └── PathUtilities.cs
+        │   ├── LargeFiles
+        │   │   ├── ILargeFileExplorer.cs
+        │   │   ├── LargeFileEntry.cs
+        │   │   ├── LargeFileExplorer.cs
+        │   │   ├── LargeFileScanFailure.cs
+        │   │   ├── LargeFileScanOptions.cs
+        │   │   └── LargeFileScanResult.cs
+        │   ├── Networking
+        │   │   ├── IInternetRepairService.cs
+        │   │   ├── InternetRepairAction.cs
+        │   │   ├── InternetRepairResult.cs
+        │   │   ├── InternetRepairService.cs
+        │   │   ├── InternetRepairServiceFactory.cs
+        │   │   └── InternetRepairStepUpdate.cs
+        │   └── Storage
+        │       ├── IStorageOverviewService.cs
+        │       ├── StorageDriveInfo.cs
+        │       ├── StorageOverviewResult.cs
+        │       ├── StorageOverviewService.cs
+        │       └── ValueFormatting.cs
+        ├── Diagnostics
+        │   └── AppDataPaths.cs
+        ├── Modules
+        │   ├── Dashboard
+        │   │   ├── ViewModels
+        │   │   │   └── DriveUsageViewModel.cs
+        │   │   └── Views
+        │   │       ├── DashboardView.xaml
+        │   │       └── DashboardView.xaml.cs
+        │   ├── DiskCleanup
+        │   │   ├── ViewModels
+        │   │   │   └── DiskCleanupItemViewModel.cs
+        │   │   └── Views
+        │   │       ├── DiskCleanupView.xaml
+        │   │       └── DiskCleanupView.xaml.cs
+        │   ├── EmptyFolders
+        │   │   ├── Contracts
+        │   │   │   └── IEmptyFolderCleanupView.cs
+        │   │   ├── EmptyFolderCleanupController.cs
+        │   │   ├── ViewModels
+        │   │   │   └── EmptyFolderNode.cs
+        │   │   └── Views
+        │   │       ├── EmptyFoldersView.xaml
+        │   │       └── EmptyFoldersView.xaml.cs
+        │   ├── InternetRepair
+        │   │   ├── ViewModels
+        │   │   │   └── InternetRepairLogEntry.cs
+        │   │   └── Views
+        │   │       ├── InternetRepairView.xaml
+        │   │       └── InternetRepairView.xaml.cs
+        │   └── LargeFiles
+        │       ├── ViewModels
+        │       │   ├── LargeFileGroupViewModel.cs
+        │       │   └── LargeFileItemViewModel.cs
+        │       └── Views
+        │           ├── LargeFilesView.xaml
+        │           └── LargeFilesView.xaml.cs
+        ├── NativeMethods.txt
+        ├── Package.appxmanifest
+        ├── Program.cs
+        ├── Properties
+        │   ├── launchSettings.json
+        │   └── PublishProfiles
+        │       ├── win-arm64.pubxml
+        │       ├── win-x64.pubxml
+        │       └── win-x86.pubxml
+        ├── Shell
+        │   ├── App.xaml
+        │   ├── App.xaml.cs
+        │   ├── MainWindow.Appearance.cs
+        │   ├── MainWindow.DiskCleanup.cs
+        │   ├── MainWindow.EmptyFolders.cs
+        │   ├── MainWindow.InternetRepair.cs
+        │   ├── MainWindow.LargeFiles.cs
+        │   ├── MainWindow.Settings.cs
+        │   ├── MainWindow.xaml
+        │   ├── MainWindow.xaml.cs
+        │   ├── Settings
+        │   │   ├── SettingsView.xaml
+        │   │   └── SettingsView.xaml.cs
+        │   └── Themes
+        │       └── DesignTokens.xaml
+        ├── SmartCleanerForWindows.csproj
+        └── Strings
+            ├── en-US
+            │   └── Resources.resw
+            └── es-ES
+                └── Resources.resw

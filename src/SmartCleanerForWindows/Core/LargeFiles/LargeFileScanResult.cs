@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace Smart_Cleaner_for_Windows.Core.LargeFiles;
+namespace SmartCleanerForWindows.Core.LargeFiles;
 
 public sealed class LargeFileScanResult
 {

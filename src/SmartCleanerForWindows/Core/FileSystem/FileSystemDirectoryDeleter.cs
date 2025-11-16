@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
-namespace Smart_Cleaner_for_Windows.Core.FileSystem
+namespace SmartCleanerForWindows.Core.FileSystem
 {
     public sealed class FileSystemDirectoryDeleter : IDirectoryDeleter
     {

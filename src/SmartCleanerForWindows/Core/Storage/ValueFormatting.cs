@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Smart_Cleaner_for_Windows.Core.Storage;
+namespace SmartCleanerForWindows.Core.Storage;
 
 public static class ValueFormatting
 {

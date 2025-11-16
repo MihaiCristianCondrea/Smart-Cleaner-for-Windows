@@ -1,7 +1,7 @@
 using System;
-using Smart_Cleaner_for_Windows.Core.FileSystem;
+using SmartCleanerForWindows.Core.FileSystem;
 
-namespace Smart_Cleaner_for_Windows.Modules.EmptyFolders.Contracts;
+namespace SmartCleanerForWindows.Modules.EmptyFolders.Contracts;
 
 /// <summary>
 /// Defines the UI contract required by the empty folder cleanup workflow.

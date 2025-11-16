@@ -5,10 +5,10 @@ using System.Linq;
 using System.Threading;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Smart_Cleaner_for_Windows.Core.FileSystem;
-using Smart_Cleaner_for_Windows.Modules.EmptyFolders.ViewModels;
+using SmartCleanerForWindows.Core.FileSystem;
+using SmartCleanerForWindows.Modules.EmptyFolders.ViewModels;
 
-namespace Smart_Cleaner_for_Windows.Shell;
+namespace SmartCleanerForWindows.Shell;
 
 public sealed partial class MainWindow
 {

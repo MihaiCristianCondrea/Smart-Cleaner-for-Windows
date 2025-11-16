@@ -7,13 +7,13 @@ using System.Threading;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.VisualBasic.FileIO;
-using Smart_Cleaner_for_Windows.Core.LargeFiles;
-using Smart_Cleaner_for_Windows.Core.Storage;
-using Smart_Cleaner_for_Windows.Modules.LargeFiles.ViewModels;
+using SmartCleanerForWindows.Core.LargeFiles;
+using SmartCleanerForWindows.Core.Storage;
+using SmartCleanerForWindows.Modules.LargeFiles.ViewModels;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
 
-namespace Smart_Cleaner_for_Windows.Shell;
+namespace SmartCleanerForWindows.Shell;
 
 public sealed partial class MainWindow
 {

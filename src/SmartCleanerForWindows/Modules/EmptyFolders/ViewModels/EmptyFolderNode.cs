@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
-namespace Smart_Cleaner_for_Windows.Modules.EmptyFolders.ViewModels;
+namespace SmartCleanerForWindows.Modules.EmptyFolders.ViewModels;
 
 /// <summary>
 /// Represents an empty folder candidate displayed in the tree view, including

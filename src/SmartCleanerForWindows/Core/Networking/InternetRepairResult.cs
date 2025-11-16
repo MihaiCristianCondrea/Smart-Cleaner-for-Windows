@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Smart_Cleaner_for_Windows.Core.Networking;
+namespace SmartCleanerForWindows.Core.Networking;
 
 public sealed class InternetRepairResult(IReadOnlyList<InternetRepairStepResult> steps)
 {

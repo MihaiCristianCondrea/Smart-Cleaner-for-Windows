@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Smart_Cleaner_for_Windows.Core.Storage;
+namespace SmartCleanerForWindows.Core.Storage;
 
 /// <summary>
 /// Represents the result of retrieving the current drive usage information.

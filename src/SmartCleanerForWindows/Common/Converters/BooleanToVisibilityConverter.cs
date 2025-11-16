@@ -2,7 +2,7 @@ using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 
-namespace Smart_Cleaner_for_Windows.Common.Converters;
+namespace SmartCleanerForWindows.Common.Converters;
 
 /// <summary>
 /// Converts boolean values to <see cref="Visibility"/> instances.

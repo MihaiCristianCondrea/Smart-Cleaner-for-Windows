@@ -2,7 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Windows.Foundation;
 
-namespace Smart_Cleaner_for_Windows.Modules.EmptyFolders.Views;
+namespace SmartCleanerForWindows.Modules.EmptyFolders.Views;
 
 public sealed partial class EmptyFoldersView : UserControl
 {

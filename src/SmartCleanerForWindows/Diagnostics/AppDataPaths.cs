@@ -1,11 +1,12 @@
 using System;
 using System.IO;
 
-namespace Smart_Cleaner_for_Windows.Diagnostics;
+namespace SmartCleanerForWindows.Diagnostics;
 
 internal static class AppDataPaths
 {
     private const string RootDirectoryName = "SmartCleanerForWindows";
+    private const string LogsDirectoryName = "logs";
 
     public static string EnsureBaseDirectory()
     {
@@ -17,8 +18,18 @@ internal static class AppDataPaths
     }
 
     public static string GetCrashLogPath()
-        => Path.Combine(EnsureBaseDirectory(), "crash.log");
+        => Path.Combine(EnsureLogsDirectory(), "crash.log");
 
     public static string GetEventLogPath()
-        => Path.Combine(EnsureBaseDirectory(), "events.log");
+        => Path.Combine(EnsureLogsDirectory(), "events.log");
+
+    public static string GetStartupLogPath()
+        => Path.Combine(EnsureLogsDirectory(), "startup.log");
+
+    private static string EnsureLogsDirectory()
+    {
+        var logsDirectory = Path.Combine(EnsureBaseDirectory(), LogsDirectoryName);
+        Directory.CreateDirectory(logsDirectory);
+        return logsDirectory;
+    }
 }

@@ -1,0 +1,313 @@
+Microsoft.CmdPal.UI
+├── App.xaml
+├── App.xaml.cs
+├── Assets
+│   ├── Dev
+│   │   ├── BadgeLogo.scale-100.png
+│   │   ├── BadgeLogo.scale-125.png
+│   │   ├── BadgeLogo.scale-150.png
+│   │   ├── BadgeLogo.scale-200.png
+│   │   ├── BadgeLogo.scale-400.png
+│   │   ├── icon.ico
+│   │   ├── icon.svg
+│   │   ├── LargeTile.scale-100.png
+│   │   ├── LargeTile.scale-125.png
+│   │   ├── LargeTile.scale-150.png
+│   │   ├── LargeTile.scale-200.png
+│   │   ├── LargeTile.scale-400.png
+│   │   ├── SmallTile.scale-100.png
+│   │   ├── SmallTile.scale-125.png
+│   │   ├── SmallTile.scale-150.png
+│   │   ├── SmallTile.scale-200.png
+│   │   ├── SmallTile.scale-400.png
+│   │   ├── SplashScreen.scale-100.png
+│   │   ├── SplashScreen.scale-125.png
+│   │   ├── SplashScreen.scale-150.png
+│   │   ├── SplashScreen.scale-200.png
+│   │   ├── SplashScreen.scale-400.png
+│   │   ├── Square150x150Logo.scale-100.png
+│   │   ├── Square150x150Logo.scale-125.png
+│   │   ├── Square150x150Logo.scale-150.png
+│   │   ├── Square150x150Logo.scale-200.png
+│   │   ├── Square150x150Logo.scale-400.png
+│   │   ├── Square44x44Logo.altform-lightunplated_targetsize-16.png
+│   │   ├── Square44x44Logo.altform-lightunplated_targetsize-24.png
+│   │   ├── Square44x44Logo.altform-lightunplated_targetsize-256.png
+│   │   ├── Square44x44Logo.altform-lightunplated_targetsize-32.png
+│   │   ├── Square44x44Logo.altform-lightunplated_targetsize-48.png
+│   │   ├── Square44x44Logo.altform-unplated_targetsize-16.png
+│   │   ├── Square44x44Logo.altform-unplated_targetsize-24.png
+│   │   ├── Square44x44Logo.altform-unplated_targetsize-256.png
+│   │   ├── Square44x44Logo.altform-unplated_targetsize-32.png
+│   │   ├── Square44x44Logo.altform-unplated_targetsize-48.png
+│   │   ├── Square44x44Logo.scale-100.png
+│   │   ├── Square44x44Logo.scale-125.png
+│   │   ├── Square44x44Logo.scale-150.png
+│   │   ├── Square44x44Logo.scale-200.png
+│   │   ├── Square44x44Logo.scale-400.png
+│   │   ├── Square44x44Logo.targetsize-16.png
+│   │   ├── Square44x44Logo.targetsize-20.png
+│   │   ├── Square44x44Logo.targetsize-24.png
+│   │   ├── Square44x44Logo.targetsize-256.png
+│   │   ├── Square44x44Logo.targetsize-32.png
+│   │   ├── Square44x44Logo.targetsize-48.png
+│   │   ├── StoreLogo.png
+│   │   ├── StoreLogo.scale-100.png
+│   │   ├── StoreLogo.scale-125.png
+│   │   ├── StoreLogo.scale-150.png
+│   │   ├── StoreLogo.scale-200.png
+│   │   ├── StoreLogo.scale-400.png
+│   │   ├── Wide310x150Logo.scale-100.png
+│   │   ├── Wide310x150Logo.scale-125.png
+│   │   ├── Wide310x150Logo.scale-150.png
+│   │   ├── Wide310x150Logo.scale-200.png
+│   │   └── Wide310x150Logo.scale-400.png
+│   ├── Stable
+│   │   ├── icon.ico
+│   │   ├── icon.svg
+│   │   ├── LargeTile.scale-100.png
+│   │   ├── LargeTile.scale-125.png
+│   │   ├── LargeTile.scale-150.png
+│   │   ├── LargeTile.scale-200.png
+│   │   ├── LargeTile.scale-400.png
+│   │   ├── LockScreenLogo.scale-200.png
+│   │   ├── SmallTile.scale-100.png
+│   │   ├── SmallTile.scale-125.png
+│   │   ├── SmallTile.scale-150.png
+│   │   ├── SmallTile.scale-200.png
+│   │   ├── SmallTile.scale-400.png
+│   │   ├── SplashScreen.scale-100.png
+│   │   ├── SplashScreen.scale-125.png
+│   │   ├── SplashScreen.scale-150.png
+│   │   ├── SplashScreen.scale-200.png
+│   │   ├── SplashScreen.scale-400.png
+│   │   ├── Square150x150Logo.scale-100.png
+│   │   ├── Square150x150Logo.scale-125.png
+│   │   ├── Square150x150Logo.scale-150.png
+│   │   ├── Square150x150Logo.scale-200.png
+│   │   ├── Square150x150Logo.scale-400.png
+│   │   ├── Square44x44Logo.altform-lightunplated_targetsize-16.png
+│   │   ├── Square44x44Logo.altform-lightunplated_targetsize-24.png
+│   │   ├── Square44x44Logo.altform-lightunplated_targetsize-256.png
+│   │   ├── Square44x44Logo.altform-lightunplated_targetsize-32.png
+│   │   ├── Square44x44Logo.altform-lightunplated_targetsize-48.png
+│   │   ├── Square44x44Logo.altform-unplated_targetsize-16.png
+│   │   ├── Square44x44Logo.altform-unplated_targetsize-256.png
+│   │   ├── Square44x44Logo.altform-unplated_targetsize-32.png
+│   │   ├── Square44x44Logo.altform-unplated_targetsize-48.png
+│   │   ├── Square44x44Logo.scale-100.png
+│   │   ├── Square44x44Logo.scale-125.png
+│   │   ├── Square44x44Logo.scale-150.png
+│   │   ├── Square44x44Logo.scale-200.png
+│   │   ├── Square44x44Logo.scale-400.png
+│   │   ├── Square44x44Logo.targetsize-16.png
+│   │   ├── Square44x44Logo.targetsize-24.png
+│   │   ├── Square44x44Logo.targetsize-24_altform-unplated.png
+│   │   ├── Square44x44Logo.targetsize-256.png
+│   │   ├── Square44x44Logo.targetsize-32.png
+│   │   ├── Square44x44Logo.targetsize-48.png
+│   │   ├── StoreLogo.png
+│   │   ├── StoreLogo.scale-100.png
+│   │   ├── StoreLogo.scale-125.png
+│   │   ├── StoreLogo.scale-150.png
+│   │   ├── StoreLogo.scale-200.png
+│   │   ├── StoreLogo.scale-400.png
+│   │   ├── Wide310x150Logo.scale-100.png
+│   │   ├── Wide310x150Logo.scale-125.png
+│   │   ├── Wide310x150Logo.scale-150.png
+│   │   ├── Wide310x150Logo.scale-200.png
+│   │   └── Wide310x150Logo.scale-400.png
+│   ├── StoreLogo.dark.svg
+│   ├── StoreLogo.light.svg
+│   └── WinGetLogo.svg
+├── CmdPal.Branding.props
+├── CmdPal.pre.props
+├── Controls
+│   ├── AdaptiveCardsConfig.cs
+│   ├── CheckBoxWithDescriptionControl.cs
+│   ├── CommandBar.xaml
+│   ├── CommandBar.xaml.cs
+│   ├── ContentFormControl.xaml
+│   ├── ContentFormControl.xaml.cs
+│   ├── ContentIcon.cs
+│   ├── ContextMenu.xaml
+│   ├── ContextMenu.xaml.cs
+│   ├── FiltersDropDown.xaml
+│   ├── FiltersDropDown.xaml.cs
+│   ├── IconBox.cs
+│   ├── IconMarginConverter.cs
+│   ├── IsEnabledTextBlock.xaml
+│   ├── IsEnabledTextBlock.xaml.cs
+│   ├── KeyVisual
+│   │   ├── KeyVisual.cs
+│   │   └── KeyVisual.xaml
+│   ├── SearchBar.xaml
+│   ├── SearchBar.xaml.cs
+│   ├── ShortcutControl
+│   │   ├── HotkeySettingsControlHook.cs
+│   │   ├── NativeKeyboardHelper.cs
+│   │   ├── NativeMethods.cs
+│   │   ├── POINT.cs
+│   │   ├── RECT.cs
+│   │   ├── ShortcutControl.xaml
+│   │   ├── ShortcutControl.xaml.cs
+│   │   ├── ShortcutDialogContentControl.xaml
+│   │   ├── ShortcutDialogContentControl.xaml.cs
+│   │   ├── ShortcutWithTextLabelControl.xaml
+│   │   ├── ShortcutWithTextLabelControl.xaml.cs
+│   │   └── WINDOWPLACEMENT.cs
+│   ├── SourceRequestedEventArgs.cs
+│   ├── Tag.xaml
+│   └── Tag.xaml.cs
+├── Converters
+│   ├── ContentTemplateSelector.cs
+│   ├── ContextItemTemplateSelector.cs
+│   ├── DetailsDataTemplateSelector.cs
+│   ├── FilterTemplateSelector.cs
+│   ├── GridItemTemplateSelector.cs
+│   ├── KeyChordToStringConverter.cs
+│   ├── MessageStateToSeverityConverter.cs
+│   └── PlaceholderTextConverter.cs
+├── Events
+│   ├── BeginInvoke.cs
+│   ├── CmdPalDismissedOnEsc.cs
+│   ├── CmdPalDismissedOnLostFocus.cs
+│   ├── CmdPalHotkeySummoned.cs
+│   ├── CmdPalInvokeResult.cs
+│   ├── CmdPalProcessStarted.cs
+│   ├── ColdLaunch.cs
+│   ├── OpenPage.cs
+│   ├── ReactivateInstance.cs
+│   └── RunEvents.cs
+├── ExtViews
+│   ├── CleanupHelper.xaml.cs
+│   ├── ContentPage.xaml
+│   ├── ContentPage.xaml.cs
+│   ├── ListPage.xaml
+│   └── ListPage.xaml.cs
+├── Helpers
+│   ├── BindTransformers.cs
+│   ├── GlobalErrorHandler.cs
+│   ├── GpoValueChecker.cs
+│   ├── IconCacheProvider.cs
+│   ├── IconCacheService.cs
+│   ├── LocalKeyboardListener.cs
+│   ├── LocalKeyboardListenerKeyPressedEventArgs.cs
+│   ├── MarkdownImageProviders
+│   │   ├── CompositeImageSourceProvider.cs
+│   │   ├── DataImageSourceProvider.cs
+│   │   ├── HttpImageSourceProvider.cs
+│   │   ├── IImageSourceProvider.cs
+│   │   ├── ImageHints.cs
+│   │   ├── ImageProvider.cs
+│   │   ├── ImageSourceFactory.cs
+│   │   ├── ImageSourceInfo.cs
+│   │   ├── LocalImageSourceProvider.cs
+│   │   └── RtbInlineImageFactory.cs
+│   ├── NativeMethods.cs
+│   ├── OptionalColorToBrushConverter.cs
+│   ├── ResourceLoaderInstance.cs
+│   ├── TelemetryForwarder.cs
+│   ├── TrayIconService.cs
+│   ├── TypedEventHandlerExtensions.cs
+│   ├── UIHelper.cs
+│   ├── WindowExtensions.cs
+│   └── WindowHelper.cs
+├── HiddenOwnerWindowBehavior.cs
+├── LocalSuppressions.cs
+├── LogWrapper.cs
+├── MainWindow.xaml
+├── MainWindow.xaml.cs
+├── Messages
+│   ├── HotkeySummonMessage.cs
+│   ├── OpenContextMenuMessage.cs
+│   └── SettingsWindowClosedMessage.cs
+├── Microsoft.CmdPal.UI.csproj
+├── NativeMethods.txt
+├── Package-Dev.appxmanifest
+├── Package.appxmanifest
+├── Pages
+│   ├── LoadingPage.xaml
+│   ├── LoadingPage.xaml.cs
+│   ├── ShellPage.xaml
+│   └── ShellPage.xaml.cs
+├── PowerToysAppHostService.cs
+├── PowerToysRootPageService.cs
+├── Program.cs
+├── Release-Assets
+│   ├── LargeTile.scale-100.png
+│   ├── LargeTile.scale-125.png
+│   ├── LargeTile.scale-150.png
+│   ├── LargeTile.scale-200.png
+│   ├── LargeTile.scale-400.png
+│   ├── LockScreenLogo.scale-200.png
+│   ├── SmallTile.scale-100.png
+│   ├── SmallTile.scale-125.png
+│   ├── SmallTile.scale-150.png
+│   ├── SmallTile.scale-200.png
+│   ├── SmallTile.scale-400.png
+│   ├── SplashScreen.scale-100.png
+│   ├── SplashScreen.scale-125.png
+│   ├── SplashScreen.scale-150.png
+│   ├── SplashScreen.scale-200.png
+│   ├── SplashScreen.scale-400.png
+│   ├── Square150x150Logo.scale-100.png
+│   ├── Square150x150Logo.scale-125.png
+│   ├── Square150x150Logo.scale-150.png
+│   ├── Square150x150Logo.scale-200.png
+│   ├── Square150x150Logo.scale-400.png
+│   ├── Square44x44Logo.altform-lightunplated_targetsize-16.png
+│   ├── Square44x44Logo.altform-lightunplated_targetsize-24.png
+│   ├── Square44x44Logo.altform-lightunplated_targetsize-256.png
+│   ├── Square44x44Logo.altform-lightunplated_targetsize-32.png
+│   ├── Square44x44Logo.altform-lightunplated_targetsize-48.png
+│   ├── Square44x44Logo.altform-unplated_targetsize-16.png
+│   ├── Square44x44Logo.altform-unplated_targetsize-256.png
+│   ├── Square44x44Logo.altform-unplated_targetsize-32.png
+│   ├── Square44x44Logo.altform-unplated_targetsize-48.png
+│   ├── Square44x44Logo.scale-100.png
+│   ├── Square44x44Logo.scale-125.png
+│   ├── Square44x44Logo.scale-150.png
+│   ├── Square44x44Logo.scale-200.png
+│   ├── Square44x44Logo.scale-400.png
+│   ├── Square44x44Logo.targetsize-16.png
+│   ├── Square44x44Logo.targetsize-24.png
+│   ├── Square44x44Logo.targetsize-24_altform-unplated.png
+│   ├── Square44x44Logo.targetsize-256.png
+│   ├── Square44x44Logo.targetsize-32.png
+│   ├── Square44x44Logo.targetsize-48.png
+│   ├── StoreLogo.png
+│   ├── StoreLogo.scale-100.png
+│   ├── StoreLogo.scale-125.png
+│   ├── StoreLogo.scale-150.png
+│   ├── StoreLogo.scale-200.png
+│   ├── StoreLogo.scale-400.png
+│   ├── Wide310x150Logo.scale-100.png
+│   ├── Wide310x150Logo.scale-125.png
+│   ├── Wide310x150Logo.scale-150.png
+│   ├── Wide310x150Logo.scale-200.png
+│   └── Wide310x150Logo.scale-400.png
+├── RunHistoryService.cs
+├── Settings
+│   ├── ExtensionPage.xaml
+│   ├── ExtensionPage.xaml.cs
+│   ├── ExtensionsPage.xaml
+│   ├── ExtensionsPage.xaml.cs
+│   ├── GeneralPage.xaml
+│   ├── GeneralPage.xaml.cs
+│   ├── NavigateToExtensionSettingsMessage.xaml.cs
+│   ├── SettingsWindow.xaml
+│   └── SettingsWindow.xaml.cs
+├── Strings
+│   └── en-us
+│       └── Resources.resw
+├── Styles
+│   ├── Colors.xaml
+│   ├── Settings.xaml
+│   ├── TextBlock.xaml
+│   └── TextBox.xaml
+├── ToastWindow.xaml
+├── ToastWindow.xaml.cs
+├── TypePreservation.cs
+└── Views
+    └── ICurrentPageAware.cs

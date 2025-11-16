@@ -2,9 +2,9 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
-using Smart_Cleaner_for_Windows.Diagnostics;
+using SmartCleanerForWindows.Diagnostics;
 
-namespace Smart_Cleaner_for_Windows.Shell;
+namespace SmartCleanerForWindows.Shell;
 
 public partial class App : Application
 {
@@ -12,6 +12,7 @@ public partial class App : Application
 
     public App()
     {
+        StartupDiagnostics.AttachToApplication(this);
         InitializeComponent();
         AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;

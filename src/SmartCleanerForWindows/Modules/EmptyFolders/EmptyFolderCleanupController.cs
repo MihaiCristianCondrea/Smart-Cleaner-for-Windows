@@ -1,10 +1,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Smart_Cleaner_for_Windows.Core.FileSystem;
-using Smart_Cleaner_for_Windows.Modules.EmptyFolders.Contracts;
+using SmartCleanerForWindows.Core.FileSystem;
+using SmartCleanerForWindows.Modules.EmptyFolders.Contracts;
 
-namespace Smart_Cleaner_for_Windows.Modules.EmptyFolders;
+namespace SmartCleanerForWindows.Modules.EmptyFolders;
 
 /// <summary>
 /// Coordinates the empty folder preview and cleanup workflows, keeping the UI logic isolated

@@ -3,9 +3,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using Smart_Cleaner_for_Windows.Core.Storage;
+using SmartCleanerForWindows.Core.Storage;
 
-namespace Smart_Cleaner_for_Windows.Modules.LargeFiles.ViewModels;
+namespace SmartCleanerForWindows.Modules.LargeFiles.ViewModels;
 
 public sealed class LargeFileGroupViewModel(
     string displayName,

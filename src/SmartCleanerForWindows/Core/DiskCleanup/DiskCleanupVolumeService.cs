@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace Smart_Cleaner_for_Windows.Core.DiskCleanup;
+namespace SmartCleanerForWindows.Core.DiskCleanup;
 
 public sealed class DiskCleanupVolumeService : IDiskCleanupVolumeService
 {

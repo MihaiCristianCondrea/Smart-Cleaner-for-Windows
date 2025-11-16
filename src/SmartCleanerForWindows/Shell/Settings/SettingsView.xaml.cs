@@ -2,7 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Windows.Foundation;
 
-namespace Smart_Cleaner_for_Windows.Shell.Settings;
+namespace SmartCleanerForWindows.Shell.Settings;
 
 public sealed partial class SettingsView : UserControl
 {

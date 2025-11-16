@@ -1,4 +1,4 @@
-namespace Smart_Cleaner_for_Windows.Core.DiskCleanup;
+namespace SmartCleanerForWindows.Core.DiskCleanup;
 
 public interface IDiskCleanupVolumeService
 {
