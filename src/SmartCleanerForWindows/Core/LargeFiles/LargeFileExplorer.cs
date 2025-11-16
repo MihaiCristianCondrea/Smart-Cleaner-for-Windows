@@ -310,6 +310,11 @@ public sealed class LargeFileExplorer(IDirectorySystem directorySystem) : ILarge
                 }
             }
 
+            foreach (var restricted in SystemPathExclusions.GetRestrictedDirectories(root))
+            {
+                _fullPathExclusions.Add(restricted);
+            }
+
             if (options.ExcludedNamePatterns is { Count: > 0 })
             {
                 var normalized = new List<string>();

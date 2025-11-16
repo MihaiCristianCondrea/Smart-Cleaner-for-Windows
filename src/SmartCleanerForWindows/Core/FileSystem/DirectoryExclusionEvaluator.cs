@@ -47,6 +47,11 @@ internal sealed class DirectoryExclusionEvaluator : IDirectoryExclusionEvaluator
             }
         }
 
+        foreach (var restricted in SystemPathExclusions.GetRestrictedDirectories(root))
+        {
+            _fullPathExclusions.Add(restricted);
+        }
+
         if (options.ExcludedNamePatterns is { Count: > 0 })
         {
             var validPatterns = new List<string>();

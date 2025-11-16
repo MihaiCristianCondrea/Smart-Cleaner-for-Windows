@@ -4,7 +4,7 @@ Smart Cleaner for Windows is a modern WinUI 3 desktop utility that helps you tid
 
 ## Highlights
 - **Dashboard overview** – review drive usage at a glance and jump directly into the cleanup tools from a Fluent NavigationView.
-- **Empty folders cleaner** – preview every empty directory before deletion, send removals to the **Recycle Bin** by default, cap traversal depth, skip reparse points, cancel long scans, and exclude folders with wildcard rules such as `.git; build/*; node_modules`.
+- **Empty folders cleaner** – preview every empty directory before deletion, send removals to the **Recycle Bin** by default, cap traversal depth, skip reparse points, cancel long scans, automatically ignore protected system folders (for example `System Volume Information` or the SRU database), and exclude folders with wildcard rules such as `.git; build/*; node_modules`.
 - **Disk cleanup integration** – inspect the Windows Disk Cleanup handlers for a volume, see the estimated size reclaimed per category, review warnings (including elevation requirements), and clean only the items you select.
 - **Personal and polished** – supports English (United States) and Spanish (Spain), includes theme/accent controls, and keeps all operations on-device with no telemetry.
 
