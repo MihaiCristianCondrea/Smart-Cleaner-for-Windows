@@ -83,8 +83,8 @@ public abstract class Program
         }
         catch (Exception ex)
         {
-            Log.Fatal(ex, "Unhandled exception during application startup.");
-            throw;
+            CrashHandler.HandleFatalException("application startup", ex, terminateProcess: true);
+            return;
         }
         finally
         {
