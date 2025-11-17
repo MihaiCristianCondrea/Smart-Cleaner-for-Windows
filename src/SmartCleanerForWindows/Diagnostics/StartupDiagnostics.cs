@@ -12,13 +12,13 @@ namespace SmartCleanerForWindows.Diagnostics;
 internal static class StartupDiagnostics
 {
     private const int FirstChanceSampleLimit = 20;
-    private static int s_initialized; // FIXME: Name 's_initialized' does not match rule 'Static fields (private)'. Suggested name is '_sInitialized'.
-    private static int s_firstChanceCount; // FIXME: Name 's_firstChanceCount' does not match rule 'Static fields (private)'. Suggested name is '_sFirstChanceCount'.
+    private static int _initialized;
+    private static int _firstChanceCount;
     private static readonly Lock SyncRoot = new();
 
     public static void Initialize()
     {
-        if (Interlocked.Exchange(ref s_initialized, 1) == 1)
+        if (Interlocked.Exchange(ref _initialized, 1) == 1)
         {
             return;
         }
@@ -74,7 +74,7 @@ internal static class StartupDiagnostics
 
     private static void OnFirstChanceException(object? sender, FirstChanceExceptionEventArgs e)
     {
-        var count = Interlocked.Increment(ref s_firstChanceCount);
+        var count = Interlocked.Increment(ref _firstChanceCount);
         if (count > FirstChanceSampleLimit)
         {
             return;

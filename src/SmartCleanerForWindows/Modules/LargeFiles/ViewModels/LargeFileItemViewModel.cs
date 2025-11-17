@@ -36,13 +36,18 @@ public sealed class LargeFileItemViewModel
 
     public long Size { get; }
 
-    public string Name { get; } // FIXME: Auto-property accessor 'Name.get' is never used
+    private string Name { get; }
 
-    public string Directory { get; } // FIXME: Auto-property accessor 'Directory.get' is never used
+    private string Directory { get; }
 
-    public string ExtensionDisplay { get; } // FIXME: Auto-property accessor 'ExtensionDisplay.get' is never used
+    private string ExtensionDisplay { get; }
 
-    public string TypeName { get; } // FIXME: Auto-property accessor 'TypeName.get' is never used
+    private string TypeName { get; }
 
-    public string SizeDisplay { get; } // FIXME: Auto-property accessor 'SizeDisplay.get' is never used
+    private string SizeDisplay { get; }
+
+    public override string ToString()
+    {
+        return $"{Name} ({SizeDisplay}) — {TypeName} in {Directory} [{ExtensionDisplay}]";
+    }
 }

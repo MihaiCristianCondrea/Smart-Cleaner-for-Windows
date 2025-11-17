@@ -239,18 +239,25 @@ public sealed partial class MainWindow
         }
     }
 
-    private async void OnInternetRepairCancel(object sender, RoutedEventArgs e) // FIXME: Avoid using 'async' for method with the 'void' return type or catch all exceptions in it: any exceptions unhandled by the method might lead to the process crash
+    private async void OnInternetRepairCancel(object sender, RoutedEventArgs e)
     {
-        if (_internetRepairCts is { IsCancellationRequested: false } cts)
+        try
         {
-            try
+            if (_internetRepairCts is { IsCancellationRequested: false } cts)
             {
-                await cts.CancelAsync().ConfigureAwait(true);
+                try
+                {
+                    await cts.CancelAsync().ConfigureAwait(true);
+                }
+                catch (Exception ex)
+                {
+                    ShowInternetRepairInfo($"Error: {ex.Message}", InfoBarSeverity.Error);
+                }
             }
-            catch (Exception ex)
-            {
-                ShowInternetRepairInfo($"Error: {ex.Message}", InfoBarSeverity.Error);
-            }
+        }
+        catch (Exception ex)
+        {
+            ShowInternetRepairInfo($"Error: {ex.Message}", InfoBarSeverity.Error);
         }
     }
 

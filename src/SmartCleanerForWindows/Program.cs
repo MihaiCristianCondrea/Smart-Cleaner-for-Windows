@@ -23,15 +23,17 @@ public abstract class Program
     private static readonly WindowsAppSdkConfiguration WindowsAppSdk = WindowsAppSdkConfiguration.Load();
 
     [STAThread]
-    public static void Main(string[] args)
+    public static void Main(string[]? args)
     {
         LoggingConfiguration.Initialize(args);
         Log.Information("Program.Main reached. DISABLE_XAML_GENERATED_MAIN entrypoint active.");
         StartupDiagnostics.Initialize();
         ComWrappersSupport.InitializeComWrappers();
 
-        Log.Information("Command line arguments: {ArgsCount} ({Args})", args?.Length ?? 0, // FIXME: Conditional access qualifier expression is never null according to nullable reference types' annotations
-            args is { Length: > 0 } ? string.Join(" ", args) : "(none)");
+        var argsLength = args?.Length ?? 0;
+        var argsDescription = args is { Length: > 0 } ? string.Join(" ", args) : "(none)";
+
+        Log.Information("Command line arguments: {ArgsCount} ({Args})", argsLength, argsDescription);
 
         var isPackaged = IsRunningPackaged();
         Log.Information("Packaged detection result: {IsPackaged}", isPackaged);
@@ -68,7 +70,7 @@ public abstract class Program
         }
 
         Log.Information("Launching Smart Cleaner for Windows (packaged: {IsPackaged}).", isPackaged);
-        StartupDiagnostics.LogMessage("Startup", $"Main invoked (packaged: {isPackaged}, args: {args.Length})."); // FIXME: Dereference of a possibly null reference
+        StartupDiagnostics.LogMessage("Startup", $"Main invoked (packaged: {isPackaged}, args: {argsLength}).");
 
         try
         {
@@ -84,7 +86,6 @@ public abstract class Program
         catch (Exception ex)
         {
             CrashHandler.HandleFatalException("application startup", ex, terminateProcess: true);
-            return; // FIXME: Redundant control flow jump statement
         }
         finally
         {
@@ -250,19 +251,6 @@ public abstract class Program
         Bootstrap.Initialize(WindowsAppSdkMajorMinor, configuration.Channel);
     }
 
-    private static void LogEvent(string category, string message) // FIXME :Method 'LogEvent' is never used
-    {
-        try
-        {
-            var logPath = AppDataPaths.GetEventLogPath();
-            File.AppendAllText(logPath, $"{DateTime.Now:u} [{category}] {message}{Environment.NewLine}");
-        }
-        catch
-        {
-            // Ignore logging failures to avoid impacting startup.
-        }
-    }
-
     private static bool IsRunningPackaged()
     {
         try
@@ -291,11 +279,13 @@ public abstract class Program
 
         public static WindowsAppSdkConfiguration Load()
         {
-            var metadata = typeof(Program).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>();
-            var channel = NormalizeChannel(GetMetadata(metadata, "WindowsAppSdkChannel")); // FIXME: Possible multiple enumeration
-            var stable = GetMetadata(metadata, "WindowsAppSdkStableVersion"); // FIXME :Possible multiple enumeration
-            var preview = GetMetadata(metadata, "WindowsAppSdkPreviewVersion"); // FIXME :Possible multiple enumeration
-            var experimental = GetMetadata(metadata, "WindowsAppSdkExperimentalVersion"); // FIXME :Possible multiple enumeration
+            var metadata = typeof(Program).Assembly
+                .GetCustomAttributes<AssemblyMetadataAttribute>()
+                .ToArray();
+            var channel = NormalizeChannel(GetMetadata(metadata, "WindowsAppSdkChannel"));
+            var stable = GetMetadata(metadata, "WindowsAppSdkStableVersion");
+            var preview = GetMetadata(metadata, "WindowsAppSdkPreviewVersion");
+            var experimental = GetMetadata(metadata, "WindowsAppSdkExperimentalVersion");
 
             var selectedVersion = channel switch
             {
