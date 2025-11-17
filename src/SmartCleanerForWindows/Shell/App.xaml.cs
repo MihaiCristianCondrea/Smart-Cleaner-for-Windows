@@ -6,7 +6,7 @@ using Serilog;
 
 namespace SmartCleanerForWindows.Shell;
 
-public partial class App : Application
+public partial class App
 {
     private Window? _window;
 
@@ -22,7 +22,7 @@ public partial class App : Application
         UnhandledException += OnApplicationUnhandledException;
     }
 
-    protected override void OnLaunched(LaunchActivatedEventArgs args)
+    protected override void OnLaunched(LaunchActivatedEventArgs? args)
     {
         try
         {
@@ -39,7 +39,7 @@ public partial class App : Application
         }
     }
 
-    private void OnUnhandledException(object? sender, global::System.UnhandledExceptionEventArgs e)
+    private void OnUnhandledException(object? sender, System.UnhandledExceptionEventArgs e)
     {
         HandleUnhandledException(e.ExceptionObject as Exception, "AppDomain.UnhandledException");
     }

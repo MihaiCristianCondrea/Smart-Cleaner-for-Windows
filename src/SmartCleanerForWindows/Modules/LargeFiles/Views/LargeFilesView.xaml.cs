@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace SmartCleanerForWindows.Modules.LargeFiles.Views;
 
-public sealed partial class LargeFilesView : UserControl
+public sealed partial class LargeFilesView
 {
     public LargeFilesView()
     {

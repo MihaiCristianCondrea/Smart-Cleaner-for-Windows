@@ -4,7 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace SmartCleanerForWindows.Modules.Dashboard.Views;
 
-public sealed partial class DashboardView : UserControl
+public sealed partial class DashboardView
 {
     public DashboardView()
     {

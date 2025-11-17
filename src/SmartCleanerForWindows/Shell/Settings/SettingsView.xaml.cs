@@ -4,7 +4,7 @@ using Windows.Foundation;
 
 namespace SmartCleanerForWindows.Shell.Settings;
 
-public sealed partial class SettingsView : UserControl
+public sealed partial class SettingsView
 {
     public SettingsView()
     {

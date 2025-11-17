@@ -7,17 +7,17 @@ namespace SmartCleanerForWindows.Common.Converters;
 /// <summary>
 /// Converts boolean values to <see cref="Visibility"/> instances.
 /// </summary>
-public sealed class BooleanToVisibilityConverter : IValueConverter
+public sealed class BooleanToVisibilityConverter(bool isInverted) : IValueConverter
 {
     /// <summary>
     /// Gets or sets a value indicating whether the conversion should be inverted.
     /// </summary>
-    public bool IsInverted { get; set; }
+    private bool IsInverted { get; set; } = isInverted;
 
     /// <inheritdoc />
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-        var boolValue = value is bool b && b;
+        var boolValue = value is true;
 
         if (ShouldInvert(parameter))
         {
@@ -30,19 +30,16 @@ public sealed class BooleanToVisibilityConverter : IValueConverter
     /// <inheritdoc />
     public object ConvertBack(object value, Type targetType, object parameter, string language)
     {
-        if (value is Visibility visibility)
+        if (value is not Visibility visibility) return false;
+        var result = visibility == Visibility.Visible;
+
+        if (ShouldInvert(parameter))
         {
-            var result = visibility == Visibility.Visible;
-
-            if (ShouldInvert(parameter))
-            {
-                result = !result;
-            }
-
-            return result;
+            result = !result;
         }
 
-        return false;
+        return result;
+
     }
 
     private bool ShouldInvert(object parameter)

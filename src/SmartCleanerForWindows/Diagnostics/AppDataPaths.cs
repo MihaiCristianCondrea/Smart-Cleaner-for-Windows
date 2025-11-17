@@ -8,7 +8,7 @@ internal static class AppDataPaths
     private const string RootDirectoryName = "SmartCleanerForWindows";
     private const string LogsDirectoryName = "Logs";
 
-    public static string EnsureBaseDirectory()
+    private static string EnsureBaseDirectory()
     {
         var directory = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),

@@ -13,10 +13,10 @@ namespace SmartCleanerForWindows.Core.FileSystem;
 internal static class SystemPathExclusions
 {
     private static readonly string[] WindowsRelativePaths =
-    {
+    [
         Path.Combine("System32", "SRU"),
         Path.Combine("System32", "LogFiles", "SRU")
-    };
+    ];
 
     public static IReadOnlyList<string> GetRestrictedDirectories(string root)
     {

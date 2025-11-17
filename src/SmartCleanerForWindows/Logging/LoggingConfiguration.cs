@@ -8,7 +8,7 @@ namespace SmartCleanerForWindows.Logging;
 
 internal static class LoggingConfiguration
 {
-    public static void Initialize(string[] args)
+    public static void Initialize(string[]? args)
     {
         var logDirectory = AppDataPaths.GetLogsDirectory();
         var logPath = AppDataPaths.GetAppLogPath();

@@ -1,9 +1,8 @@
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 
 namespace SmartCleanerForWindows.Modules.DiskCleanup.Views;
 
-public sealed partial class DiskCleanupView : UserControl
+public sealed partial class DiskCleanupView
 {
     public DiskCleanupView()
     {

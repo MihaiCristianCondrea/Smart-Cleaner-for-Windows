@@ -30,7 +30,7 @@ public abstract class Program
         StartupDiagnostics.Initialize();
         ComWrappersSupport.InitializeComWrappers();
 
-        Log.Information("Command line arguments: {ArgsCount} ({Args})", args?.Length ?? 0,
+        Log.Information("Command line arguments: {ArgsCount} ({Args})", args?.Length ?? 0, // FIXME: Conditional access qualifier expression is never null according to nullable reference types' annotations
             args is { Length: > 0 } ? string.Join(" ", args) : "(none)");
 
         var isPackaged = IsRunningPackaged();
@@ -68,7 +68,7 @@ public abstract class Program
         }
 
         Log.Information("Launching Smart Cleaner for Windows (packaged: {IsPackaged}).", isPackaged);
-        StartupDiagnostics.LogMessage("Startup", $"Main invoked (packaged: {isPackaged}, args: {args.Length}).");
+        StartupDiagnostics.LogMessage("Startup", $"Main invoked (packaged: {isPackaged}, args: {args.Length})."); // FIXME: Dereference of a possibly null reference
 
         try
         {
@@ -84,7 +84,7 @@ public abstract class Program
         catch (Exception ex)
         {
             CrashHandler.HandleFatalException("application startup", ex, terminateProcess: true);
-            return;
+            return; // FIXME: Redundant control flow jump statement
         }
         finally
         {
@@ -250,7 +250,7 @@ public abstract class Program
         Bootstrap.Initialize(WindowsAppSdkMajorMinor, configuration.Channel);
     }
 
-    private static void LogEvent(string category, string message)
+    private static void LogEvent(string category, string message) // FIXME :Method 'LogEvent' is never used
     {
         try
         {
@@ -285,17 +285,17 @@ public abstract class Program
 
         public string Channel { get; }
 
-        public string DisplayChannel => string.IsNullOrEmpty(Channel) ? "stable" : Channel;
+        private string DisplayChannel => string.IsNullOrEmpty(Channel) ? "stable" : Channel;
 
-        public string Version { get; }
+        private string Version { get; }
 
         public static WindowsAppSdkConfiguration Load()
         {
             var metadata = typeof(Program).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>();
-            var channel = NormalizeChannel(GetMetadata(metadata, "WindowsAppSdkChannel"));
-            var stable = GetMetadata(metadata, "WindowsAppSdkStableVersion");
-            var preview = GetMetadata(metadata, "WindowsAppSdkPreviewVersion");
-            var experimental = GetMetadata(metadata, "WindowsAppSdkExperimentalVersion");
+            var channel = NormalizeChannel(GetMetadata(metadata, "WindowsAppSdkChannel")); // FIXME: Possible multiple enumeration
+            var stable = GetMetadata(metadata, "WindowsAppSdkStableVersion"); // FIXME :Possible multiple enumeration
+            var preview = GetMetadata(metadata, "WindowsAppSdkPreviewVersion"); // FIXME :Possible multiple enumeration
+            var experimental = GetMetadata(metadata, "WindowsAppSdkExperimentalVersion"); // FIXME :Possible multiple enumeration
 
             var selectedVersion = channel switch
             {
@@ -308,8 +308,6 @@ public abstract class Program
             {
                 selectedVersion = stable;
             }
-
-            selectedVersion ??= string.Empty;
 
             return new WindowsAppSdkConfiguration(channel, selectedVersion);
         }

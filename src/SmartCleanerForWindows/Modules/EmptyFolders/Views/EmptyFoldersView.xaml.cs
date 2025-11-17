@@ -4,7 +4,7 @@ using Windows.Foundation;
 
 namespace SmartCleanerForWindows.Modules.EmptyFolders.Views;
 
-public sealed partial class EmptyFoldersView : UserControl
+public sealed partial class EmptyFoldersView
 {
     public EmptyFoldersView()
     {

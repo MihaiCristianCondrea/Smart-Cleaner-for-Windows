@@ -1,9 +1,8 @@
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 
 namespace SmartCleanerForWindows.Modules.InternetRepair.Views;
 
-public sealed partial class InternetRepairView : UserControl
+public sealed partial class InternetRepairView
 {
     public InternetRepairView()
     {

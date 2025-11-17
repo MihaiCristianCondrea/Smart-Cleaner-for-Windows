@@ -5,15 +5,16 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
+using UnhandledExceptionEventArgs = System.UnhandledExceptionEventArgs;
 
 namespace SmartCleanerForWindows.Diagnostics;
 
 internal static class StartupDiagnostics
 {
     private const int FirstChanceSampleLimit = 20;
-    private static int s_initialized;
-    private static int s_firstChanceCount;
-    private static readonly object SyncRoot = new();
+    private static int s_initialized; // FIXME: Name 's_initialized' does not match rule 'Static fields (private)'. Suggested name is '_sInitialized'.
+    private static int s_firstChanceCount; // FIXME: Name 's_firstChanceCount' does not match rule 'Static fields (private)'. Suggested name is '_sFirstChanceCount'.
+    private static readonly Lock SyncRoot = new();
 
     public static void Initialize()
     {
@@ -29,7 +30,7 @@ internal static class StartupDiagnostics
         WriteLine($"[Info] Startup diagnostics initialized (ProcessId={Environment.ProcessId}, Version={Environment.Version}).");
     }
 
-    public static void AttachToApplication(Application application)
+    public static void AttachToApplication(Application? application)
     {
         if (application is null)
         {
@@ -44,7 +45,7 @@ internal static class StartupDiagnostics
         WriteLine($"[{category}] {message}");
     }
 
-    private static void OnApplicationUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+    private static void OnApplicationUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs? e)
     {
         if (e?.Exception is null)
         {
@@ -54,7 +55,7 @@ internal static class StartupDiagnostics
         WriteException("App.UnhandledException", e.Exception);
     }
 
-    private static void OnUnhandledException(object? sender, System.UnhandledExceptionEventArgs e)
+    private static void OnUnhandledException(object? sender, UnhandledExceptionEventArgs? e)
     {
         if (e?.ExceptionObject is Exception exception)
         {
