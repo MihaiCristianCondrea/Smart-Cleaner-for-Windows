@@ -7,12 +7,21 @@ namespace SmartCleanerForWindows.Common.Converters;
 /// <summary>
 /// Converts boolean values to <see cref="Visibility"/> instances.
 /// </summary>
-public sealed class BooleanToVisibilityConverter(bool isInverted) : IValueConverter
+public sealed class BooleanToVisibilityConverter : IValueConverter
 {
+    public BooleanToVisibilityConverter()
+    {
+    }
+
+    public BooleanToVisibilityConverter(bool isInverted)
+    {
+        IsInverted = isInverted;
+    }
+
     /// <summary>
     /// Gets or sets a value indicating whether the conversion should be inverted.
     /// </summary>
-    private bool IsInverted { get; set; } = isInverted;
+    public bool IsInverted { get; set; }
 
     /// <inheritdoc />
     public object Convert(object value, Type targetType, object parameter, string language)
