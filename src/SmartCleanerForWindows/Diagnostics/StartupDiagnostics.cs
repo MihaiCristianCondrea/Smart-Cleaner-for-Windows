@@ -87,11 +87,41 @@ internal static class StartupDiagnostics
     {
         var builder = new StringBuilder();
         builder.Append('[').Append(category).Append("] ");
-        builder.Append(exception.GetType().FullName);
-        builder.Append(':').Append(' ').Append(exception.Message);
-        builder.AppendLine();
-        builder.AppendLine(exception.StackTrace ?? "(no stack trace)");
+        builder.AppendLine(DescribeException(exception));
+
+        var inner = exception.InnerException;
+        var depth = 1;
+        while (inner is not null && depth <= 8)
+        {
+            builder.AppendLine($"---> InnerException#{depth}: {DescribeException(inner)}");
+            inner = inner.InnerException;
+            depth++;
+        }
+
         WriteLine(builder.ToString().TrimEnd());
+    }
+
+    private static string DescribeException(Exception exception)
+    {
+        var message = new StringBuilder();
+        message.Append(exception.GetType().FullName);
+        message.Append(" (0x").Append(exception.HResult.ToString("X8")).Append(')');
+        if (!string.IsNullOrWhiteSpace(exception.Message))
+        {
+            message.Append(": ").Append(exception.Message.Replace("\r", " ").Replace("\n", " "));
+        }
+
+        var stack = exception.StackTrace;
+        if (!string.IsNullOrWhiteSpace(stack))
+        {
+            message.Append("\n").Append(stack.Trim());
+        }
+        else
+        {
+            message.Append("\n(no stack trace)");
+        }
+
+        return message.ToString();
     }
 
     private static void WriteLine(string message)

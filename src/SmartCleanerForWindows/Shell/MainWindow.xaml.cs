@@ -33,7 +33,7 @@ using SmartCleanerForWindows.Core.DiskCleanup;
 
 namespace SmartCleanerForWindows.Shell;
 
-public sealed partial class MainWindow : IEmptyFolderCleanupView
+public sealed partial class MainWindow : Window, IEmptyFolderCleanupView
 {
     private readonly IDiskCleanupService _diskCleanupService;
     private readonly IStorageOverviewService _storageOverviewService;

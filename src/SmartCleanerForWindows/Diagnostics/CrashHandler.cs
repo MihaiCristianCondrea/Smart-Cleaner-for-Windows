@@ -28,19 +28,17 @@ internal static class CrashHandler
 
         ShowMessageBox("Smart Cleaner for Windows - Fatal error", message);
 
-        if (terminateProcess)
+        if (!terminateProcess) return;
+        try
         {
-            try
-            {
-                Log.CloseAndFlush();
-            }
-            catch
-            {
-                // Ignore logging failures during shutdown.
-            }
-
-            Environment.Exit(1);
+            Log.CloseAndFlush();
         }
+        catch
+        {
+            // Ignore logging failures during shutdown.
+        }
+
+        Environment.Exit(1);
     }
 
     private static void TryWriteCrashLog(string context, Exception exception)
@@ -49,12 +47,31 @@ internal static class CrashHandler
         {
             var logPath = AppDataPaths.GetCrashLogPath();
             File.AppendAllText(logPath,
-                $"{DateTime.Now:u} [Fatal:{context}]\r\n{exception}\r\n\r\n");
+                $"{DateTime.Now:u} [Fatal:{context}]\r\n{DescribeExceptionTree(exception)}\r\n\r\n");
         }
         catch
         {
             // Swallow logging failures to avoid masking the original crash.
         }
+    }
+
+    private static string DescribeExceptionTree(Exception exception)
+    {
+        var writer = new StringWriter();
+        var current = exception;
+        var depth = 0;
+        while (current is not null && depth < 16)
+        {
+            var prefix = depth == 0 ? string.Empty : new string('>', depth) + " ";
+            writer.WriteLine($"{prefix}{current.GetType().FullName} (0x{current.HResult:X8}): {current.Message}");
+            writer.WriteLine(current.StackTrace ?? "(no stack trace)");
+            writer.WriteLine();
+
+            current = current.InnerException;
+            depth++;
+        }
+
+        return writer.ToString();
     }
 
     private static void ShowMessageBox(string title, string message)
