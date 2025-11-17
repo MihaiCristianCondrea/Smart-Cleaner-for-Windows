@@ -9,3 +9,5 @@ Windows.Win32.UI.WindowsAndMessaging.IMAGE_FLAGS
 Windows.Win32.UI.WindowsAndMessaging.GDI_IMAGE_TYPE
 Windows.Win32.UI.WindowsAndMessaging.MessageBox
 Windows.Win32.UI.WindowsAndMessaging.MESSAGEBOX_STYLE
+Windows.Win32.UI.WindowsAndMessaging.MessageBox
+Windows.Win32.UI.WindowsAndMessaging.MESSAGEBOX_STYLE
