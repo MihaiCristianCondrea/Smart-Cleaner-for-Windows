@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Serilog;
+using System.Linq;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
@@ -14,8 +15,16 @@ internal static class CrashHandler
         Log.Error(exception, "Fatal exception during {Context}.", context);
         TryWriteCrashLog(context, exception);
 
+        var baseException = exception.GetBaseException();
+        var logPath = AppDataPaths.GetCrashLogPath();
+        var firstStackLine = baseException.StackTrace?
+            .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
+            .FirstOrDefault();
+
         var message = $"Smart Cleaner for Windows encountered a fatal error during {context} and needs to close.\n\n" +
-                      $"Error: {exception.Message}";
+                      $"Error: {baseException.GetType().Name}: {baseException.Message}\n" +
+                      (firstStackLine is not null ? $"Location: {firstStackLine}\n" : string.Empty) +
+                      $"A detailed crash log was written to:{Environment.NewLine}{logPath}";
 
         ShowMessageBox("Smart Cleaner for Windows - Fatal error", message);
 
