@@ -69,6 +69,10 @@
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
         </Page>
+        <Page Include="Shell\Themes\DesignTokens.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+        </Page>
         <Page Include="Shell\Settings\SettingsView.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
@@ -90,11 +94,6 @@
             <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
         </Page>
         <Page Include="Modules\LargeFiles\Views\LargeFilesView.xaml">
-            <Generator>MSBuild:Compile</Generator>
-            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-        </Page>
-        <!-- Ensure loose resource dictionaries are compiled into the package so XAML lookups succeed at runtime. -->
-        <Page Update="Shell\Themes\DesignTokens.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
         </Page>

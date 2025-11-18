@@ -24,11 +24,13 @@ using SmartCleanerForWindows.Modules.EmptyFolders.Contracts;
 using SmartCleanerForWindows.Modules.EmptyFolders.ViewModels;
 using SmartCleanerForWindows.Modules.LargeFiles.ViewModels;
 using SmartCleanerForWindows.Modules.InternetRepair.ViewModels;
+using Serilog;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.UI;
 using WinRT.Interop;
 using System.Security.Principal;
+using Microsoft.UI.Xaml.Markup;
 using SmartCleanerForWindows.Core.DiskCleanup;
 
 namespace SmartCleanerForWindows.Shell;
@@ -177,7 +179,11 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         _internetRepairService = internetRepairService ?? throw new ArgumentNullException(nameof(internetRepairService));
         _diskCleanupVolume = _diskCleanupService.GetDefaultVolume();
 
-        InitializeComponent();
+        if (!TryInitializeComponentWithDiagnostics(out var xamlFailure))
+        {
+            BuildFallbackShell(xamlFailure);
+            return;
+        }
 
         _emptyFolderController = new EmptyFolderCleanupController(directoryCleaner1, this);
         EmptyFoldersView.CandidatesTree.ItemsSource = _filteredEmptyFolderRoots;
@@ -287,6 +293,91 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         Closed += OnClosed;
 
         NavigateTo(DashboardItem);
+    }
+
+    private bool TryInitializeComponentWithDiagnostics(out Exception? failure)
+    {
+        try
+        {
+            InitializeComponent();
+            failure = null;
+            return true;
+        }
+        catch (FileNotFoundException fileEx)
+        {
+            Log.Error(
+                fileEx,
+                "XAML load failed: missing file referenced by markup (likely resource dictionary or asset). Message={Message}",
+                fileEx.Message);
+            failure = fileEx;
+        }
+        catch (XamlParseException xamlEx)
+        {
+            Log.Error(
+                xamlEx,
+                "XAML parse failed while constructing MainWindow. HResult={HResult}, Inner={InnerMessage}",
+                xamlEx.HResult,
+                xamlEx.InnerException?.Message);
+            failure = xamlEx;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Unexpected failure during MainWindow InitializeComponent.");
+            failure = ex;
+        }
+
+        return false;
+    }
+
+    private void BuildFallbackShell(Exception? failure)
+    {
+        var diagnosticText = "Smart Cleaner for Windows could not load the main XAML layout.";
+        if (failure is not null)
+        {
+            diagnosticText += $"\n\n{failure.GetType().Name}: {failure.Message}";
+            if (failure.InnerException is not null)
+            {
+                diagnosticText += $"\nInner: {failure.InnerException.GetType().Name}: {failure.InnerException.Message}";
+            }
+        }
+
+        Content = new Grid
+        {
+            Background = Application.Current.Resources["ApplicationPageBackgroundThemeBrush"] as Brush,
+            Children =
+            {
+                new StackPanel
+                {
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Spacing = 12,
+                    Children =
+                    {
+                        new TextBlock
+                        {
+                            Text = "Startup fallback shell loaded",
+                            FontSize = 20,
+                            HorizontalAlignment = HorizontalAlignment.Center
+                        },
+                        new TextBlock
+                        {
+                            Text = diagnosticText,
+                            TextWrapping = TextWrapping.Wrap,
+                            MaxWidth = 480,
+                            HorizontalAlignment = HorizontalAlignment.Center
+                        },
+                        new TextBlock
+                        {
+                            Text = "Check the crash log for details and verify all XAML resources are packaged.",
+                            TextWrapping = TextWrapping.Wrap,
+                            MaxWidth = 480,
+                            HorizontalAlignment = HorizontalAlignment.Center,
+                            Foreground = Application.Current.Resources["TextFillColorSecondaryBrush"] as Brush
+                        }
+                    }
+                }
+            }
+        };
     }
 
     private void OnClosed(object sender, WindowEventArgs args)

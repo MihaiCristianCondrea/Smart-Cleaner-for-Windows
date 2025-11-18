@@ -41,10 +41,12 @@ public sealed partial class App : Application
         }
         catch (FileNotFoundException fileEx)
         {
+            Log.Error(fileEx, "Fatal XAML load failed: missing file during app launch. Message={Message}", fileEx.Message);
             CrashHandler.HandleFatalException("app launch (missing file during XAML load)", fileEx, terminateProcess: true);
         }
         catch (XamlParseException xamlEx)
         {
+            Log.Error(xamlEx, "Fatal XAML parse during app launch. HResult={HResult}, Inner={InnerMessage}", xamlEx.HResult, xamlEx.InnerException?.Message);
             CrashHandler.HandleFatalException("app launch (XAML parse)", xamlEx, terminateProcess: true);
         }
         catch (Exception ex)
