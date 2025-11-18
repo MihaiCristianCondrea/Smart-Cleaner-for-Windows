@@ -17,6 +17,7 @@
         <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
         <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
         <ProjectPriFileName>SmartCleanerForWindows.pri</ProjectPriFileName>
+        <EnableDefaultPageItems>false</EnableDefaultPageItems>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -54,9 +55,48 @@
     </ItemGroup>
 
     <ItemGroup>
+        <!-- Ensure App.xaml is treated as the application definition, matching PowerToys' explicit removal pattern. -->
+        <Page Remove="Shell\App.xaml" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- Explicitly include WinUI entrypoints and views so their XAML is compiled and packaged. -->
+        <ApplicationDefinition Include="Shell\App.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+        </ApplicationDefinition>
+        <Page Include="Shell\MainWindow.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+        </Page>
+        <Page Include="Shell\Settings\SettingsView.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+        </Page>
+        <Page Include="Modules\Dashboard\Views\DashboardView.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+        </Page>
+        <Page Include="Modules\DiskCleanup\Views\DiskCleanupView.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+        </Page>
+        <Page Include="Modules\EmptyFolders\Views\EmptyFoldersView.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+        </Page>
+        <Page Include="Modules\InternetRepair\Views\InternetRepairView.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+        </Page>
+        <Page Include="Modules\LargeFiles\Views\LargeFilesView.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+        </Page>
         <!-- Ensure loose resource dictionaries are compiled into the package so XAML lookups succeed at runtime. -->
         <Page Update="Shell\Themes\DesignTokens.xaml">
             <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
         </Page>
     </ItemGroup>
 

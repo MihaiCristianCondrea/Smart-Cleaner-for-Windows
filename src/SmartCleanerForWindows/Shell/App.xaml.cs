@@ -1,12 +1,17 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Markup;
 using SmartCleanerForWindows.Diagnostics;
 using Serilog;
 
 namespace SmartCleanerForWindows.Shell;
 
-public partial class App
+/// <summary>
+/// App is declared partial because InitializeComponent is generated from App.xaml at build time.
+/// </summary>
+public sealed partial class App : Application
 {
     private Window? _window;
 
@@ -15,23 +20,32 @@ public partial class App
     public App()
     {
         Log.Information("App constructor invoked. Setting up global exception handlers.");
-        StartupDiagnostics.AttachToApplication(this);
         InitializeComponent();
+        StartupDiagnostics.Initialize();
+        StartupDiagnostics.AttachToApplication(this);
         AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
         UnhandledException += OnApplicationUnhandledException;
     }
 
-    protected override void OnLaunched(LaunchActivatedEventArgs? args)
+    protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         try
         {
             OnLaunchedInvoked = true;
-            Log.Information("App.OnLaunched entered. Launch arguments: {Arguments}", args?.Arguments ?? "(none)");
+            Log.Information("App.OnLaunched entered. Launch arguments: {Arguments}", args.Arguments);
             _window = new MainWindow();
             Log.Information("MainWindow instance created. Activating window.");
             _window.Activate();
             Log.Information("MainWindow activation requested.");
+        }
+        catch (FileNotFoundException fileEx)
+        {
+            CrashHandler.HandleFatalException("app launch (missing file during XAML load)", fileEx, terminateProcess: true);
+        }
+        catch (XamlParseException xamlEx)
+        {
+            CrashHandler.HandleFatalException("app launch (XAML parse)", xamlEx, terminateProcess: true);
         }
         catch (Exception ex)
         {
