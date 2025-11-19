@@ -60,7 +60,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="Settings\SmartCleanerForWindows.Settings.csproj" />
+        <ProjectReference Include="..\SmartCleanerForWindows.Settings\SmartCleanerForWindows.Settings.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -173,6 +173,15 @@
       <None Remove="inspiration\Source\Includes\Update.au3" />
       <None Remove="inspiration\Source\Includes\Versioning.au3" />
       <None Remove="inspiration\ComIntRep.ini" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Settings\ToolSettingField.cs" />
+      <Compile Remove="Settings\ToolSettingFieldType.cs" />
+      <Compile Remove="Settings\ToolSettingOption.cs" />
+      <Compile Remove="Settings\ToolSettingsCatalog.cs" />
+      <Compile Remove="Settings\ToolSettingsChangedEventArgs.cs" />
+      <Compile Remove="Settings\ToolSettingsStore.cs" />
     </ItemGroup>
 
 </Project>

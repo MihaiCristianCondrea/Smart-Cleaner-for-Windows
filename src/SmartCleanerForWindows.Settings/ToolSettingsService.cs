@@ -1,13 +1,10 @@
 using System.Collections.Concurrent;
 using System.Text.Json.Nodes;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace SmartCleanerForWindows.Settings;
 
 public sealed class ToolSettingsService : IDisposable
 {
-    private readonly ToolSettingsCatalog _catalog;
+    private readonly ToolSettingsCatalog _catalog; // FIXME: The field is always assigned before being used and can be converted into a local variable
     private readonly ToolSettingsStore _store;
     private readonly FileSystemWatcher _watcher;
     private readonly ConcurrentDictionary<string, ToolSettingsSnapshot> _snapshots = new(StringComparer.OrdinalIgnoreCase);
@@ -61,7 +58,7 @@ public sealed class ToolSettingsService : IDisposable
             return;
         }
 
-        snapshot.Values = values;
+        snapshot.Values = values; // FIXME: Init-only property 'SmartCleanerForWindows.Settings.ToolSettingsSnapshot.Values' can only be assigned in an object initializer, or on 'this' or 'base' in an instance constructor or an 'init' accessor
         _snapshots[toolId] = snapshot;
         await Task.Run(() => _store.SaveValues(toolId, values), cancellationToken).ConfigureAwait(false);
         OnSettingsChanged(snapshot);
@@ -83,7 +80,7 @@ public sealed class ToolSettingsService : IDisposable
         try
         {
             var updatedValues = _store.LoadValues(snapshot.Definition);
-            snapshot.Values = updatedValues;
+            snapshot.Values = updatedValues; // FIXME: Init-only property 'SmartCleanerForWindows.Settings.ToolSettingsSnapshot.Values' can only be assigned in an object initializer, or on 'this' or 'base' in an instance constructor or an 'init' accessor
             _snapshots[toolId] = snapshot;
             OnSettingsChanged(snapshot);
         }
@@ -111,7 +108,7 @@ public sealed class ToolSettingsService : IDisposable
 
         _watcher.Dispose();
         _disposed = true;
-        GC.SuppressFinalize(this);
+        GC.SuppressFinalize(this); // FIXME: 'GC.SuppressFinalize' is invoked for type without destructor
     }
 
     public static ToolSettingsService CreateDefault()
