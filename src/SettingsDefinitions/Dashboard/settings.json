@@ -1,0 +1,28 @@
+{
+  "id": "dashboard",
+  "title": "Dashboard",
+  "description": "Overview of available cleanup utilities and health indicators.",
+  "icon": "Home",
+  "viewKey": "Dashboard",
+  "order": 0,
+  "defaults": {
+    "showUsageCards": true,
+    "remindWeekly": false
+  },
+  "fields": [
+    {
+      "key": "showUsageCards",
+      "displayName": "Show usage cards",
+      "description": "Toggle visibility of the drive usage and quick actions cards.",
+      "type": "Boolean",
+      "defaultValue": true
+    },
+    {
+      "key": "remindWeekly",
+      "displayName": "Show weekly reminder",
+      "description": "Enable reminders to run Smart Cleaner tasks once a week.",
+      "type": "Boolean",
+      "defaultValue": false
+    }
+  ]
+}

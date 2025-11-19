@@ -46,16 +46,6 @@ public sealed partial class MainWindow
         ApplyAccentPreference(savedAccent, save: false);
         SelectAccentOption(_accentPreference);
 
-        _cleanerSendToRecycleBin = ParseBoolSetting(ReadSetting(CleanerRecyclePreferenceKey), defaultValue: true);
-        _cleanerDepthLimit = ParseIntSetting(
-            ReadSetting(CleanerDepthPreferenceKey),
-            defaultValue: 0,
-            min: 0,
-            max: 999);
-        _cleanerExclusions = ReadSetting(CleanerExclusionsPreferenceKey) ?? string.Empty;
-
-        _automationAutoPreview = ParseBoolSetting(ReadSetting(AutomationAutoPreviewKey), defaultValue: false);
-        _automationWeeklyReminder = ParseBoolSetting(ReadSetting(AutomationReminderKey), defaultValue: false);
         _notificationShowCompletion = ParseBoolSetting(ReadSetting(NotificationShowCompletionKey), defaultValue: true);
         _notificationDesktopAlerts = ParseBoolSetting(ReadSetting(NotificationDesktopAlertsKey), defaultValue: false);
         _historyRetentionDays = ParseIntSetting(
@@ -64,30 +54,8 @@ public sealed partial class MainWindow
             min: HistoryRetentionMinDays,
             max: HistoryRetentionMaxDays);
 
-        if (SettingsView.CleanerRecycleToggle is not null)
-        {
-            SettingsView.CleanerRecycleToggle.IsOn = _cleanerSendToRecycleBin;
-        }
-
-        if (SettingsView.CleanerDepthPreferenceBox is not null)
-        {
-            SettingsView.CleanerDepthPreferenceBox.Value = _cleanerDepthLimit;
-        }
-
-        if (SettingsView.CleanerExclusionsPreferenceBox is not null)
-        {
-            SettingsView.CleanerExclusionsPreferenceBox.Text = _cleanerExclusions;
-        }
-
-        if (SettingsView.AutomationAutoPreviewToggle is not null)
-        {
-            SettingsView.AutomationAutoPreviewToggle.IsOn = _automationAutoPreview;
-        }
-
-        if (SettingsView.AutomationReminderToggle is not null)
-        {
-            SettingsView.AutomationReminderToggle.IsOn = _automationWeeklyReminder;
-        }
+        UpdateCleanerSettingsView();
+        UpdateAutomationSettingsView();
 
         if (SettingsView.NotificationCompletionToggle is not null)
         {
@@ -297,9 +265,7 @@ public sealed partial class MainWindow
         if (sender is ToggleSwitch toggle)
         {
             _cleanerSendToRecycleBin = toggle.IsOn;
-            SaveSetting(
-                CleanerRecyclePreferenceKey,
-                _cleanerSendToRecycleBin.ToString(CultureInfo.InvariantCulture));
+            PersistEmptyFolderSettings();
             UpdateCleanerDefaultsSummary();
             ApplyCleanerDefaultsToSession();
         }
@@ -318,7 +284,7 @@ public sealed partial class MainWindow
         var depth = (int)Math.Clamp(Math.Round(value), 0, 999);
         sender.Value = depth;
         _cleanerDepthLimit = depth;
-        SaveSetting(CleanerDepthPreferenceKey, depth.ToString(CultureInfo.InvariantCulture));
+        PersistEmptyFolderSettings();
         UpdateCleanerDefaultsSummary();
         ApplyCleanerDefaultsToSession();
     }
@@ -330,7 +296,7 @@ public sealed partial class MainWindow
         if (sender is TextBox textBox)
         {
             _cleanerExclusions = textBox.Text?.Trim() ?? string.Empty;
-            SaveSetting(CleanerExclusionsPreferenceKey, _cleanerExclusions);
+            PersistEmptyFolderSettings();
             UpdateCleanerDefaultsSummary();
             ApplyCleanerDefaultsToSession();
         }
@@ -352,16 +318,12 @@ public sealed partial class MainWindow
         if (SettingsView.AutomationAutoPreviewToggle is not null && ReferenceEquals(source, SettingsView.AutomationAutoPreviewToggle))
         {
             _automationAutoPreview = SettingsView.AutomationAutoPreviewToggle.IsOn;
-            SaveSetting(
-                AutomationAutoPreviewKey,
-                _automationAutoPreview.ToString(CultureInfo.InvariantCulture));
+            PersistEmptyFolderSettings();
         }
         else if (SettingsView.AutomationReminderToggle is not null && ReferenceEquals(source, SettingsView.AutomationReminderToggle))
         {
             _automationWeeklyReminder = SettingsView.AutomationReminderToggle.IsOn;
-            SaveSetting(
-                AutomationReminderKey,
-                _automationWeeklyReminder.ToString(CultureInfo.InvariantCulture));
+            PersistDashboardSettings();
         }
 
         UpdateAutomationSummary();
@@ -473,6 +435,82 @@ public sealed partial class MainWindow
         {
             // Ignore persistence failures on unsupported platforms.
         }
+    }
+
+    private void UpdateCleanerSettingsView()
+    {
+        var previous = _isInitializingSettings;
+        _isInitializingSettings = true;
+
+        try
+        {
+            if (SettingsView.CleanerRecycleToggle is not null)
+            {
+                SettingsView.CleanerRecycleToggle.IsOn = _cleanerSendToRecycleBin;
+            }
+
+            if (SettingsView.CleanerDepthPreferenceBox is not null)
+            {
+                SettingsView.CleanerDepthPreferenceBox.Value = _cleanerDepthLimit;
+            }
+
+            if (SettingsView.CleanerExclusionsPreferenceBox is not null)
+            {
+                SettingsView.CleanerExclusionsPreferenceBox.Text = _cleanerExclusions;
+            }
+        }
+        finally
+        {
+            _isInitializingSettings = previous;
+        }
+    }
+
+    private void UpdateAutomationSettingsView()
+    {
+        var previous = _isInitializingSettings;
+        _isInitializingSettings = true;
+
+        try
+        {
+            if (SettingsView.AutomationAutoPreviewToggle is not null)
+            {
+                SettingsView.AutomationAutoPreviewToggle.IsOn = _automationAutoPreview;
+            }
+
+            if (SettingsView.AutomationReminderToggle is not null)
+            {
+                SettingsView.AutomationReminderToggle.IsOn = _automationWeeklyReminder;
+            }
+        }
+        finally
+        {
+            _isInitializingSettings = previous;
+        }
+    }
+
+    private void PersistEmptyFolderSettings()
+    {
+        if (!_settingsSnapshots.TryGetValue(EmptyFoldersToolId, out var snapshot))
+        {
+            return;
+        }
+
+        snapshot.Values["sendToRecycleBin"] = _cleanerSendToRecycleBin;
+        snapshot.Values["depthLimit"] = _cleanerDepthLimit;
+        snapshot.Values["exclusions"] = _cleanerExclusions;
+        snapshot.Values["previewAutomatically"] = _automationAutoPreview;
+        _ = _toolSettingsService.UpdateAsync(EmptyFoldersToolId, snapshot.Values);
+    }
+
+    private void PersistDashboardSettings()
+    {
+        if (!_settingsSnapshots.TryGetValue(DashboardToolId, out var snapshot))
+        {
+            return;
+        }
+
+        snapshot.Values["remindWeekly"] = _automationWeeklyReminder;
+        _ = _toolSettingsService.UpdateAsync(DashboardToolId, snapshot.Values);
     }
 
     private Color GetZestAccentColor()

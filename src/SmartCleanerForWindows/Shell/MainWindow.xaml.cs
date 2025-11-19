@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Numerics;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.UI;
@@ -32,10 +34,11 @@ using WinRT.Interop;
 using System.Security.Principal;
 using Microsoft.UI.Xaml.Markup;
 using SmartCleanerForWindows.Core.DiskCleanup;
+using SmartCleanerForWindows.Settings;
 
 namespace SmartCleanerForWindows.Shell;
 
-public sealed partial class MainWindow : Window, IEmptyFolderCleanupView
+public sealed partial class MainWindow : Window, IEmptyFolderCleanupView // FIXME: Base type 'Window' is already specified in other parts
 {
     private readonly IDiskCleanupService _diskCleanupService;
     private readonly IStorageOverviewService _storageOverviewService;
@@ -87,6 +90,18 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView
     private bool _notificationDesktopAlerts;
     private int _historyRetentionDays = HistoryRetentionDefaultDays;
     private bool _isSystemTitleBarInitialized;
+    private readonly ToolSettingsService _toolSettingsService = ToolSettingsService.CreateDefault();
+    private readonly ObservableCollection<NavigationViewItem> _navigationItems = new();
+    private readonly Dictionary<string, UIElement> _toolViewLookup = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, UIElement> _viewKeyLookup = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, ToolSettingsSnapshot> _settingsSnapshots = new(StringComparer.OrdinalIgnoreCase);
+    private readonly List<UIElement> _allViews = [];
+    private string? _currentToolId; // FIXME: Field '_currentToolId' is assigned but its value is never used
+
+    private NavigationViewItem? DashboardItem => FindNavigationItem(DashboardToolId); // FIXME: Property 'DashboardItem' is never used
+    private NavigationViewItem? EmptyFoldersItem => FindNavigationItem(EmptyFoldersToolId); // FIXME: Property 'EmptyFoldersItem' is never used
+    private NavigationViewItem? LargeFilesItem => FindNavigationItem(LargeFilesToolId); // FIXME: Property 'LargeFilesItem' is never used
+    private NavigationViewItem? InternetRepairItem => FindNavigationItem(InternetRepairToolId); // FIXME: Property 'InternetRepairItem' is never used
 
     private const string ThemePreferenceKey = "Settings.ThemePreference";
     private const string AccentPreferenceKey = "Settings.AccentPreference";
@@ -95,18 +110,23 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView
     private const string ThemePreferenceDefault = "default";
     private const string AccentPreferenceZest = "zest";
     private const string AccentPreferenceDefault = "default";
-    private const string CleanerRecyclePreferenceKey = "Settings.Cleaner.SendToRecycleBin";
-    private const string CleanerDepthPreferenceKey = "Settings.Cleaner.DepthLimit";
-    private const string CleanerExclusionsPreferenceKey = "Settings.Cleaner.Exclusions";
-    private const string AutomationAutoPreviewKey = "Settings.Automation.AutoPreview";
-    private const string AutomationReminderKey = "Settings.Automation.Reminder";
+    private const string CleanerRecyclePreferenceKey = "Settings.Cleaner.SendToRecycleBin"; // FIXME: Constant 'CleanerRecyclePreferenceKey' is never used
+    private const string CleanerDepthPreferenceKey = "Settings.Cleaner.DepthLimit"; // FIXME: Constant 'CleanerDepthPreferenceKey' is never used
+    private const string CleanerExclusionsPreferenceKey = "Settings.Cleaner.Exclusions"; // FIXME: Constant 'CleanerExclusionsPreferenceKey' is never used
+    private const string AutomationAutoPreviewKey = "Settings.Automation.AutoPreview"; // FIXME: Constant 'AutomationAutoPreviewKey' is never used
+    private const string AutomationReminderKey = "Settings.Automation.Reminder"; // FIXME: Constant 'AutomationReminderKey' is never used
     private const string NotificationShowCompletionKey = "Settings.Notifications.ShowCompletion";
     private const string NotificationDesktopAlertsKey = "Settings.Notifications.DesktopAlerts";
     private const string HistoryRetentionKey = "Settings.History.RetentionDays";
     private const int HistoryRetentionDefaultDays = 30;
     private const int HistoryRetentionMinDays = 0;
     private const int HistoryRetentionMaxDays = 365;
-    private const string LargeFilesExclusionsKey = "LargeFiles.Exclusions";
+    private const string LargeFilesExclusionsKey = "LargeFiles.Exclusions"; // FIXME: Constant 'LargeFilesExclusionsKey' is never used
+    private const string DashboardToolId = "dashboard";
+    private const string EmptyFoldersToolId = "emptyFolders";
+    private const string LargeFilesToolId = "largeFiles";
+    private const string DiskCleanupToolId = "diskCleanup";
+    private const string InternetRepairToolId = "internetRepair";
     private const string TitleBarIconTempFileName = "SmartCleanerTitleIcon.ico";
     private const string TitleBarIconBase64 = """
 AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAADUeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4
@@ -165,7 +185,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     {
     }
 
-    private MainWindow(
+    private MainWindow( // FIXME: Non-nullable field '_emptyFolderController' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the field as nullable.
         IDirectoryCleaner directoryCleaner,
         IDiskCleanupService diskCleanupService,
         IStorageOverviewService storageOverviewService,
@@ -181,6 +201,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
         if (!TryInitializeComponentWithDiagnostics(out var xamlFailure))
         {
+            _toolSettingsService.Dispose();
             BuildFallbackShell(xamlFailure);
             return;
         }
@@ -190,10 +211,10 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
         LargeFilesView.LargeFilesGroupList.ItemsSource = _largeFileGroups;
 
-        DashboardView.NavigateToEmptyFoldersRequested += (_, _) => NavigateTo(EmptyFoldersItem);
-        DashboardView.NavigateToLargeFilesRequested += (_, _) => NavigateTo(LargeFilesItem);
-        DashboardView.NavigateToDiskCleanupRequested += (_, _) => NavigateTo(DiskCleanupItem);
-        DashboardView.NavigateToInternetRepairRequested += (_, _) => NavigateTo(InternetRepairItem);
+        DashboardView.NavigateToEmptyFoldersRequested += (_, _) => NavigateToTool(EmptyFoldersToolId);
+        DashboardView.NavigateToLargeFilesRequested += (_, _) => NavigateToTool(LargeFilesToolId);
+        DashboardView.NavigateToDiskCleanupRequested += (_, _) => NavigateToTool(DiskCleanupToolId);
+        DashboardView.NavigateToInternetRepairRequested += (_, _) => NavigateToTool(InternetRepairToolId);
 
         EmptyFoldersView.BrowseRequested += OnBrowse;
         EmptyFoldersView.CancelRequested += OnCancel;
@@ -292,7 +313,10 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         Activated += OnWindowActivated;
         Closed += OnClosed;
 
-        NavigateTo(DashboardItem);
+        InitializeViewRegistry();
+        _toolSettingsService.SettingsChanged += OnToolSettingsChanged; // FIXME: Argument type 'method group' is not assignable to parameter type 'EventHandler<ToolSettingsChangedEventArgs>?'
+        BuildToolNavigation();
+        NavigateToTool(DashboardToolId);
     }
 
     private bool TryInitializeComponentWithDiagnostics(out Exception? failure)
@@ -401,17 +425,166 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         _storageOverviewCts?.Cancel();
         _storageOverviewCts?.Dispose();
         _storageOverviewCts = null;
+        _toolSettingsService.SettingsChanged -= OnToolSettingsChanged;
+        _toolSettingsService.Dispose();
     }
 
     private void OnNavigationLoaded(object sender, RoutedEventArgs e)
     {
-        if (RootNavigation.SelectedItem is null)
+        if (RootNavigation.SelectedItem is null && _navigationItems.Count > 0)
         {
-            NavigateTo(DashboardItem);
+            RootNavigation.SelectedItem = _navigationItems[0];
+            ShowPage(_navigationItems[0]);
             return;
         }
 
-        ShowPage(RootNavigation.SelectedItem);
+        if (RootNavigation.SelectedItem is not null)
+        {
+            ShowPage(RootNavigation.SelectedItem);
+        }
+    }
+
+    private void InitializeViewRegistry()
+    {
+        _viewKeyLookup.Clear();
+        _viewKeyLookup["Dashboard"] = DashboardView;
+        _viewKeyLookup["EmptyFolders"] = EmptyFoldersView;
+        _viewKeyLookup["LargeFiles"] = LargeFilesView;
+        _viewKeyLookup["DiskCleanup"] = DiskCleanupView;
+        _viewKeyLookup["InternetRepair"] = InternetRepairView;
+
+        _allViews.Clear();
+        foreach (var view in _viewKeyLookup.Values.Distinct())
+        {
+            _allViews.Add(view);
+        }
+
+        if (!_allViews.Contains(SettingsView))
+        {
+            _allViews.Add(SettingsView);
+        }
+    }
+
+    private void BuildToolNavigation()
+    {
+        _toolViewLookup.Clear();
+        _navigationItems.Clear();
+
+        foreach (var definition in _toolSettingsService.Definitions)
+        {
+            if (string.IsNullOrWhiteSpace(definition.ViewKey))
+            {
+                continue;
+            }
+
+            if (!_viewKeyLookup.TryGetValue(definition.ViewKey!, out var view))
+            {
+                continue;
+            }
+
+            var navItem = CreateNavigationItem(definition);
+            _navigationItems.Add(navItem);
+            _toolViewLookup[definition.Id] = view;
+
+            if (_toolSettingsService.GetSnapshot(definition.Id) is { } snapshot)
+            {
+                ApplySnapshot(snapshot);
+            }
+        }
+
+        RootNavigation.MenuItems.Clear();
+        foreach (var item in _navigationItems)
+        {
+            RootNavigation.MenuItems.Add(item);
+        }
+    }
+
+    private static NavigationViewItem CreateNavigationItem(ToolSettingsDefinition definition)
+    {
+        var item = new NavigationViewItem
+        {
+            Content = definition.Title,
+            Tag = definition.Id,
+            ToolTip = definition.Description // FIXME: Cannot resolve symbol 'ToolTip'
+        };
+
+        if (definition.Icon is string icon && Enum.TryParse(icon, ignoreCase: true, out Symbol symbol)) // FIXME: Use not null pattern instead of a type check succeeding on any not-null value
+        {
+            item.Icon = new SymbolIcon(symbol);
+        }
+
+        return item;
+    }
+
+    private void ApplySnapshot(ToolSettingsSnapshot snapshot)
+    {
+        _settingsSnapshots[snapshot.Definition.Id] = snapshot;
+
+        if (string.Equals(snapshot.Definition.Id, EmptyFoldersToolId, StringComparison.OrdinalIgnoreCase))
+        {
+            ApplyEmptyFolderSettings(snapshot.Values);
+        }
+        else if (string.Equals(snapshot.Definition.Id, DashboardToolId, StringComparison.OrdinalIgnoreCase))
+        {
+            ApplyDashboardSettings(snapshot.Values);
+        }
+        else if (string.Equals(snapshot.Definition.Id, LargeFilesToolId, StringComparison.OrdinalIgnoreCase))
+        {
+            ApplyLargeFilesSettings(snapshot.Values);
+        }
+    }
+
+    private void ApplyEmptyFolderSettings(JsonObject values)
+    {
+        _cleanerSendToRecycleBin = values.TryGetPropertyValue("sendToRecycleBin", out var recycleNode) && recycleNode?.GetValue<bool>() == true;
+        _cleanerDepthLimit = values.TryGetPropertyValue("depthLimit", out var depthNode)
+            ? (int)Math.Max(0, Math.Min(int.MaxValue, depthNode?.GetValue<double>() ?? 0))
+            : 0;
+        _cleanerExclusions = values.TryGetPropertyValue("exclusions", out var exclusionsNode)
+            ? exclusionsNode?.ToString() ?? string.Empty
+            : string.Empty;
+        _automationAutoPreview = values.TryGetPropertyValue("previewAutomatically", out var previewNode) && previewNode?.GetValue<bool>() == true;
+        UpdateCleanerSettingsView();
+        ApplyCleanerDefaultsToSession();
+    }
+
+    private void ApplyDashboardSettings(JsonObject values)
+    {
+        _automationWeeklyReminder = values.TryGetPropertyValue("remindWeekly", out var reminderNode) && reminderNode?.GetValue<bool>() == true;
+        UpdateAutomationSettingsView();
+        UpdateAutomationSummary();
+    }
+
+    private void ApplyLargeFilesSettings(JsonObject values)
+    {
+        var exclusionText = values.TryGetPropertyValue("excludedPaths", out var exclusionNode)
+            ? exclusionNode?.ToString() ?? string.Empty
+            : string.Empty;
+
+        var segments = exclusionText.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        _largeFileExclusions.Clear();
+        _largeFileExclusionLookup.Clear();
+
+        foreach (var segment in segments)
+        {
+            if (_largeFileExclusionLookup.Add(segment))
+            {
+                _largeFileExclusions.Add(segment);
+            }
+        }
+
+        UpdateLargeFilesExclusionState();
+    }
+
+    private void OnToolSettingsChanged(object? sender, ToolSettingsChangedEventArgs e)
+    {
+        DispatcherQueue.TryEnqueue(() => ApplySnapshot(e.Snapshot));
+    }
+
+    private NavigationViewItem? FindNavigationItem(string toolId)
+    {
+        return _navigationItems.FirstOrDefault(
+            item => string.Equals(item.Tag as string, toolId, StringComparison.OrdinalIgnoreCase));
     }
 
     private void OnNavigationSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
@@ -420,8 +593,30 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         ShowPage(target);
     }
 
-    private void NavigateTo(object? target)
+    private void NavigateTo(object? target) // FIXME: Method 'NavigateTo' is never used
     {
+        if (target is string toolId)
+        {
+            NavigateToTool(toolId);
+            return;
+        }
+
+        if (target is null)
+        {
+            return;
+        }
+
+        if (!Equals(RootNavigation.SelectedItem, target))
+        {
+            RootNavigation.SelectedItem = target;
+        }
+
+        ShowPage(target);
+    }
+
+    private void NavigateToTool(string toolId)
+    {
+        var target = FindNavigationItem(toolId);
         if (target is null)
         {
             return;
@@ -437,46 +632,32 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
     private void ShowPage(object? item)
     {
-        var target = item ?? DashboardItem;
         var settingsItem = RootNavigation.SettingsItem;
-
-        var isDashboard = Equals(target, DashboardItem);
-        var isEmptyFolders = Equals(target, EmptyFoldersItem);
-        var isLargeFiles = Equals(target, LargeFilesItem);
-        var isDiskCleanup = Equals(target, DiskCleanupItem);
-        var isInternetRepair = Equals(target, InternetRepairItem);
-        var isSettings = settingsItem is not null && Equals(target, settingsItem);
-
-        SetViewVisibility(DashboardView, isDashboard);
-        SetViewVisibility(EmptyFoldersView, isEmptyFolders);
-        SetViewVisibility(LargeFilesView, isLargeFiles);
-        SetViewVisibility(DiskCleanupView, isDiskCleanup);
-        SetViewVisibility(InternetRepairView, isInternetRepair);
-        SetViewVisibility(SettingsView, isSettings);
-
-        UIElement? activeView = isDashboard
-            ? DashboardView
-            : isEmptyFolders
-                ? EmptyFoldersView
-                : isLargeFiles
-                    ? LargeFilesView
-                    : isDiskCleanup
-                        ? DiskCleanupView
-                        : isInternetRepair
-                            ? InternetRepairView
-                            : isSettings
-                                ? SettingsView
-                                : null;
-
-        if (activeView is not null)
+        if (settingsItem is not null && Equals(item, settingsItem))
         {
-            PlayEntranceTransition(activeView);
+            ActivateView(SettingsView);
+            return;
         }
 
-        if (Equals(target, DashboardItem))
+        if (item is not NavigationViewItem { Tag: string toolId } ||
+            !_toolViewLookup.TryGetValue(toolId, out var view)) return;
+        _currentToolId = toolId;
+        ActivateView(view);
+
+        if (string.Equals(toolId, DashboardToolId, StringComparison.OrdinalIgnoreCase))
         {
             _ = UpdateStorageOverviewAsync();
         }
+    }
+
+    private void ActivateView(UIElement target)
+    {
+        foreach (var view in _allViews)
+        {
+            SetViewVisibility(view, ReferenceEquals(view, target));
+        }
+
+        PlayEntranceTransition(target);
     }
 
     private static void SetViewVisibility(UIElement view, bool shouldBeVisible)

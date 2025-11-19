@@ -1,0 +1,31 @@
+{
+  "id": "largeFiles",
+  "title": "Large files",
+  "description": "Surfaces oversized files that may be wasting disk space.",
+  "icon": "SaveLocal",
+  "viewKey": "LargeFiles",
+  "order": 2,
+  "defaults": {
+    "minimumSizeMb": 256,
+    "excludedPaths": ""
+  },
+  "fields": [
+    {
+      "key": "minimumSizeMb",
+      "displayName": "Minimum size (MB)",
+      "description": "Only show files larger than this value.",
+      "type": "Number",
+      "defaultValue": 256,
+      "minimum": 64,
+      "maximum": 8192,
+      "step": 64
+    },
+    {
+      "key": "excludedPaths",
+      "displayName": "Excluded folders",
+      "description": "Semi-colon separated folders that should be ignored when scanning.",
+      "type": "Text",
+      "defaultValue": ""
+    }
+  ]
+}

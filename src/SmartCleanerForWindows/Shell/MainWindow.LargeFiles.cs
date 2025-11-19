@@ -478,16 +478,9 @@ public sealed partial class MainWindow
 
     private void LoadLargeFilePreferences()
     {
-        var saved = ReadSetting(LargeFilesExclusionsKey);
-        if (string.IsNullOrWhiteSpace(saved))
+        if (_settingsSnapshots.TryGetValue(LargeFilesToolId, out var snapshot))
         {
-            return;
-        }
-
-        var entries = saved.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        foreach (var entry in entries)
-        {
-            _ = AddLargeFileExclusion(entry, save: false, showMessageOnError: false);
+            ApplyLargeFilesSettings(snapshot.Values);
         }
 
         UpdateLargeFilesExclusionState();
@@ -495,8 +488,13 @@ public sealed partial class MainWindow
 
     private void PersistLargeFileExclusions()
     {
-        var serialized = string.Join('\n', _largeFileExclusions);
-        SaveSetting(LargeFilesExclusionsKey, serialized);
+        if (!_settingsSnapshots.TryGetValue(LargeFilesToolId, out var snapshot))
+        {
+            return;
+        }
+
+        snapshot.Values["excludedPaths"] = string.Join(";", _largeFileExclusions);
+        _ = _toolSettingsService.UpdateAsync(LargeFilesToolId, snapshot.Values);
     }
 
     private bool AddLargeFileExclusion(string path, bool save = true, bool showMessageOnError = true)

@@ -1,0 +1,36 @@
+{
+  "id": "internetRepair",
+  "title": "Internet repair",
+  "description": "Automates common networking reset tasks.",
+  "icon": "Globe",
+  "viewKey": "InternetRepair",
+  "order": 4,
+  "defaults": {
+    "flushDns": true,
+    "resetWinsock": true,
+    "cycleAdapters": false
+  },
+  "fields": [
+    {
+      "key": "flushDns",
+      "displayName": "Flush DNS",
+      "description": "Run ipconfig /flushdns before other repair tasks.",
+      "type": "Boolean",
+      "defaultValue": true
+    },
+    {
+      "key": "resetWinsock",
+      "displayName": "Reset Winsock",
+      "description": "Execute netsh winsock reset during repairs.",
+      "type": "Boolean",
+      "defaultValue": true
+    },
+    {
+      "key": "cycleAdapters",
+      "displayName": "Restart adapters",
+      "description": "Disable and enable all physical adapters when a repair runs.",
+      "type": "Boolean",
+      "defaultValue": false
+    }
+  ]
+}

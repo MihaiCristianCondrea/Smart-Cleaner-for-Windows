@@ -1,0 +1,47 @@
+{
+  "id": "emptyFolders",
+  "title": "Empty folders",
+  "description": "Scans for redundant empty directories and removes them safely.",
+  "icon": "Folder",
+  "viewKey": "EmptyFolders",
+  "order": 1,
+  "defaults": {
+    "sendToRecycleBin": true,
+    "depthLimit": 2,
+    "exclusions": "",
+    "previewAutomatically": true
+  },
+  "fields": [
+    {
+      "key": "sendToRecycleBin",
+      "displayName": "Send to Recycle Bin",
+      "description": "Move deleted folders to the Recycle Bin instead of deleting permanently.",
+      "type": "Boolean",
+      "defaultValue": true
+    },
+    {
+      "key": "depthLimit",
+      "displayName": "Depth limit",
+      "description": "Maximum subfolder depth to traverse when scanning for empty directories.",
+      "type": "Number",
+      "defaultValue": 2,
+      "minimum": 0,
+      "maximum": 10,
+      "step": 1
+    },
+    {
+      "key": "exclusions",
+      "displayName": "Path exclusions",
+      "description": "Semi-colon separated list of directories that should never be cleaned.",
+      "type": "Text",
+      "defaultValue": ""
+    },
+    {
+      "key": "previewAutomatically",
+      "displayName": "Auto preview",
+      "description": "Immediately start a preview scan when a new root is selected.",
+      "type": "Boolean",
+      "defaultValue": true
+    }
+  ]
+}

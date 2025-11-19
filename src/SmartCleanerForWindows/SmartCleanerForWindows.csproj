@@ -55,6 +55,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="Settings\SmartCleanerForWindows.Settings.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
         <!-- Ensure App.xaml is treated as the application definition, matching PowerToys' explicit removal pattern. -->
         <Page Remove="Shell\App.xaml" />
     </ItemGroup>
@@ -143,6 +147,10 @@
       <Folder Include="inspiration\Source\Includes\" />
       <Folder Include="Modules\Dashboard\ViewModels\" />
       <Folder Include="Modules\Dashboard\Views\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="..\SettingsDefinitions\**\*.json" Link="SettingsDefinitions\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
     <ItemGroup>

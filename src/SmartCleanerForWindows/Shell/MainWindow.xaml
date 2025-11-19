@@ -38,34 +38,6 @@
                 </Style>
             </NavigationView.Resources>
 
-        <NavigationView.MenuItems>
-            <NavigationViewItem x:Name="DashboardItem" Content="Dashboard" IsSelected="True">
-                <NavigationViewItem.Icon>
-                    <SymbolIcon Symbol="Home" />
-                </NavigationViewItem.Icon>
-            </NavigationViewItem>
-            <NavigationViewItem x:Name="EmptyFoldersItem" Content="Empty folders">
-                <NavigationViewItem.Icon>
-                    <SymbolIcon Symbol="Folder" />
-                </NavigationViewItem.Icon>
-            </NavigationViewItem>
-            <NavigationViewItem x:Name="LargeFilesItem" Content="Large files">
-                <NavigationViewItem.Icon>
-                    <SymbolIcon Symbol="SaveLocal" />
-                </NavigationViewItem.Icon>
-            </NavigationViewItem>
-            <NavigationViewItem x:Name="DiskCleanupItem" Content="Disk cleanup">
-                <NavigationViewItem.Icon>
-                    <SymbolIcon Symbol="Delete" />
-                </NavigationViewItem.Icon>
-            </NavigationViewItem>
-            <NavigationViewItem x:Name="InternetRepairItem" Content="Internet repair">
-                <NavigationViewItem.Icon>
-                    <SymbolIcon Symbol="Globe" />
-                </NavigationViewItem.Icon>
-            </NavigationViewItem>
-        </NavigationView.MenuItems>
-
             <NavigationView.Content>
                 <Grid>
                     <dashboard:DashboardView x:Name="DashboardView" />
