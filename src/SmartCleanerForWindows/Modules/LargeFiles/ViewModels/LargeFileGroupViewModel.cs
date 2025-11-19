@@ -13,12 +13,12 @@ public sealed class LargeFileGroupViewModel(
     Func<long, string>? formatBytes = null)
     : INotifyPropertyChanged
 {
-    public string DisplayName { get; } = displayName; // FIXME: 					Property 'DisplayName' is never used (0 issues)
+    public string DisplayName { get; } = displayName;
     private readonly Func<int, string> _formatFileCount = formatFileCount ?? throw new ArgumentNullException(nameof(formatFileCount));
     private readonly Func<long, string> _formatBytes = formatBytes ?? ValueFormatting.FormatBytes;
     private long _totalBytes;
 
-    public LargeFileGroupViewModel() : this(string.Empty, static count => count.ToString(CultureInfo.CurrentCulture)) // FIXME: 					Constructor 'LargeFileGroupViewModel' is never used (0 issues)
+    public LargeFileGroupViewModel() : this(string.Empty, static count => count.ToString(CultureInfo.CurrentCulture))
     {
     }
 

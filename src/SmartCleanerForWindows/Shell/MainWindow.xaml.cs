@@ -150,7 +150,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     {
     }
 
-    public MainWindow(IDirectoryCleaner directoryCleaner) // FIXME: 					Constructor 'MainWindow' is never used (0 issues)
+    public MainWindow(IDirectoryCleaner directoryCleaner)
         : this(
             directoryCleaner,
             DiskCleanupServiceFactory.CreateDefault(),

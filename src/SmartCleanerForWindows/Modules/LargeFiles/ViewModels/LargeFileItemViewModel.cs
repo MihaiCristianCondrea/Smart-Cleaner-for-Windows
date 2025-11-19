@@ -43,7 +43,7 @@ public sealed class LargeFileItemViewModel
 
     private string SizeDisplay { get; }
 
-    public LargeFileItemViewModel() : this(new LargeFileEntry(), string.Empty) // FIXME: 					Constructor 'LargeFileItemViewModel' is never used (0 issues)
+    public LargeFileItemViewModel() : this(new LargeFileEntry(), string.Empty)
     {
     }
 
