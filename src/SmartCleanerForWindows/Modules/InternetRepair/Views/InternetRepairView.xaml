@@ -75,7 +75,7 @@
                         </Border>
 
                         <Grid
-                            x:Name="InternetRepairLayout" <!--FIXME: Field 'InternetRepairLayout' is never used-->
+                            x:Name="InternetRepairLayout"
                             Grid.Row="1"
                             ColumnSpacing="{StaticResource Spacing.Size240}">
                             <Grid.RowDefinitions>
@@ -84,7 +84,7 @@
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition x:Name="InternetRepairSecondaryColumn" Width="360" /> <!--FIXME: Field 'InternetRepairSecondaryColumn' is never used-->
+                                <ColumnDefinition x:Name="InternetRepairSecondaryColumn" Width="360" />
                             </Grid.ColumnDefinitions>
 
                             <VisualStateManager.VisualStateGroups>
@@ -119,7 +119,7 @@
                             </VisualStateManager.VisualStateGroups>
 
                             <StackPanel
-                                x:Name="InternetRepairPrimaryPanel" <!--FIXME: Field 'InternetRepairPrimaryPanel' is never used-->
+                                x:Name="InternetRepairPrimaryPanel"
                                 Grid.Column="0"
                                 Spacing="{StaticResource Spacing.Size160}">
                                 <Border Style="{StaticResource CardStyle}">
@@ -229,7 +229,7 @@
                             </StackPanel>
 
                             <StackPanel
-                                x:Name="InternetRepairSecondaryPanel" <!--FIXME: Field 'InternetRepairSecondaryPanel' is never used-->
+                                x:Name="InternetRepairSecondaryPanel"
                                 Grid.Row="0"
                                 Grid.Column="1"
                                 Spacing="{StaticResource Spacing.Size160}">

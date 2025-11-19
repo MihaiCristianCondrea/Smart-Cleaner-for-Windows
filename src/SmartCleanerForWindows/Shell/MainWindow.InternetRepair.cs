@@ -243,16 +243,14 @@ public sealed partial class MainWindow
     {
         try
         {
-            if (_internetRepairCts is { IsCancellationRequested: false } cts)
+            if (_internetRepairCts is not { IsCancellationRequested: false } cts) return;
+            try
             {
-                try
-                {
-                    await cts.CancelAsync().ConfigureAwait(true);
-                }
-                catch (Exception ex)
-                {
-                    ShowInternetRepairInfo($"Error: {ex.Message}", InfoBarSeverity.Error);
-                }
+                await cts.CancelAsync().ConfigureAwait(true);
+            }
+            catch (Exception ex)
+            {
+                ShowInternetRepairInfo($"Error: {ex.Message}", InfoBarSeverity.Error);
             }
         }
         catch (Exception ex)
@@ -339,6 +337,8 @@ public sealed partial class MainWindow
                     Symbol.Cancel,
                     Localize("InternetRepairLogCancelled", "Cancelled."));
                 break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 

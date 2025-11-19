@@ -25,16 +25,14 @@ public sealed partial class MainWindow
             picker.FileTypeFilter.Add("*");
             InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
             var folder = await picker.PickSingleFolderAsync();
-            if (folder is not null)
-            {
-                LargeFilesView.LargeFilesRootPathBox.Text = folder.Path;
-                ClearLargeFilesResults();
-                SetLargeFilesStatus(
-                    Symbol.SaveLocal,
-                    Localize("LargeFilesStatusFolderSelectedTitle", "Folder selected"),
-                    Localize("LargeFilesStatusFolderSelectedDescription", "Run Scan to find the largest files in this location."));
-                SetLargeFilesActivity(Localize("ActivityReadyToScan", "Ready to scan the selected folder."));
-            }
+            if (folder is null) return;
+            LargeFilesView.LargeFilesRootPathBox.Text = folder.Path;
+            ClearLargeFilesResults();
+            SetLargeFilesStatus(
+                Symbol.SaveLocal,
+                Localize("LargeFilesStatusFolderSelectedTitle", "Folder selected"),
+                Localize("LargeFilesStatusFolderSelectedDescription", "Run Scan to find the largest files in this location."));
+            SetLargeFilesActivity(Localize("ActivityReadyToScan", "Ready to scan the selected folder."));
         }
         catch (Exception ex)
         {
@@ -207,16 +205,14 @@ public sealed partial class MainWindow
 
     private void OnLargeFilesCancel(object sender, RoutedEventArgs e)
     {
-        if (_largeFilesCts is { IsCancellationRequested: false })
-        {
-            _largeFilesCts.Cancel();
-            SetLargeFilesActivity(Localize("ActivityCancelling", "Cancelling current operation…"));
-        }
+        if (_largeFilesCts is not { IsCancellationRequested: false }) return;
+        _largeFilesCts.Cancel();
+        SetLargeFilesActivity(Localize("ActivityCancelling", "Cancelling current operation…"));
     }
 
     private void OnLargeFileOpen(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button button || button.Tag is not LargeFileItemViewModel item)
+        if (sender is not Button { Tag: LargeFileItemViewModel item })
         {
             return;
         }
@@ -245,7 +241,7 @@ public sealed partial class MainWindow
 
     private void OnLargeFileDelete(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button button || button.Tag is not LargeFileItemViewModel item)
+        if (sender is not Button { Tag: LargeFileItemViewModel item })
         {
             return;
         }
@@ -280,17 +276,15 @@ public sealed partial class MainWindow
             return;
         }
 
-        if (AddLargeFileExclusion(item.Path))
-        {
-            RemoveLargeFileItem(item);
-            ShowLargeFilesInfo(Localize("LargeFilesInfoExcluded", "Excluded from future scans."), InfoBarSeverity.Success);
-            SetLargeFilesActivity(Localize("LargeFilesActivityFileExcluded", "File excluded from future scans."));
-        }
+        if (!AddLargeFileExclusion(item.Path)) return;
+        RemoveLargeFileItem(item);
+        ShowLargeFilesInfo(Localize("LargeFilesInfoExcluded", "Excluded from future scans."), InfoBarSeverity.Success);
+        SetLargeFilesActivity(Localize("LargeFilesActivityFileExcluded", "File excluded from future scans."));
     }
 
     private void OnLargeFilesRemoveExclusion(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button button || button.Tag is not string path)
+        if (sender is not Button { Tag: string path })
         {
             return;
         }
@@ -374,12 +368,10 @@ public sealed partial class MainWindow
             }
 
             var viewModel = new LargeFileGroupViewModel(group.Name, FormatFileCount, ValueFormatting.FormatBytes);
-            foreach (var entry in group.Entries)
+            foreach (var item in from entry in @group.Entries let extensionLabel = string.IsNullOrEmpty(entry.Extension)
+                         ? Localize("LargeFilesNoExtensionLabel", "No extension")
+                         : entry.Extension.ToUpperInvariant() select new LargeFileItemViewModel(entry, extensionLabel, ValueFormatting.FormatBytes))
             {
-                var extensionLabel = string.IsNullOrEmpty(entry.Extension)
-                    ? Localize("LargeFilesNoExtensionLabel", "No extension")
-                    : entry.Extension.ToUpperInvariant();
-                var item = new LargeFileItemViewModel(entry, extensionLabel, ValueFormatting.FormatBytes);
                 viewModel.AddItem(item);
             }
 
@@ -438,11 +430,9 @@ public sealed partial class MainWindow
         LargeFilesView.LargeFilesStatusHero.Background = GetStatusHeroBrush(symbol);
         LargeFilesView.LargeFilesStatusGlyph.Foreground = GetStatusGlyphBrush(symbol);
 
-        if (badgeValue is > 0)
-        {
-            LargeFilesView.LargeFilesResultBadge.Value = badgeValue.Value;
-            LargeFilesView.LargeFilesResultBadge.Visibility = Visibility.Visible;
-        }
+        if (badgeValue is not > 0) return;
+        LargeFilesView.LargeFilesResultBadge.Value = badgeValue.Value;
+        LargeFilesView.LargeFilesResultBadge.Visibility = Visibility.Visible;
     }
 
     private void SetLargeFilesActivity(string message)
@@ -559,11 +549,9 @@ public sealed partial class MainWindow
 
         for (var i = _largeFileExclusions.Count - 1; i >= 0; i--)
         {
-            if (comparer.Equals(_largeFileExclusions[i], normalized))
-            {
-                _largeFileExclusions.RemoveAt(i);
-                break;
-            }
+            if (!comparer.Equals(_largeFileExclusions[i], normalized)) continue;
+            _largeFileExclusions.RemoveAt(i);
+            break;
         }
 
         _largeFileExclusionLookup.Remove(normalized);
@@ -604,15 +592,13 @@ public sealed partial class MainWindow
 
         foreach (var group in _largeFileGroups)
         {
-            if (group.RemoveItem(item))
+            if (!group.RemoveItem(item)) continue;
+            if (group.ItemCount == 0)
             {
-                if (group.ItemCount == 0)
-                {
-                    emptyGroup = group;
-                }
-
-                break;
+                emptyGroup = group;
             }
+
+            break;
         }
 
         if (emptyGroup is not null)
@@ -622,14 +608,12 @@ public sealed partial class MainWindow
 
         UpdateLargeFilesSummary();
 
-        if (_largeFileGroups.Sum(group => group.ItemCount) == 0)
-        {
-            SetLargeFilesStatus(
-                Symbol.SaveLocal,
-                Localize("LargeFilesStatusReadyTitle", "Ready to explore large files"),
-                Localize("LargeFilesStatusReadyDescription", "Choose a location to find the biggest files grouped by type."));
-            SetLargeFilesResultsCaption(Localize("LargeFilesResultsPlaceholder", "Scan results will appear here after you run a scan."));
-        }
+        if (_largeFileGroups.Sum(group => group.ItemCount) != 0) return;
+        SetLargeFilesStatus(
+            Symbol.SaveLocal,
+            Localize("LargeFilesStatusReadyTitle", "Ready to explore large files"),
+            Localize("LargeFilesStatusReadyDescription", "Choose a location to find the biggest files grouped by type."));
+        SetLargeFilesResultsCaption(Localize("LargeFilesResultsPlaceholder", "Scan results will appear here after you run a scan."));
     }
 
 }

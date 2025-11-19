@@ -114,8 +114,8 @@
                                             <CheckBox
                                                 Padding="0"
                                                 HorizontalContentAlignment="Stretch"
-                                                IsChecked="{Binding IsSelected, Mode=TwoWay}" <!--FIXME: Constructor must be public-->
-                                                IsEnabled="{Binding CanSelect}"> <!--FIXME: Constructor must be public-->
+                                                IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                IsEnabled="{Binding CanSelect}">
                                                 <Grid ColumnSpacing="12">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="Auto" />
@@ -138,21 +138,21 @@
                                                     </Border>
                                                     <StackPanel Grid.Column="1" Spacing="2">
                                                         <TextBlock
-                                                            Text="{Binding Name}" <!--FIXME: Constructor must be public-->
+                                                            Text="{Binding Name}"
                                                             FontWeight="SemiBold"
                                                             TextWrapping="Wrap" />
                                                         <TextBlock
-                                                            Text="{Binding Description}" <!--FIXME: Constructor must be public-->
+                                                            Text="{Binding Description}"
                                                             Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                             TextWrapping="Wrap" />
                                                         <TextBlock
-                                                            Text="{Binding ErrorMessage}" <!--FIXME: Constructor must be public-->
+                                                            Text="{Binding ErrorMessage}"
                                                             Foreground="{ThemeResource SystemFillColorCriticalBrush}"
                                                             TextWrapping="Wrap" />
                                                     </StackPanel>
                                                     <TextBlock
                                                         Grid.Column="2"
-                                                        Text="{Binding FormattedSize}" <!--FIXME: Constructor must be public-->
+                                                        Text="{Binding FormattedSize}"
                                                         HorizontalAlignment="Right"
                                                         VerticalAlignment="Center"
                                                         FontWeight="SemiBold" />

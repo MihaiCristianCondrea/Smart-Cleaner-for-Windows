@@ -74,7 +74,7 @@
                         </Border>
 
                         <Grid
-                            x:Name="LargeFilesLayout" <!-- FIXME: Field 'LargeFilesLayout' is never used-->
+                            x:Name="LargeFilesLayout"
                             Grid.Row="1"
                             ColumnSpacing="{StaticResource Spacing.Size240}">
                             <Grid.RowDefinitions>
@@ -83,7 +83,7 @@
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition x:Name="LargeFilesOptionsColumn" Width="360" /> <!--FIXME Field 'LargeFilesOptionsColumn' is never used-->
+                                <ColumnDefinition x:Name="LargeFilesOptionsColumn" Width="360" />
                             </Grid.ColumnDefinitions>
 
                             <VisualStateManager.VisualStateGroups>
@@ -118,7 +118,7 @@
                             </VisualStateManager.VisualStateGroups>
 
                             <StackPanel
-                                x:Name="LargeFilesResultsPanel" <!--FIXME: Field 'LargeFilesResultsPanel' is never used-->
+                                x:Name="LargeFilesResultsPanel"
                                 Grid.Column="0"
                                 Spacing="{StaticResource Spacing.Size160}">
                                 <Border Style="{StaticResource CardStyle}">
@@ -160,14 +160,14 @@
                                                                 <ColumnDefinition Width="*" />
                                                                 <ColumnDefinition Width="Auto" />
                                                             </Grid.ColumnDefinitions>
-                                                            <TextBlock Text="{Binding DisplayName}" FontSize="18" FontWeight="SemiBold" /> <!--FIXME: Constructor must be public-->
+                                                            <TextBlock Text="{Binding DisplayName}" FontSize="18" FontWeight="SemiBold" />
                                                             <TextBlock
                                                                 Grid.Column="1"
-                                                                Text="{Binding Summary}"<!--FIXME: Constructor must be public-->
+                                                                Text="{Binding Summary}"
                                                                 Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                                 HorizontalAlignment="Right" />
                                                         </Grid>
-                                                        <ItemsControl ItemsSource="{Binding Items}"><!--FIXME: Constructor must be public-->
+                                                        <ItemsControl ItemsSource="{Binding Items}">
                                                             <ItemsControl.ItemsPanel>
                                                                 <ItemsPanelTemplate>
                                                                     <StackPanel Spacing="{StaticResource Spacing.Size120}" />
@@ -187,18 +187,18 @@
                                                                                         <ColumnDefinition Width="*" />
                                                                                         <ColumnDefinition Width="Auto" />
                                                                                     </Grid.ColumnDefinitions>
-                                                                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" /><!--FIXME: Constructor must be public-->
+                                                                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
                                                                                     <TextBlock
                                                                                         Grid.Column="1"
-                                                                                        Text="{Binding SizeDisplay}"<!--FIXME: Constructor must be public-->
+                                                                                        Text="{Binding SizeDisplay}"
                                                                                         Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                                                                 </Grid>
                                                                                 <TextBlock
-                                                                                    Text="{Binding Directory}"<!--FIXME: Constructor must be public-->
+                                                                                    Text="{Binding Directory}"
                                                                                     Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                                                     TextWrapping="Wrap"
                                                                                     TextTrimming="CharacterEllipsis"
-                                                                                    ToolTipService.ToolTip="{Binding Directory}" /><!--FIXME: Constructor must be public-->
+                                                                                    ToolTipService.ToolTip="{Binding Directory}" />
                                                                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
                                                                                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
                                                                                         <Border
@@ -211,7 +211,7 @@
                                                                                                 Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
                                                                                         </Border>
                                                                                         <TextBlock
-                                                                                            Text="{Binding TypeName}"<!--FIXME: Constructor must be public-->
+                                                                                            Text="{Binding TypeName}"
                                                                                             Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                                                             TextTrimming="CharacterEllipsis" />
                                                                                     </StackPanel>
@@ -251,7 +251,7 @@
                             </StackPanel>
 
                             <StackPanel
-                                x:Name="LargeFilesOptionsPanel" <!--FIXME: Field 'LargeFilesOptionsPanel' is never used-->
+                                x:Name="LargeFilesOptionsPanel"
                                 Grid.Row="0"
                                 Grid.Column="1"
                                 Spacing="{StaticResource Spacing.Size160}">

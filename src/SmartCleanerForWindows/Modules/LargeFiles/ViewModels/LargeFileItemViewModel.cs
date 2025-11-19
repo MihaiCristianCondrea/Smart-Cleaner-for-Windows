@@ -12,10 +12,7 @@ public sealed class LargeFileItemViewModel
         string extensionDisplay,
         Func<ulong, string>? formatBytes = null)
     {
-        if (entry is null)
-        {
-            throw new ArgumentNullException(nameof(entry));
-        }
+        ArgumentNullException.ThrowIfNull(entry);
 
         var sizeFormatter = formatBytes ?? ValueFormatting.FormatBytes;
 
@@ -45,6 +42,10 @@ public sealed class LargeFileItemViewModel
     private string TypeName { get; }
 
     private string SizeDisplay { get; }
+
+    public LargeFileItemViewModel() : this(new LargeFileEntry(), string.Empty) // FIXME: 					Constructor 'LargeFileItemViewModel' is never used (0 issues)
+    {
+    }
 
     public override string ToString()
     {

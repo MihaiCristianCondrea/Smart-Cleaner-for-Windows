@@ -13,12 +13,16 @@ public sealed class LargeFileGroupViewModel(
     Func<long, string>? formatBytes = null)
     : INotifyPropertyChanged
 {
-    public string DisplayName { get; } = displayName;
+    public string DisplayName { get; } = displayName; // FIXME: 					Property 'DisplayName' is never used (0 issues)
     private readonly Func<int, string> _formatFileCount = formatFileCount ?? throw new ArgumentNullException(nameof(formatFileCount));
     private readonly Func<long, string> _formatBytes = formatBytes ?? ValueFormatting.FormatBytes;
     private long _totalBytes;
 
-    private ObservableCollection<LargeFileItemViewModel> Items { get; } = [];
+    public LargeFileGroupViewModel() : this(string.Empty, static count => count.ToString(CultureInfo.CurrentCulture)) // FIXME: 					Constructor 'LargeFileGroupViewModel' is never used (0 issues)
+    {
+    }
+
+    public ObservableCollection<LargeFileItemViewModel> Items { get; } = [];
 
     public long TotalBytes => _totalBytes;
 
@@ -41,14 +45,11 @@ public sealed class LargeFileGroupViewModel(
 
     public bool RemoveItem(LargeFileItemViewModel item)
     {
-        if (Items.Remove(item))
-        {
-            _totalBytes -= item.Size;
-            OnGroupChanged();
-            return true;
-        }
+        if (!Items.Remove(item)) return false;
+        _totalBytes -= item.Size;
+        OnGroupChanged();
+        return true;
 
-        return false;
     }
 
     private void OnGroupChanged()

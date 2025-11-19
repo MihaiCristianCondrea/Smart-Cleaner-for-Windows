@@ -47,6 +47,10 @@ public sealed class DiskCleanupItemViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    public DiskCleanupItemViewModel() : this(new DiskCleanupItem())
+    {
+    }
+
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

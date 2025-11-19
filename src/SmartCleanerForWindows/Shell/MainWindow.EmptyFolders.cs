@@ -319,13 +319,21 @@ public sealed partial class MainWindow
     {
         var depthValue = EmptyFoldersView.DepthBox.Value;
         int? maxDepth = null;
-        if (!double.IsNaN(depthValue))
-        {
-            var depth = (int)Math.Max(0, Math.Round(depthValue, MidpointRounding.AwayFromZero));
-            if (depth > 0)
+        if (double.IsNaN(depthValue))
+            return new DirectoryCleanOptions
             {
-                maxDepth = depth;
-            }
+                DryRun = dryRun,
+                SendToRecycleBin = EmptyFoldersView.RecycleChk.IsChecked == true,
+                SkipReparsePoints = true,
+                DeleteRootWhenEmpty = false,
+                MaxDepth = maxDepth,
+                ExcludedNamePatterns = ParseExclusions(EmptyFoldersView.ExcludeBox.Text),
+                ExcludedFullPaths = _inlineExcludedPaths.ToArray(),
+            };
+        var depth = (int)Math.Max(0, Math.Round(depthValue, MidpointRounding.AwayFromZero));
+        if (depth > 0)
+        {
+            maxDepth = depth;
         }
 
         return new DirectoryCleanOptions
@@ -706,17 +714,15 @@ public sealed partial class MainWindow
 
     private void OnResultSortChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (EmptyFoldersView.ResultsSortBox.SelectedItem is ComboBoxItem { Tag: string tag })
+        if (EmptyFoldersView.ResultsSortBox.SelectedItem is not ComboBoxItem { Tag: string tag }) return;
+        _currentResultSort = tag switch
         {
-            _currentResultSort = tag switch
-            {
-                "NameDescending" => EmptyFolderSortOption.NameDescending,
-                "DepthDescending" => EmptyFolderSortOption.DepthDescending,
-                _ => EmptyFolderSortOption.NameAscending,
-            };
+            "NameDescending" => EmptyFolderSortOption.NameDescending,
+            "DepthDescending" => EmptyFolderSortOption.DepthDescending,
+            _ => EmptyFolderSortOption.NameAscending,
+        };
 
-            RefreshPreviewTree();
-        }
+        RefreshPreviewTree();
     }
 
     private void OnHideExcludedToggled(object sender, RoutedEventArgs e)

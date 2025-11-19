@@ -8,7 +8,7 @@ public sealed class ToolSettingsSnapshot
 
     public required JsonObject Values { get; init; }
 
-    public JsonNode? GetValue(string key)
+    public JsonNode? GetValue(string key) // FIXME: 				Method 'GetValue' is never used (0 issues)
     {
         return Values.TryGetPropertyValue(key, out var node) ? node : null;
     }

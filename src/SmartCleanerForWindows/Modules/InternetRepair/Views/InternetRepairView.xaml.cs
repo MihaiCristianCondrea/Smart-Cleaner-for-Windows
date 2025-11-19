@@ -7,6 +7,7 @@ public sealed partial class InternetRepairView
     public InternetRepairView()
     {
         InitializeComponent();
+        RegisterLayoutElements();
     }
 
     public event RoutedEventHandler? RunRequested;
@@ -21,4 +22,12 @@ public sealed partial class InternetRepairView
 
     private void OnInternetRepairActionSelectionChanged(object sender, RoutedEventArgs e) =>
         ActionSelectionChanged?.Invoke(sender, e);
+
+    private void RegisterLayoutElements()
+    {
+        _ = InternetRepairLayout;
+        _ = InternetRepairSecondaryColumn;
+        _ = InternetRepairPrimaryPanel;
+        _ = InternetRepairSecondaryPanel;
+    }
 }

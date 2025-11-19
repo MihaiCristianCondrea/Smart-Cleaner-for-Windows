@@ -48,9 +48,9 @@ public sealed partial class MainWindow : IEmptyFolderCleanupView
     private MicaController? _mica;
     private SystemBackdropConfiguration? _backdropConfig;
     private readonly EmptyFolderCleanupController _emptyFolderController = null!;
-    private readonly List<string> _previewCandidates = new();
-    private readonly ObservableCollection<EmptyFolderNode> _emptyFolderRoots = new();
-    private readonly ObservableCollection<EmptyFolderNode> _filteredEmptyFolderRoots = new();
+    private readonly List<string> _previewCandidates = [];
+    private readonly ObservableCollection<EmptyFolderNode> _emptyFolderRoots = [];
+    private readonly ObservableCollection<EmptyFolderNode> _filteredEmptyFolderRoots = [];
     private readonly Dictionary<string, EmptyFolderNode> _emptyFolderLookup = new(FileSystemPathComparer.PathComparer);
     private readonly HashSet<string> _inlineExcludedPaths = new(FileSystemPathComparer.PathComparer);
     private int _totalPreviewCount;
@@ -59,11 +59,11 @@ public sealed partial class MainWindow : IEmptyFolderCleanupView
     private bool _hideExcludedResults;
     private EmptyFolderSortOption _currentResultSort = EmptyFolderSortOption.NameAscending;
     private bool _isBusy;
-    private readonly ObservableCollection<DriveUsageViewModel> _driveUsage = new();
-    private readonly ObservableCollection<DiskCleanupItemViewModel> _diskCleanupItems = new();
-    private readonly ObservableCollection<LargeFileGroupViewModel> _largeFileGroups = new();
-    private readonly ObservableCollection<string> _largeFileExclusions = new();
-    private readonly ObservableCollection<InternetRepairLogEntry> _internetRepairLog = new();
+    private readonly ObservableCollection<DriveUsageViewModel> _driveUsage = [];
+    private readonly ObservableCollection<DiskCleanupItemViewModel> _diskCleanupItems = [];
+    private readonly ObservableCollection<LargeFileGroupViewModel> _largeFileGroups = [];
+    private readonly ObservableCollection<string> _largeFileExclusions = [];
+    private readonly ObservableCollection<InternetRepairLogEntry> _internetRepairLog = [];
     private readonly HashSet<string> _largeFileExclusionLookup = new(OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
     private readonly Dictionary<string, InternetRepairAction> _internetRepairActions = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, InternetRepairLogEntry> _internetRepairLogLookup = new(StringComparer.OrdinalIgnoreCase);
@@ -91,7 +91,7 @@ public sealed partial class MainWindow : IEmptyFolderCleanupView
     private int _historyRetentionDays = HistoryRetentionDefaultDays;
     private bool _isSystemTitleBarInitialized;
     private readonly ToolSettingsService _toolSettingsService = ToolSettingsService.CreateDefault();
-    private readonly ObservableCollection<NavigationViewItem> _navigationItems = new();
+    private readonly ObservableCollection<NavigationViewItem> _navigationItems = [];
     private readonly Dictionary<string, UIElement> _toolViewLookup = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, UIElement> _viewKeyLookup = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, ToolSettingsSnapshot> _settingsSnapshots = new(StringComparer.OrdinalIgnoreCase);
@@ -150,7 +150,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     {
     }
 
-    public MainWindow(IDirectoryCleaner directoryCleaner)
+    public MainWindow(IDirectoryCleaner directoryCleaner) // FIXME: 					Constructor 'MainWindow' is never used (0 issues)
         : this(
             directoryCleaner,
             DiskCleanupServiceFactory.CreateDefault(),
@@ -1014,21 +1014,27 @@ private void NavigateToTool(string toolId)
         }
 
         string summary;
-        if (_notificationShowCompletion && _notificationDesktopAlerts)
+        switch (_notificationShowCompletion)
         {
-            summary = Localize("SettingsNotificationsAll", "All notifications enabled");
-        }
-        else if (_notificationShowCompletion)
-        {
-            summary = Localize("SettingsNotificationsCompletionOnly", "Completion summary only");
-        }
-        else if (_notificationDesktopAlerts)
-        {
-            summary = Localize("SettingsNotificationsDesktopOnly", "Desktop alerts only");
-        }
-        else
-        {
-            summary = Localize("SettingsNotificationsMuted", "Notifications muted");
+            case true when _notificationDesktopAlerts:
+                summary = Localize("SettingsNotificationsAll", "All notifications enabled");
+                break;
+            case true:
+                summary = Localize("SettingsNotificationsCompletionOnly", "Completion summary only");
+                break;
+            default:
+            {
+                if (_notificationDesktopAlerts)
+                {
+                    summary = Localize("SettingsNotificationsDesktopOnly", "Desktop alerts only");
+                }
+                else
+                {
+                    summary = Localize("SettingsNotificationsMuted", "Notifications muted");
+                }
+
+                break;
+            }
         }
 
         SettingsView.NotificationSummaryText.Text = summary;
@@ -1129,7 +1135,7 @@ private void NavigateToTool(string toolId)
         _ => GetBrushResource("Brush.BrandSecondary"),
     };
 
-    private Brush GetBrushResource(string key, string? fallbackKey = null)
+    private static Brush GetBrushResource(string key, string? fallbackKey = null)
     {
         if (Application.Current.Resources.TryGetValue(key, out var brushObj) && brushObj is Brush brush)
         {

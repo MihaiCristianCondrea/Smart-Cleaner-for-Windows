@@ -9,6 +9,7 @@ public sealed partial class EmptyFoldersView
     public EmptyFoldersView()
     {
         InitializeComponent();
+        RegisterLayoutElements();
     }
 
     public event RoutedEventHandler? BrowseRequested;
@@ -63,4 +64,13 @@ public sealed partial class EmptyFoldersView
     private void OnResultSortChanged(object sender, SelectionChangedEventArgs e) => ResultSortChanged?.Invoke(sender, e);
 
     private void RootPathBox_TextChanged(object sender, TextChangedEventArgs e) => RootPathTextChanged?.Invoke(sender, e);
+
+    private void RegisterLayoutElements()
+    {
+        _ = EmptyFoldersLayout;
+        _ = EmptyFoldersPrimaryColumn;
+        _ = EmptyFoldersSecondaryColumn;
+        _ = EmptyFoldersPrimaryPanel;
+        _ = EmptyFoldersDetailsPanel;
+    }
 }

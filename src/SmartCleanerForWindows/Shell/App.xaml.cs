@@ -11,7 +11,7 @@ namespace SmartCleanerForWindows.Shell;
 /// <summary>
 /// App is declared partial because InitializeComponent is generated from App.xaml at build time.
 /// </summary>
-public sealed partial class App : Application
+public sealed partial class App
 {
     private Window? _window;
 
@@ -55,18 +55,18 @@ public sealed partial class App : Application
         }
     }
 
-    private void OnUnhandledException(object? sender, System.UnhandledExceptionEventArgs e)
+    private static void OnUnhandledException(object? sender, System.UnhandledExceptionEventArgs e)
     {
         HandleUnhandledException(e.ExceptionObject as Exception, "AppDomain.UnhandledException");
     }
 
-    private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
+    private static void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
         HandleUnhandledException(e.Exception, "TaskScheduler.UnobservedTaskException");
         e.SetObserved();
     }
 
-    private void OnApplicationUnhandledException(object? sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+    private static void OnApplicationUnhandledException(object? sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
         HandleUnhandledException(e.Exception, "Application.UnhandledException");
         e.Handled = true;

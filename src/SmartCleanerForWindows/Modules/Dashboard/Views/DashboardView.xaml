@@ -70,16 +70,16 @@
                                         <ColumnDefinition Width="160" />
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Spacing="{StaticResource Spacing.Size40}">
-                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" /> <!--FIXME: Constructor must be public-->
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
                                         <TextBlock
-                                            Text="{Binding Details}" <!--FIXME: Constructor must be public-->
+                                            Text="{Binding Details}"
                                             Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                             TextWrapping="Wrap" />
                                     </StackPanel>
                                     <StackPanel Grid.Column="1" Spacing="{StaticResource Spacing.Size40}" VerticalAlignment="Center">
-                                        <ProgressBar Minimum="0" Maximum="100" Value="{Binding UsedPercentage}" Height="6" /> <!--FIXME: Constructor must be public-->
+                                        <ProgressBar Minimum="0" Maximum="100" Value="{Binding UsedPercentage}" Height="6" />
                                         <TextBlock
-                                            Text="{Binding UsageSummary}" <!--FIXME: Constructor must be public-->
+                                            Text="{Binding UsageSummary}"
                                             HorizontalAlignment="Right"
                                             Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                     </StackPanel>

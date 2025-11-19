@@ -26,8 +26,7 @@ public sealed class ToolSettingsStore
         try
         {
             using var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            var node = JsonNode.Parse(stream) as JsonObject;
-            if (node is null)
+            if (JsonNode.Parse(stream) is not JsonObject node)
             {
                 var fallback = definition.CreateDefaultValues();
                 SaveValues(definition.Id, fallback);
@@ -66,7 +65,7 @@ public sealed class ToolSettingsStore
         return watcher;
     }
 
-    public string GetUserSettingsPath(string toolId)
+    private string GetUserSettingsPath(string toolId)
     {
         return Path.Combine(_userRoot, $"{toolId}.json");
     }

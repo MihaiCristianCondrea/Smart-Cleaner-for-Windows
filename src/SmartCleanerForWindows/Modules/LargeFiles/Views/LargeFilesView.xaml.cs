@@ -8,6 +8,7 @@ public sealed partial class LargeFilesView
     public LargeFilesView()
     {
         InitializeComponent();
+        RegisterLayoutElements();
     }
 
     public event RoutedEventHandler? BrowseRequested;
@@ -45,4 +46,12 @@ public sealed partial class LargeFilesView
     private void OnLargeFileOpen(object sender, RoutedEventArgs e) => OpenRequested?.Invoke(sender, e);
 
     private void OnLargeFilesRemoveExclusion(object sender, RoutedEventArgs e) => RemoveExclusionRequested?.Invoke(sender, e);
+
+    private void RegisterLayoutElements()
+    {
+        _ = LargeFilesLayout;
+        _ = LargeFilesOptionsColumn;
+        _ = LargeFilesResultsPanel;
+        _ = LargeFilesOptionsPanel;
+    }
 }

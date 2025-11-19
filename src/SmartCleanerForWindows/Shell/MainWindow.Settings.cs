@@ -220,8 +220,7 @@ public sealed partial class MainWindow
         return lower switch
         {
             AccentPreferenceZest => AccentPreferenceZest,
-            AccentPreferenceDefault => AccentPreferenceDefault,
-            "system" => AccentPreferenceDefault,
+            AccentPreferenceDefault or "system" => AccentPreferenceDefault,
             _ => trimmed
         };
     }
@@ -250,25 +249,18 @@ public sealed partial class MainWindow
             return "Use system setting";
         }
 
-        if (preference.StartsWith('#'))
-        {
-            return string.Format(CultureInfo.CurrentCulture, "Custom ({0})", preference.ToUpperInvariant());
-        }
-
-        return preference;
+        return preference.StartsWith('#') ? string.Format(CultureInfo.CurrentCulture, "Custom ({0})", preference.ToUpperInvariant()) : preference;
     }
 
     private void OnCleanerRecyclePreferenceToggled(object sender, RoutedEventArgs e)
     {
         if (_isInitializingSettings) return;
 
-        if (sender is ToggleSwitch toggle)
-        {
-            _cleanerSendToRecycleBin = toggle.IsOn;
-            PersistEmptyFolderSettings();
-            UpdateCleanerDefaultsSummary();
-            ApplyCleanerDefaultsToSession();
-        }
+        if (sender is not ToggleSwitch toggle) return;
+        _cleanerSendToRecycleBin = toggle.IsOn;
+        PersistEmptyFolderSettings();
+        UpdateCleanerDefaultsSummary();
+        ApplyCleanerDefaultsToSession();
     }
 
     private void OnCleanerDepthPreferenceChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
@@ -513,7 +505,7 @@ public sealed partial class MainWindow
         _ = _toolSettingsService.UpdateAsync(DashboardToolId, snapshot.Values);
     }
 
-    private Color GetZestAccentColor()
+    private static Color GetZestAccentColor()
     {
         if (Application.Current.Resources.TryGetValue("Color.BrandPrimary", out var value) && value is Color color)
         {
@@ -545,7 +537,7 @@ public sealed partial class MainWindow
         }
     }
 
-    private void ApplyAccentColor(Color color)
+    private static void ApplyAccentColor(Color color)
     {
         SetAccentResource("SystemAccentColor", color);
         SetAccentResource("SystemAccentColorLight1", Lighten(color, 0.3));
@@ -591,9 +583,9 @@ public sealed partial class MainWindow
         var span = value.AsSpan();
         if (span[0] == '#') span = span[1..];
 
-        if (span.Length == 6)
+        switch (span.Length)
         {
-            if (uint.TryParse(span, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var rgb))
+            case 6 when uint.TryParse(span, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var rgb):
             {
                 var r = (byte)((rgb >> 16) & 0xFF);
                 var g = (byte)((rgb >> 8) & 0xFF);
@@ -601,10 +593,7 @@ public sealed partial class MainWindow
                 color = Color.FromArgb(255, r, g, b);
                 return true;
             }
-        }
-        else if (span.Length == 8)
-        {
-            if (uint.TryParse(span, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var argb))
+            case 8 when uint.TryParse(span, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var argb):
             {
                 var a = (byte)((argb >> 24) & 0xFF);
                 var r = (byte)((argb >> 16) & 0xFF);
@@ -613,9 +602,9 @@ public sealed partial class MainWindow
                 color = Color.FromArgb(a, r, g, b);
                 return true;
             }
+            default:
+                return false;
         }
-
-        return false;
     }
 }
 

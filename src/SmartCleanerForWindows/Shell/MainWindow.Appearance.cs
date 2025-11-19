@@ -154,7 +154,7 @@ public sealed partial class MainWindow
     {
         try
         {
-            return this.AppWindow;
+            return AppWindow;
         }
         catch
         {
@@ -213,11 +213,9 @@ public sealed partial class MainWindow
             }
 
             var tempPath = Path.Combine(Path.GetTempPath(), TitleBarIconTempFileName);
-            if (!File.Exists(tempPath))
-            {
-                var iconBytes = Convert.FromBase64String(TitleBarIconBase64);
-                File.WriteAllBytes(tempPath, iconBytes);
-            }
+            if (File.Exists(tempPath)) return tempPath;
+            var iconBytes = Convert.FromBase64String(TitleBarIconBase64);
+            File.WriteAllBytes(tempPath, iconBytes);
 
             return tempPath;
         }

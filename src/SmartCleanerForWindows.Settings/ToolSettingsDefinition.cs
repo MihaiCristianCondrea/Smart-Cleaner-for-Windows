@@ -28,7 +28,7 @@ public sealed record ToolSettingsDefinition
     public JsonObject? Defaults { get; init; }
 
     [JsonPropertyName("fields")]
-    public IReadOnlyList<ToolSettingField> Fields { get; init; } = Array.Empty<ToolSettingField>();
+    public IReadOnlyList<ToolSettingField> Fields { get; init; } = [];
 
     [JsonIgnore]
     public string? DefinitionPath { get; init; }

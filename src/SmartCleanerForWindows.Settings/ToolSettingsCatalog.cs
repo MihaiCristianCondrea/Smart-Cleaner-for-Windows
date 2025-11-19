@@ -19,7 +19,7 @@ public sealed class ToolSettingsCatalog(string? definitionRoot = null)
     {
         if (!Directory.Exists(_definitionRoot))
         {
-            return Array.Empty<ToolSettingsDefinition>();
+            return [];
         }
 
         var definitions = new List<ToolSettingsDefinition>();
@@ -34,7 +34,7 @@ public sealed class ToolSettingsCatalog(string? definitionRoot = null)
                     continue;
                 }
 
-                definitions.Add(definition with { DefinitionPath = file }); // FIXME: The receiver type 'SmartCleanerForWindows.Settings.ToolSettingsDefinition' is not a valid record or value type
+                definitions.Add(definition with { DefinitionPath = file });
             }
             catch
             {

@@ -73,7 +73,7 @@
                         </Border>
 
                         <Grid
-                            x:Name="EmptyFoldersLayout" <!--FIXME: Field 'EmptyFoldersLayout' is never used-->
+                            x:Name="EmptyFoldersLayout"
                             Grid.Row="1"
                             ColumnSpacing="{StaticResource Spacing.Size240}">
                             <Grid.RowDefinitions>
@@ -81,8 +81,8 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition x:Name="EmptyFoldersPrimaryColumn" Width="*" /> <!--FIXME: Field 'EmptyFoldersPrimaryColumn' is never used-->
-                                <ColumnDefinition x:Name="EmptyFoldersSecondaryColumn" Width="360" /> <!--FIXME: Field 'EmptyFoldersSecondaryColumn' is never used-->
+                                <ColumnDefinition x:Name="EmptyFoldersPrimaryColumn" Width="*" />
+                                <ColumnDefinition x:Name="EmptyFoldersSecondaryColumn" Width="360" />
                             </Grid.ColumnDefinitions>
 
                             <VisualStateManager.VisualStateGroups>
@@ -126,7 +126,7 @@
                             </VisualStateManager.VisualStateGroups>
 
                             <StackPanel
-                                x:Name="EmptyFoldersPrimaryPanel" <!--FIXME: Field 'EmptyFoldersPrimaryPanel' is never used-->
+                                x:Name="EmptyFoldersPrimaryPanel"
                                 Grid.Column="0"
                                 Spacing="{StaticResource Spacing.Size160}">
                                 <Border Style="{StaticResource CardStyle}">
@@ -254,7 +254,7 @@
                             </StackPanel>
 
                             <StackPanel
-                                x:Name="EmptyFoldersDetailsPanel" <!--FIXME: Field 'EmptyFoldersDetailsPanel' is never used-->
+                                x:Name="EmptyFoldersDetailsPanel"
                                 Grid.Row="0"
                                 Grid.Column="1"
                                 Spacing="{StaticResource Spacing.Size160}">
