@@ -74,7 +74,7 @@
                         </Border>
 
                         <Grid
-                            x:Name="LargeFilesLayout"
+                            x:Name="LargeFilesLayout" <!-- FIXME: Field 'LargeFilesLayout' is never used-->
                             Grid.Row="1"
                             ColumnSpacing="{StaticResource Spacing.Size240}">
                             <Grid.RowDefinitions>
@@ -83,7 +83,7 @@
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition x:Name="LargeFilesOptionsColumn" Width="360" />
+                                <ColumnDefinition x:Name="LargeFilesOptionsColumn" Width="360" /> <!--FIXME Field 'LargeFilesOptionsColumn' is never used-->
                             </Grid.ColumnDefinitions>
 
                             <VisualStateManager.VisualStateGroups>
@@ -118,7 +118,7 @@
                             </VisualStateManager.VisualStateGroups>
 
                             <StackPanel
-                                x:Name="LargeFilesResultsPanel"
+                                x:Name="LargeFilesResultsPanel" <!--FIXME: Field 'LargeFilesResultsPanel' is never used-->
                                 Grid.Column="0"
                                 Spacing="{StaticResource Spacing.Size160}">
                                 <Border Style="{StaticResource CardStyle}">
@@ -141,7 +141,7 @@
                                                 <TextBlock
                                                     x:Name="LargeFilesResultsCaption" x:FieldModifier="internal"
                                                     Text="Scan results will appear here after you run a scan."
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                     TextWrapping="Wrap" />
                                             </StackPanel>
                                         </StackPanel>
@@ -160,14 +160,14 @@
                                                                 <ColumnDefinition Width="*" />
                                                                 <ColumnDefinition Width="Auto" />
                                                             </Grid.ColumnDefinitions>
-                                                            <TextBlock Text="{Binding DisplayName}" FontSize="18" FontWeight="SemiBold" />
+                                                            <TextBlock Text="{Binding DisplayName}" FontSize="18" FontWeight="SemiBold" /> <!--FIXME: Constructor must be public-->
                                                             <TextBlock
                                                                 Grid.Column="1"
-                                                                Text="{Binding Summary}"
-                                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                Text="{Binding Summary}"<!--FIXME: Constructor must be public-->
+                                                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                                 HorizontalAlignment="Right" />
                                                         </Grid>
-                                                        <ItemsControl ItemsSource="{Binding Items}">
+                                                        <ItemsControl ItemsSource="{Binding Items}"><!--FIXME: Constructor must be public-->
                                                             <ItemsControl.ItemsPanel>
                                                                 <ItemsPanelTemplate>
                                                                     <StackPanel Spacing="{StaticResource Spacing.Size120}" />
@@ -187,18 +187,18 @@
                                                                                         <ColumnDefinition Width="*" />
                                                                                         <ColumnDefinition Width="Auto" />
                                                                                     </Grid.ColumnDefinitions>
-                                                                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                                                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" /><!--FIXME: Constructor must be public-->
                                                                                     <TextBlock
                                                                                         Grid.Column="1"
-                                                                                        Text="{Binding SizeDisplay}"
-                                                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                                                        Text="{Binding SizeDisplay}"<!--FIXME: Constructor must be public-->
+                                                                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                                                                 </Grid>
                                                                                 <TextBlock
-                                                                                    Text="{Binding Directory}"
-                                                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                                    Text="{Binding Directory}"<!--FIXME: Constructor must be public-->
+                                                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                                                     TextWrapping="Wrap"
                                                                                     TextTrimming="CharacterEllipsis"
-                                                                                    ToolTipService.ToolTip="{Binding Directory}" />
+                                                                                    ToolTipService.ToolTip="{Binding Directory}" /><!--FIXME: Constructor must be public-->
                                                                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
                                                                                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
                                                                                         <Border
@@ -211,8 +211,8 @@
                                                                                                 Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
                                                                                         </Border>
                                                                                         <TextBlock
-                                                                                            Text="{Binding TypeName}"
-                                                                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                                            Text="{Binding TypeName}"<!--FIXME: Constructor must be public-->
+                                                                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                                                             TextTrimming="CharacterEllipsis" />
                                                                                     </StackPanel>
                                                                                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}" HorizontalAlignment="Right">
@@ -251,7 +251,7 @@
                             </StackPanel>
 
                             <StackPanel
-                                x:Name="LargeFilesOptionsPanel"
+                                x:Name="LargeFilesOptionsPanel" <!--FIXME: Field 'LargeFilesOptionsPanel' is never used-->
                                 Grid.Row="0"
                                 Grid.Column="1"
                                 Spacing="{StaticResource Spacing.Size160}">
@@ -274,7 +274,7 @@
                                                 <TextBlock Text="Scan setup" FontSize="22" FontWeight="SemiBold" />
                                                 <TextBlock
                                                     Text="Choose a location and customize the large file scan."
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                     TextWrapping="Wrap" />
                                             </StackPanel>
                                         </StackPanel>
@@ -322,7 +322,7 @@
                                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}" VerticalAlignment="Center">
                                                 <SymbolIcon
                                                     Symbol="Sort"
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                                 <TextBlock VerticalAlignment="Center" Text="Max results" />
                                                 <NumberBox
                                                     x:Name="LargeFilesMaxItemsBox" x:FieldModifier="internal"
@@ -341,7 +341,7 @@
                                                 <TextBlock
                                                     Text="Use semicolons to exclude names or relative paths."
                                                     FontSize="12"
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                             </StackPanel>
                                         </StackPanel>
                                     </StackPanel>
@@ -368,7 +368,7 @@
                                         <TextBlock
                                             x:Name="LargeFilesActivityText" x:FieldModifier="internal"
                                             Text="Waiting for the next action."
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                             TextWrapping="Wrap" />
 
                                         <ProgressBar
@@ -409,7 +409,7 @@
                                                 <TextBlock Text="Excluded paths" FontSize="22" FontWeight="SemiBold" />
                                                 <TextBlock
                                                     Text="Files excluded from future scans appear here."
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                     TextWrapping="Wrap" />
                                             </StackPanel>
                                         </StackPanel>
@@ -427,7 +427,7 @@
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock
                                                             Text="{Binding}"
-                                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                             TextWrapping="Wrap"
                                                             ToolTipService.ToolTip="{Binding}" />
                                                         <Button Grid.Column="1" Tag="{Binding}" Click="OnLargeFilesRemoveExclusion">
@@ -444,7 +444,7 @@
                                         <TextBlock
                                             x:Name="LargeFilesNoExclusionsText" x:FieldModifier="internal"
                                             Text="No exclusions yet."
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
 
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                             <Button x:Name="LargeFilesClearExclusionsBtn" x:FieldModifier="internal" Click="OnLargeFilesClearExclusions" IsEnabled="False">

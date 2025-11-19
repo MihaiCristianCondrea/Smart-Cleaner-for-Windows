@@ -75,7 +75,7 @@
                         </Border>
 
                         <Grid
-                            x:Name="InternetRepairLayout"
+                            x:Name="InternetRepairLayout" <!--FIXME: Field 'InternetRepairLayout' is never used-->
                             Grid.Row="1"
                             ColumnSpacing="{StaticResource Spacing.Size240}">
                             <Grid.RowDefinitions>
@@ -84,7 +84,7 @@
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition x:Name="InternetRepairSecondaryColumn" Width="360" />
+                                <ColumnDefinition x:Name="InternetRepairSecondaryColumn" Width="360" /> <!--FIXME: Field 'InternetRepairSecondaryColumn' is never used-->
                             </Grid.ColumnDefinitions>
 
                             <VisualStateManager.VisualStateGroups>
@@ -119,7 +119,7 @@
                             </VisualStateManager.VisualStateGroups>
 
                             <StackPanel
-                                x:Name="InternetRepairPrimaryPanel"
+                                x:Name="InternetRepairPrimaryPanel" <!--FIXME: Field 'InternetRepairPrimaryPanel' is never used-->
                                 Grid.Column="0"
                                 Spacing="{StaticResource Spacing.Size160}">
                                 <Border Style="{StaticResource CardStyle}">
@@ -141,7 +141,7 @@
                                                 <TextBlock Text="Repair queue" FontSize="22" FontWeight="SemiBold" />
                                                 <TextBlock
                                                     Text="Run the selected fixes and monitor progress."
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                     TextWrapping="Wrap" />
                                             </StackPanel>
                                         </StackPanel>
@@ -150,7 +150,7 @@
                                             <TextBlock
                                                 x:Name="InternetRepairActivityText" x:FieldModifier="internal"
                                                 Text="Waiting to start a repair."
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                 TextWrapping="Wrap" />
                                             <ProgressBar x:Name="InternetRepairProgress" x:FieldModifier="internal" Height="6" Minimum="0" Maximum="100" Visibility="Collapsed" />
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{StaticResource Spacing.Size80}">
@@ -190,7 +190,7 @@
                                                 <TextBlock Text="Repair log" FontSize="22" FontWeight="SemiBold" />
                                                 <TextBlock
                                                     Text="Detailed results appear as each action finishes."
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                     TextWrapping="Wrap" />
                                             </StackPanel>
                                         </StackPanel>
@@ -199,7 +199,7 @@
                                             <TextBlock
                                                 x:Name="InternetRepairLogPlaceholder" x:FieldModifier="internal"
                                                 Text="Log entries will appear here once you run a repair."
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                             <ListView
                                                 x:Name="InternetRepairLogList" x:FieldModifier="internal"
                                                 SelectionMode="None"
@@ -209,13 +209,13 @@
                                                         <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
                                                             <SymbolIcon
                                                                 Symbol="{x:Bind Icon}"
-                                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                                 VerticalAlignment="Center" />
                                                             <StackPanel Spacing="{StaticResource Spacing.Size40}">
                                                                 <TextBlock Text="{x:Bind Title}" FontWeight="SemiBold" TextWrapping="Wrap" />
                                                                 <TextBlock
                                                                     Text="{x:Bind Description}"
-                                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                                     TextWrapping="WrapWholeWords" />
                                                             </StackPanel>
                                                         </StackPanel>
@@ -229,7 +229,7 @@
                             </StackPanel>
 
                             <StackPanel
-                                x:Name="InternetRepairSecondaryPanel"
+                                x:Name="InternetRepairSecondaryPanel" <!--FIXME: Field 'InternetRepairSecondaryPanel' is never used-->
                                 Grid.Row="0"
                                 Grid.Column="1"
                                 Spacing="{StaticResource Spacing.Size160}">
@@ -252,7 +252,7 @@
                                                 <TextBlock Text="Common fixes" FontSize="22" FontWeight="SemiBold" />
                                                 <TextBlock
                                                     Text="Select the repairs that match your symptoms."
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                     TextWrapping="Wrap" />
                                             </StackPanel>
                                         </StackPanel>
@@ -267,7 +267,7 @@
                                                     <TextBlock Text="Reset Winsock catalog" FontWeight="SemiBold" />
                                                     <TextBlock
                                                         Text="Repairs socket corruption that can break connectivity."
-                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                         TextWrapping="WrapWholeWords" />
                                                 </StackPanel>
                                             </CheckBox>
@@ -281,7 +281,7 @@
                                                     <TextBlock Text="Reset TCP/IP stack" FontWeight="SemiBold" />
                                                     <TextBlock
                                                         Text="Rebuilds the IP stack and reverts advanced network tweaks."
-                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                         TextWrapping="WrapWholeWords" />
                                                 </StackPanel>
                                             </CheckBox>
@@ -295,7 +295,7 @@
                                                     <TextBlock Text="Flush DNS cache" FontWeight="SemiBold" />
                                                     <TextBlock
                                                         Text="Clears cached DNS records to resolve name lookup issues."
-                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                         TextWrapping="WrapWholeWords" />
                                                 </StackPanel>
                                             </CheckBox>
@@ -309,7 +309,7 @@
                                                     <TextBlock Text="Release IP address" FontWeight="SemiBold" />
                                                     <TextBlock
                                                         Text="Drops the current lease so you can request a fresh address."
-                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                         TextWrapping="WrapWholeWords" />
                                                 </StackPanel>
                                             </CheckBox>
@@ -323,7 +323,7 @@
                                                     <TextBlock Text="Renew IP address" FontWeight="SemiBold" />
                                                     <TextBlock
                                                         Text="Requests a new DHCP lease from the network."
-                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                         TextWrapping="WrapWholeWords" />
                                                 </StackPanel>
                                             </CheckBox>
@@ -337,7 +337,7 @@
                                                     <TextBlock Text="Reset WinHTTP proxy" FontWeight="SemiBold" />
                                                     <TextBlock
                                                         Text="Clears system proxy settings that might block traffic."
-                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                         TextWrapping="WrapWholeWords" />
                                                 </StackPanel>
                                             </CheckBox>
@@ -364,24 +364,24 @@
                                                 <TextBlock Text="Before you run" FontSize="22" FontWeight="SemiBold" />
                                                 <TextBlock
                                                     Text="Most repairs require administrator privileges and may momentarily disrupt connectivity."
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                     TextWrapping="Wrap" />
                                             </StackPanel>
                                         </StackPanel>
 
                                         <StackPanel Spacing="{StaticResource Spacing.Size120}">
                                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
-                                                <SymbolIcon Symbol="Shop" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <SymbolIcon Symbol="Shop" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                                 <TextBlock
                                                     Text="Run Smart Cleaner as an administrator for the best results."
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                     TextWrapping="Wrap" />
                                             </StackPanel>
                                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
-                                                <SymbolIcon Symbol="Refresh" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <SymbolIcon Symbol="Refresh" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                                 <TextBlock
                                                     Text="Restart Windows after applying repairs if you still have trouble."
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                     TextWrapping="Wrap" />
                                             </StackPanel>
                                         </StackPanel>

@@ -354,7 +354,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         }
 
         var fallbackInfoBrush = new SolidColorBrush(Colors.Gray);
-        if (Application.Current?.Resources?.TryGetValue("TextFillColorSecondaryBrush", out var resourceValue) == true
+        if (Application.Current?.Resources?.TryGetValue("SystemControlForegroundBaseMediumBrush", out var resourceValue) == true
             && resourceValue is SolidColorBrush resolvedBrush)
         {
             fallbackInfoBrush = resolvedBrush;

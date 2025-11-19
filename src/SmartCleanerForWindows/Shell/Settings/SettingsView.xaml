@@ -13,7 +13,7 @@
                             <TextBlock Text="Settings" FontSize="32" FontWeight="SemiBold" />
                             <TextBlock
                                 Text="Adjust Smart Cleaner to match your preferences."
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                         </StackPanel>
 
                         <Border Style="{StaticResource CardStyle}">
@@ -23,14 +23,14 @@
                                     <TextBlock Text="Smart Cleaner for Windows" FontWeight="SemiBold" />
                                     <TextBlock
                                         Text="A modern utility for tidying empty folders and reclaiming disk space."
-                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                         TextWrapping="Wrap" />
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <FontIcon
                                             Glyph="&#xE946;"
                                             FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        <TextBlock Text="Version 1.0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                                        <TextBlock Text="Version 1.0" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                     </StackPanel>
                                 </StackPanel>
 
@@ -60,7 +60,7 @@
                                         <TextBlock Text="Cleaner defaults" FontSize="22" FontWeight="SemiBold" />
                                         <TextBlock
                                             Text="Choose how empty folders are handled by default before each run."
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                             TextWrapping="Wrap" />
                                     </StackPanel>
                                 </StackPanel>
@@ -68,7 +68,7 @@
                                 <StackPanel Spacing="{StaticResource Spacing.Size160}">
                                     <TextBlock
                                         x:Name="CleanerDefaultsSummaryText" x:FieldModifier="internal"
-                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                         Text="Recycle Bin • No depth limit" />
 
                                     <ToggleSwitch
@@ -81,7 +81,7 @@
                                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}" VerticalAlignment="Center">
                                         <SymbolIcon
                                             Symbol="Sort"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                         <TextBlock VerticalAlignment="Center" Text="Default depth limit" />
                                         <NumberBox
                                             x:Name="CleanerDepthPreferenceBox" x:FieldModifier="internal"
@@ -100,7 +100,7 @@
                                         <TextBlock
                                             Text="Use semicolons to separate names or wildcard patterns."
                                             FontSize="12"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                     </StackPanel>
 
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
@@ -136,7 +136,7 @@
                                         <TextBlock Text="Automation" FontSize="22" FontWeight="SemiBold" />
                                         <TextBlock
                                             Text="Streamline routine scans with automation options."
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                             TextWrapping="Wrap" />
                                     </StackPanel>
                                 </StackPanel>
@@ -144,7 +144,7 @@
                                 <StackPanel Spacing="{StaticResource Spacing.Size160}">
                                     <TextBlock
                                         x:Name="AutomationSummaryText" x:FieldModifier="internal"
-                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                         Text="Automation disabled" />
 
                                     <ToggleSwitch
@@ -179,7 +179,7 @@
                                         <TextBlock Text="Notifications" FontSize="22" FontWeight="SemiBold" />
                                         <TextBlock
                                             Text="Choose how Smart Cleaner keeps you informed."
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                             TextWrapping="Wrap" />
                                     </StackPanel>
                                 </StackPanel>
@@ -187,7 +187,7 @@
                                 <StackPanel Spacing="{StaticResource Spacing.Size160}">
                                     <TextBlock
                                         x:Name="NotificationSummaryText" x:FieldModifier="internal"
-                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                         Text="All notifications enabled" />
 
                                     <ToggleSwitch
@@ -223,7 +223,7 @@
                                         <TextBlock Text="History &amp; data" FontSize="22" FontWeight="SemiBold" />
                                         <TextBlock
                                             Text="Control how long Smart Cleaner keeps past actions."
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                             TextWrapping="Wrap" />
                                     </StackPanel>
                                 </StackPanel>
@@ -231,13 +231,13 @@
                                 <StackPanel Spacing="{StaticResource Spacing.Size160}">
                                     <TextBlock
                                         x:Name="HistoryRetentionSummaryText" x:FieldModifier="internal"
-                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                         Text="Keep history for 30 days" />
 
                                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}" VerticalAlignment="Center">
                                         <SymbolIcon
                                             Symbol="Calendar"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                         <TextBlock VerticalAlignment="Center" Text="Days to keep history" />
                                         <NumberBox
                                             x:Name="HistoryRetentionNumberBox" x:FieldModifier="internal"
@@ -251,7 +251,7 @@
                                     <TextBlock
                                         Text="Set to 0 to clear history automatically after each run."
                                         FontSize="12"
-                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                 </StackPanel>
                             </StackPanel>
                         </Border>
@@ -275,7 +275,7 @@
                                         <TextBlock Text="Personalization" FontSize="22" FontWeight="SemiBold" />
                                         <TextBlock
                                             Text="Preview theme and accent tweaks before applying them."
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                             TextWrapping="Wrap" />
                                     </StackPanel>
                                 </StackPanel>
@@ -298,7 +298,7 @@
                                                     <TextBlock Text="App theme" FontSize="18" FontWeight="SemiBold" />
                                                     <TextBlock
                                                         Text="Choose how Smart Cleaner looks."
-                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                         TextWrapping="Wrap" />
                                                 </StackPanel>
 
@@ -306,7 +306,7 @@
                                                     x:Name="ThemeSummaryText" x:FieldModifier="internal"
                                                     Grid.Column="1"
                                                     Text="Use system setting"
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                     VerticalAlignment="Center" />
                                             </Grid>
 
@@ -331,7 +331,7 @@
                                                     <TextBlock Text="Accent color" FontSize="18" FontWeight="SemiBold" />
                                                     <TextBlock
                                                         Text="Personalize buttons and highlights with a custom accent."
-                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                         TextWrapping="Wrap" />
                                                 </StackPanel>
 
@@ -339,7 +339,7 @@
                                                     x:Name="AccentSummaryText" x:FieldModifier="internal"
                                                     Grid.Column="1"
                                                     Text="Use system setting"
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                     VerticalAlignment="Center" />
                                             </Grid>
 
@@ -362,9 +362,9 @@
                                             <StackPanel Spacing="{StaticResource Spacing.Size80}">
                                                 <Rectangle Height="12" Fill="{ThemeResource AccentFillColorDefaultBrush}" RadiusX="4" RadiusY="4" />
                                                 <StackPanel Spacing="{StaticResource Spacing.Size60}">
-                                                    <Rectangle Height="8" Fill="{ThemeResource TextFillColorPrimaryBrush}" RadiusX="4" RadiusY="4" />
-                                                    <Rectangle Height="8" Fill="{ThemeResource TextFillColorSecondaryBrush}" RadiusX="4" RadiusY="4" />
-                                                    <Rectangle Height="8" Fill="{ThemeResource TextFillColorSecondaryBrush}" RadiusX="4" RadiusY="4" Width="120" />
+                                                    <Rectangle Height="8" Fill="{ThemeResource SystemControlForegroundBaseHighBrush}" RadiusX="4" RadiusY="4" />
+                                                    <Rectangle Height="8" Fill="{ThemeResource SystemControlForegroundBaseMediumBrush}" RadiusX="4" RadiusY="4" />
+                                                    <Rectangle Height="8" Fill="{ThemeResource SystemControlForegroundBaseMediumBrush}" RadiusX="4" RadiusY="4" Width="120" />
                                                 </StackPanel>
                                             </StackPanel>
                                         </Border>

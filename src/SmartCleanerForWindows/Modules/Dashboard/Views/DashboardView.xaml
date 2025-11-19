@@ -27,7 +27,7 @@
                     <TextBlock Text="Dashboard" FontSize="32" FontWeight="SemiBold" />
                     <TextBlock
                         Text="Choose a tool to continue."
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                 </StackPanel>
             </StackPanel>
 
@@ -52,7 +52,7 @@
                             <TextBlock
                                 x:Name="StorageSummaryText"
                                 Text="Collecting drive information…"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                 TextWrapping="WrapWholeWords" />
                         </StackPanel>
                     </StackPanel>
@@ -70,18 +70,18 @@
                                         <ColumnDefinition Width="160" />
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Spacing="{StaticResource Spacing.Size40}">
-                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" /> <!--FIXME: Constructor must be public-->
                                         <TextBlock
-                                            Text="{Binding Details}"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Text="{Binding Details}" <!--FIXME: Constructor must be public-->
+                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                             TextWrapping="Wrap" />
                                     </StackPanel>
                                     <StackPanel Grid.Column="1" Spacing="{StaticResource Spacing.Size40}" VerticalAlignment="Center">
-                                        <ProgressBar Minimum="0" Maximum="100" Value="{Binding UsedPercentage}" Height="6" />
+                                        <ProgressBar Minimum="0" Maximum="100" Value="{Binding UsedPercentage}" Height="6" /> <!--FIXME: Constructor must be public-->
                                         <TextBlock
-                                            Text="{Binding UsageSummary}"
+                                            Text="{Binding UsageSummary}" <!--FIXME: Constructor must be public-->
                                             HorizontalAlignment="Right"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                     </StackPanel>
                                 </Grid>
                             </DataTemplate>
@@ -91,12 +91,12 @@
                         <FontIcon
                             Glyph="&#xE946;"
                             FontFamily="Segoe MDL2 Assets"
-                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                             VerticalAlignment="Center" />
                         <TextBlock
                             x:Name="StorageTipText"
                             Text="Keep an eye on your drives to maintain performance."
-                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                             TextWrapping="WrapWholeWords" />
                     </StackPanel>
                 </StackPanel>
@@ -121,7 +121,7 @@
                             <TextBlock Text="Empty folders cleaner" FontSize="22" FontWeight="SemiBold" />
                             <TextBlock
                                 Text="Scan for empty directories and remove them safely."
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                         </StackPanel>
                     </StackPanel>
                     <Button Click="OnNavigateToEmptyFolders">
@@ -152,7 +152,7 @@
                             <TextBlock Text="Large files explorer" FontSize="22" FontWeight="SemiBold" />
                             <TextBlock
                                 Text="Find the biggest files by type and reclaim space quickly."
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                 TextWrapping="Wrap" />
                         </StackPanel>
                     </StackPanel>
@@ -185,7 +185,7 @@
                             <TextBlock Text="Disk cleanup" FontSize="22" FontWeight="SemiBold" />
                             <TextBlock
                                 Text="Analyze Windows cleanup handlers and free up disk space."
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                 TextWrapping="Wrap" />
                         </StackPanel>
                     </StackPanel>
@@ -217,7 +217,7 @@
                             <TextBlock Text="Internet repair" FontSize="22" FontWeight="SemiBold" />
                             <TextBlock
                                 Text="Run guided fixes for common connectivity problems."
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                 TextWrapping="Wrap" />
                         </StackPanel>
                     </StackPanel>

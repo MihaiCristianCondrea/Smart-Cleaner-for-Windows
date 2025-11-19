@@ -80,10 +80,6 @@
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
         </Page>
-        <Page Include="Shell\Themes\TextResources.xaml">
-            <Generator>MSBuild:Compile</Generator>
-            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-        </Page>
         <Page Include="Shell\Settings\SettingsView.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>

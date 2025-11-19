@@ -73,7 +73,7 @@
                         </Border>
 
                         <Grid
-                            x:Name="EmptyFoldersLayout"
+                            x:Name="EmptyFoldersLayout" <!--FIXME: Field 'EmptyFoldersLayout' is never used-->
                             Grid.Row="1"
                             ColumnSpacing="{StaticResource Spacing.Size240}">
                             <Grid.RowDefinitions>
@@ -81,8 +81,8 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition x:Name="EmptyFoldersPrimaryColumn" Width="*" />
-                                <ColumnDefinition x:Name="EmptyFoldersSecondaryColumn" Width="360" />
+                                <ColumnDefinition x:Name="EmptyFoldersPrimaryColumn" Width="*" /> <!--FIXME: Field 'EmptyFoldersPrimaryColumn' is never used-->
+                                <ColumnDefinition x:Name="EmptyFoldersSecondaryColumn" Width="360" /> <!--FIXME: Field 'EmptyFoldersSecondaryColumn' is never used-->
                             </Grid.ColumnDefinitions>
 
                             <VisualStateManager.VisualStateGroups>
@@ -126,7 +126,7 @@
                             </VisualStateManager.VisualStateGroups>
 
                             <StackPanel
-                                x:Name="EmptyFoldersPrimaryPanel"
+                                x:Name="EmptyFoldersPrimaryPanel" <!--FIXME: Field 'EmptyFoldersPrimaryPanel' is never used-->
                                 Grid.Column="0"
                                 Spacing="{StaticResource Spacing.Size160}">
                                 <Border Style="{StaticResource CardStyle}">
@@ -153,7 +153,7 @@
                                                 <TextBlock Text="Root folder" FontSize="22" FontWeight="SemiBold" />
                                                 <TextBlock
                                                     Text="Pick a starting location to scan for empty directories."
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                             </StackPanel>
                                         </StackPanel>
 
@@ -212,7 +212,7 @@
                                                 <TextBlock Text="Scan options" FontSize="22" FontWeight="SemiBold" />
                                                 <TextBlock
                                                     Text="Customize how the cleaner behaves before you run a scan."
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                             </StackPanel>
                                         </StackPanel>
 
@@ -227,7 +227,7 @@
                                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}" VerticalAlignment="Center">
                                                 <SymbolIcon
                                                     Symbol="Sort"
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                                 <TextBlock VerticalAlignment="Center" Text="Depth limit" />
                                                 <NumberBox
                                                     x:Name="DepthBox" x:FieldModifier="internal"
@@ -246,7 +246,7 @@
                                                 <TextBlock
                                                     Text="Use semicolons to separate names or wildcard patterns."
                                                     FontSize="12"
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                             </StackPanel>
                                         </StackPanel>
                                     </StackPanel>
@@ -254,7 +254,7 @@
                             </StackPanel>
 
                             <StackPanel
-                                x:Name="EmptyFoldersDetailsPanel"
+                                x:Name="EmptyFoldersDetailsPanel" <!--FIXME: Field 'EmptyFoldersDetailsPanel' is never used-->
                                 Grid.Row="0"
                                 Grid.Column="1"
                                 Spacing="{StaticResource Spacing.Size160}">
@@ -279,7 +279,7 @@
                                         <TextBlock
                                             x:Name="ActivityText" x:FieldModifier="internal"
                                             Text="Waiting for the next action."
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                             TextWrapping="Wrap" />
 
                                         <ProgressBar
@@ -321,24 +321,24 @@
 
                                         <StackPanel Spacing="{StaticResource Spacing.Size120}">
                                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
-                                                <SymbolIcon Symbol="PreviewLink" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <SymbolIcon Symbol="PreviewLink" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                                 <TextBlock
                                                     Text="Preview empty directories before committing to a cleanup."
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                     TextWrapping="Wrap" />
                                             </StackPanel>
                                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
-                                                <SymbolIcon Symbol="ProtectedDocument" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <SymbolIcon Symbol="ProtectedDocument" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                                 <TextBlock
                                                     Text="Recycle Bin support keeps removals safe."
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                     TextWrapping="Wrap" />
                                             </StackPanel>
                                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                                <SymbolIcon Symbol="Filter" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <SymbolIcon Symbol="Filter" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                                 <TextBlock
                                                     Text="Exclude directories with custom rules to stay in control."
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                     TextWrapping="Wrap" />
                                             </StackPanel>
                                         </StackPanel>
@@ -377,7 +377,7 @@
                                     Grid.Row="1"
                                     x:Name="ResultsCaption" x:FieldModifier="internal"
                                     Text="Preview results will appear here once you run a scan."
-                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                    Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
 
                                 <Grid Grid.Row="2" ColumnSpacing="12">
                                     <Grid.ColumnDefinitions>
@@ -452,7 +452,7 @@
                                         x:Name="InlineExclusionSummary" x:FieldModifier="internal"
                                         Text="No inline exclusions applied."
                                         HorizontalAlignment="Right"
-                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                         VerticalAlignment="Center" />
                                 </Grid>
 
@@ -490,7 +490,7 @@
                         <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" />
                         <TextBlock Text="{x:Bind RelativePath}"
                                    FontSize="12"
-                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                   Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                     </StackPanel>
 
                     <StackPanel
