@@ -15,9 +15,13 @@
         <Nullable>enable</Nullable>
         <DefaultLanguage>en-US</DefaultLanguage>
         <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-        <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
         <ProjectPriFileName>SmartCleanerForWindows.pri</ProjectPriFileName>
         <EnableDefaultPageItems>false</EnableDefaultPageItems>
+
+        <!-- VITAL FIX: Explicitly tell the compiler to use your custom Program class -->
+        <StartupObject>SmartCleanerForWindows.Program</StartupObject>
+
+        <!-- Keep this to attempt to suppress generation, though StartupObject makes it optional -->
         <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
     </PropertyGroup>
 
@@ -60,12 +64,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <!-- Ensure App.xaml is treated as the application definition, matching PowerToys' explicit removal pattern. -->
         <Page Remove="Shell\App.xaml" />
     </ItemGroup>
 
     <ItemGroup>
-        <!-- Explicitly include WinUI entrypoints and views so their XAML is compiled and packaged. -->
         <ApplicationDefinition Include="Shell\App.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
@@ -172,5 +174,5 @@
       <None Remove="inspiration\Source\Includes\Versioning.au3" />
       <None Remove="inspiration\ComIntRep.ini" />
     </ItemGroup>
-    
+
 </Project>

@@ -23,7 +23,7 @@ public static class Program
     private static readonly WindowsAppSdkConfiguration WindowsAppSdk = WindowsAppSdkConfiguration.Load();
 
     [STAThread]
-    public static void Main(string[]? args) // FIXME: Program 'SmartCleanerForWindows.dll' has more than one entry point defined
+    public static void Main(string[]? args)
     {
         LoggingConfiguration.Initialize(args);
         Log.Information("Program.Main reached. DISABLE_XAML_GENERATED_MAIN entrypoint active.");
