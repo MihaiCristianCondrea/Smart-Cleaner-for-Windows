@@ -18,6 +18,7 @@
         <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
         <ProjectPriFileName>SmartCleanerForWindows.pri</ProjectPriFileName>
         <EnableDefaultPageItems>false</EnableDefaultPageItems>
+        <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -171,4 +172,5 @@
       <None Remove="inspiration\Source\Includes\Versioning.au3" />
       <None Remove="inspiration\ComIntRep.ini" />
     </ItemGroup>
+    
 </Project>

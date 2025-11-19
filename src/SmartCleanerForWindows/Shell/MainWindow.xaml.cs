@@ -38,7 +38,7 @@ using SmartCleanerForWindows.Settings;
 
 namespace SmartCleanerForWindows.Shell;
 
-public sealed partial class MainWindow : Window, IEmptyFolderCleanupView // FIXME: Base type 'Window' is already specified in other parts
+public sealed partial class MainWindow : IEmptyFolderCleanupView
 {
     private readonly IDiskCleanupService _diskCleanupService;
     private readonly IStorageOverviewService _storageOverviewService;
@@ -47,7 +47,7 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView // FIXM
     private CancellationTokenSource? _cts;
     private MicaController? _mica;
     private SystemBackdropConfiguration? _backdropConfig;
-    private readonly EmptyFolderCleanupController _emptyFolderController;
+    private readonly EmptyFolderCleanupController _emptyFolderController = null!;
     private readonly List<string> _previewCandidates = new();
     private readonly ObservableCollection<EmptyFolderNode> _emptyFolderRoots = new();
     private readonly ObservableCollection<EmptyFolderNode> _filteredEmptyFolderRoots = new();
@@ -96,12 +96,7 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView // FIXM
     private readonly Dictionary<string, UIElement> _viewKeyLookup = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, ToolSettingsSnapshot> _settingsSnapshots = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<UIElement> _allViews = [];
-    private string? _currentToolId; // FIXME: Field '_currentToolId' is assigned but its value is never used
-
-    private NavigationViewItem? DashboardItem => FindNavigationItem(DashboardToolId); // FIXME: Property 'DashboardItem' is never used
-    private NavigationViewItem? EmptyFoldersItem => FindNavigationItem(EmptyFoldersToolId); // FIXME: Property 'EmptyFoldersItem' is never used
-    private NavigationViewItem? LargeFilesItem => FindNavigationItem(LargeFilesToolId); // FIXME: Property 'LargeFilesItem' is never used
-    private NavigationViewItem? InternetRepairItem => FindNavigationItem(InternetRepairToolId); // FIXME: Property 'InternetRepairItem' is never used
+    private string? _currentToolId;
 
     private const string ThemePreferenceKey = "Settings.ThemePreference";
     private const string AccentPreferenceKey = "Settings.AccentPreference";
@@ -110,18 +105,12 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView // FIXM
     private const string ThemePreferenceDefault = "default";
     private const string AccentPreferenceZest = "zest";
     private const string AccentPreferenceDefault = "default";
-    private const string CleanerRecyclePreferenceKey = "Settings.Cleaner.SendToRecycleBin"; // FIXME: Constant 'CleanerRecyclePreferenceKey' is never used
-    private const string CleanerDepthPreferenceKey = "Settings.Cleaner.DepthLimit"; // FIXME: Constant 'CleanerDepthPreferenceKey' is never used
-    private const string CleanerExclusionsPreferenceKey = "Settings.Cleaner.Exclusions"; // FIXME: Constant 'CleanerExclusionsPreferenceKey' is never used
-    private const string AutomationAutoPreviewKey = "Settings.Automation.AutoPreview"; // FIXME: Constant 'AutomationAutoPreviewKey' is never used
-    private const string AutomationReminderKey = "Settings.Automation.Reminder"; // FIXME: Constant 'AutomationReminderKey' is never used
     private const string NotificationShowCompletionKey = "Settings.Notifications.ShowCompletion";
     private const string NotificationDesktopAlertsKey = "Settings.Notifications.DesktopAlerts";
     private const string HistoryRetentionKey = "Settings.History.RetentionDays";
     private const int HistoryRetentionDefaultDays = 30;
     private const int HistoryRetentionMinDays = 0;
     private const int HistoryRetentionMaxDays = 365;
-    private const string LargeFilesExclusionsKey = "LargeFiles.Exclusions"; // FIXME: Constant 'LargeFilesExclusionsKey' is never used
     private const string DashboardToolId = "dashboard";
     private const string EmptyFoldersToolId = "emptyFolders";
     private const string LargeFilesToolId = "largeFiles";
@@ -185,7 +174,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     {
     }
 
-    private MainWindow( // FIXME: Non-nullable field '_emptyFolderController' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the field as nullable.
+    private MainWindow(
         IDirectoryCleaner directoryCleaner,
         IDiskCleanupService diskCleanupService,
         IStorageOverviewService storageOverviewService,
@@ -314,7 +303,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         Closed += OnClosed;
 
         InitializeViewRegistry();
-        _toolSettingsService.SettingsChanged += OnToolSettingsChanged; // FIXME: Argument type 'method group' is not assignable to parameter type 'EventHandler<ToolSettingsChangedEventArgs>?'
+        _toolSettingsService.SettingsChanged += OnToolSettingsChanged;
         BuildToolNavigation();
         NavigateToTool(DashboardToolId);
     }
@@ -504,11 +493,16 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         var item = new NavigationViewItem
         {
             Content = definition.Title,
-            Tag = definition.Id,
-            ToolTip = definition.Description // FIXME: Cannot resolve symbol 'ToolTip'
+            Tag = definition.Id
         };
 
-        if (definition.Icon is string icon && Enum.TryParse(icon, ignoreCase: true, out Symbol symbol)) // FIXME: Use not null pattern instead of a type check succeeding on any not-null value
+        if (!string.IsNullOrWhiteSpace(definition.Description))
+        {
+            ToolTipService.SetToolTip(item, definition.Description);
+        }
+
+        if (!string.IsNullOrWhiteSpace(definition.Icon) &&
+            Enum.TryParse(definition.Icon, ignoreCase: true, out Symbol symbol))
         {
             item.Icon = new SymbolIcon(symbol);
         }
@@ -593,27 +587,6 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         ShowPage(target);
     }
 
-    private void NavigateTo(object? target) // FIXME: Method 'NavigateTo' is never used
-    {
-        if (target is string toolId)
-        {
-            NavigateToTool(toolId);
-            return;
-        }
-
-        if (target is null)
-        {
-            return;
-        }
-
-        if (!Equals(RootNavigation.SelectedItem, target))
-        {
-            RootNavigation.SelectedItem = target;
-        }
-
-        ShowPage(target);
-    }
-
     private void NavigateToTool(string toolId)
     {
         var target = FindNavigationItem(toolId);
@@ -635,12 +608,22 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         var settingsItem = RootNavigation.SettingsItem;
         if (settingsItem is not null && Equals(item, settingsItem))
         {
+            _currentToolId = null;
             ActivateView(SettingsView);
             return;
         }
 
         if (item is not NavigationViewItem { Tag: string toolId } ||
-            !_toolViewLookup.TryGetValue(toolId, out var view)) return;
+            !_toolViewLookup.TryGetValue(toolId, out var view))
+        {
+            return;
+        }
+
+        if (string.Equals(_currentToolId, toolId, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
         _currentToolId = toolId;
         ActivateView(view);
 
@@ -669,7 +652,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         }
     }
 
-    private void PlayEntranceTransition(UIElement view)
+    private static void PlayEntranceTransition(UIElement view)
     {
         if (view.XamlRoot is null)
         {
@@ -862,41 +845,25 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     {
         var name = drive.Name.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         var label = drive.VolumeLabel;
-        if (string.IsNullOrWhiteSpace(label))
-        {
-            return name;
-        }
-
-        return string.Format(CultureInfo.CurrentCulture, "{0} ({1})", name, label);
+        return string.IsNullOrWhiteSpace(label) ? name : string.Format(CultureInfo.CurrentCulture, "{0} ({1})", name, label);
     }
 
     private static string GetStorageTip(DriveUsageViewModel drive)
     {
         var usageDetail = drive.UsageSummary;
 
-        if (drive.UsedPercentage >= 90)
+        return drive.UsedPercentage switch
         {
-            return string.Format(
-                CultureInfo.CurrentCulture,
-                "{0} is running low on space ({1}). Remove large files or move content to free up storage.",
-                drive.Name,
-                usageDetail);
-        }
-
-        if (drive.UsedPercentage >= 75)
-        {
-            return string.Format(
-                CultureInfo.CurrentCulture,
+            >= 90 => string.Format(CultureInfo.CurrentCulture,
+                "{0} is running low on space ({1}). Remove large files or move content to free up storage.", drive.Name,
+                usageDetail),
+            >= 75 => string.Format(CultureInfo.CurrentCulture,
                 "{0} is getting crowded ({1}). Consider cleaning temporary files or uninstalling unused apps.",
-                drive.Name,
-                usageDetail);
-        }
-
-        return string.Format(
-            CultureInfo.CurrentCulture,
-            "{0} has plenty of room ({1}). Keep performing periodic cleanups to stay optimized.",
-            drive.Name,
-            usageDetail);
+                drive.Name, usageDetail),
+            _ => string.Format(CultureInfo.CurrentCulture,
+                "{0} has plenty of room ({1}). Keep performing periodic cleanups to stay optimized.", drive.Name,
+                usageDetail)
+        };
     }
 
 
@@ -1247,6 +1214,4 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             return false;
         }
     }
-
-
 }

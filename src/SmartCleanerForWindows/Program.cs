@@ -17,7 +17,7 @@ using WinRT;
 
 namespace SmartCleanerForWindows;
 
-public abstract class Program
+public static class Program
 {
     private const uint WindowsAppSdkMajorMinor = 0x00010008;
     private static readonly WindowsAppSdkConfiguration WindowsAppSdk = WindowsAppSdkConfiguration.Load();
@@ -338,12 +338,7 @@ public abstract class Program
             }
 
             var trimmed = channel.Trim();
-            if (trimmed.Equals("release", StringComparison.OrdinalIgnoreCase))
-            {
-                return "stable";
-            }
-
-            return trimmed.ToLowerInvariant();
+            return trimmed.Equals("release", StringComparison.OrdinalIgnoreCase) ? "stable" : trimmed.ToLowerInvariant();
         }
 
         private static bool TryGetPackageVersion(string version, out DynamicDependencyPackageVersion packageVersion)
@@ -389,17 +384,7 @@ public abstract class Program
             }
 
             var segment = components[index];
-            if (string.IsNullOrEmpty(segment))
-            {
-                return false;
-            }
-
-            if (!ushort.TryParse(segment, out value))
-            {
-                return false;
-            }
-
-            return true;
+            return !string.IsNullOrEmpty(segment) && ushort.TryParse(segment, out value);
         }
     }
 }

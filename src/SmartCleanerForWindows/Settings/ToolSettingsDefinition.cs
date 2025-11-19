@@ -32,7 +32,7 @@ public sealed class ToolSettingsDefinition
     public IReadOnlyList<ToolSettingField> Fields { get; init; } = Array.Empty<ToolSettingField>();
 
     [JsonIgnore]
-    public string? DefinitionPath { get; init; }
+    public string? DefinitionPath { get; internal set; }
 
     public JsonObject CreateDefaultValues()
     {

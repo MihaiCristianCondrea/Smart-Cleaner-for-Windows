@@ -11,17 +11,16 @@ namespace SmartCleanerForWindows.Settings;
 
 public sealed class ToolSettingsService : IDisposable
 {
-    private readonly ToolSettingsCatalog _catalog; // FIXME: The field is always assigned before being used and can be converted into a local variable
     private readonly ToolSettingsStore _store;
     private readonly FileSystemWatcher _watcher;
     private readonly ConcurrentDictionary<string, ToolSettingsSnapshot> _snapshots = new(StringComparer.OrdinalIgnoreCase);
     private bool _disposed;
 
-    public ToolSettingsService(string? definitionRoot = null, string? userRoot = null)
+    private ToolSettingsService(string? definitionRoot = null, string? userRoot = null)
     {
-        _catalog = new ToolSettingsCatalog(definitionRoot);
+        var catalog = new ToolSettingsCatalog(definitionRoot);
         _store = new ToolSettingsStore(userRoot);
-        var definitions = _catalog.LoadDefinitions();
+        var definitions = catalog.LoadDefinitions();
         foreach (var definition in definitions)
         {
             var values = _store.LoadValues(definition);
@@ -65,10 +64,15 @@ public sealed class ToolSettingsService : IDisposable
             return;
         }
 
-        snapshot.Values = values; // FIXME: Init-only property 'SmartCleanerForWindows.Settings.ToolSettingsSnapshot.Values' can only be assigned in an object initializer, or on 'this' or 'base' in an instance constructor or an 'init' accessor
-        _snapshots[toolId] = snapshot;
+        var updatedSnapshot = new ToolSettingsSnapshot
+        {
+            Definition = snapshot.Definition,
+            Values = CloneValues(values)
+        };
+
+        _snapshots[toolId] = updatedSnapshot;
         await Task.Run(() => _store.SaveValues(toolId, values), cancellationToken).ConfigureAwait(false);
-        OnSettingsChanged(snapshot);
+        OnSettingsChanged(updatedSnapshot);
     }
 
     private void OnFileChanged(object sender, FileSystemEventArgs e)
@@ -87,9 +91,14 @@ public sealed class ToolSettingsService : IDisposable
         try
         {
             var updatedValues = _store.LoadValues(snapshot.Definition);
-            snapshot.Values = updatedValues; // FIXME: Init-only property 'SmartCleanerForWindows.Settings.ToolSettingsSnapshot.Values' can only be assigned in an object initializer, or on 'this' or 'base' in an instance constructor or an 'init' accessor
-            _snapshots[toolId] = snapshot;
-            OnSettingsChanged(snapshot);
+            var updatedSnapshot = new ToolSettingsSnapshot
+            {
+                Definition = snapshot.Definition,
+                Values = updatedValues
+            };
+
+            _snapshots[toolId] = updatedSnapshot;
+            OnSettingsChanged(updatedSnapshot);
         }
         catch
         {
@@ -115,7 +124,6 @@ public sealed class ToolSettingsService : IDisposable
 
         _watcher.Dispose();
         _disposed = true;
-        GC.SuppressFinalize(this); // FIXME: 'GC.SuppressFinalize' is invoked for type without destructor
     }
 
     public static ToolSettingsService CreateDefault()
