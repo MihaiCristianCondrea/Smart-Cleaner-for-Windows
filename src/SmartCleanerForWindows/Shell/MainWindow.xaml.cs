@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -35,6 +36,7 @@ using System.Security.Principal;
 using Microsoft.UI.Xaml.Markup;
 using SmartCleanerForWindows.Core.DiskCleanup;
 using SmartCleanerForWindows.Settings;
+using AppDataPaths = SmartCleanerForWindows.Diagnostics.AppDataPaths;
 
 namespace SmartCleanerForWindows.Shell;
 
@@ -360,6 +362,13 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             fallbackInfoBrush = resolvedBrush;
         }
 
+        var openLogsButton = new Button
+        {
+            Content = "Open logs folder",
+            HorizontalAlignment = HorizontalAlignment.Center
+        };
+        openLogsButton.Click += OnFallbackOpenLogs;
+
         Content = new Grid
         {
             Background = Application.Current?.Resources?["ApplicationPageBackgroundThemeBrush"] as Brush,
@@ -392,11 +401,30 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                             MaxWidth = 480,
                             HorizontalAlignment = HorizontalAlignment.Center,
                             Foreground = fallbackInfoBrush
-                        }
+                        },
+                        openLogsButton
                     }
                 }
             }
         };
+    }
+
+    private static void OnFallbackOpenLogs(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = AppDataPaths.GetLogsDirectory(),
+                UseShellExecute = true
+            };
+
+            Process.Start(startInfo);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to open logs directory from fallback shell.");
+        }
     }
 
     private void OnClosed(object sender, WindowEventArgs args)
