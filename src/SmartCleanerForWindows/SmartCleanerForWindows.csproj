@@ -176,12 +176,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Remove="Settings\ToolSettingField.cs" />
-      <Compile Remove="Settings\ToolSettingFieldType.cs" />
-      <Compile Remove="Settings\ToolSettingOption.cs" />
-      <Compile Remove="Settings\ToolSettingsCatalog.cs" />
-      <Compile Remove="Settings\ToolSettingsChangedEventArgs.cs" />
-      <Compile Remove="Settings\ToolSettingsStore.cs" />
+      <Compile Remove="Settings\**\*.cs" />
+      <EmbeddedResource Remove="Settings\**\*.*" />
+      <None Remove="Settings\**\*.*" />
     </ItemGroup>
 
 </Project>
