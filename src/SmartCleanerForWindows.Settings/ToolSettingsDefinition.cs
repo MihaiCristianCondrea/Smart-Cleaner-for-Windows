@@ -3,7 +3,8 @@ using System.Text.Json.Serialization;
 
 namespace SmartCleanerForWindows.Settings;
 
-public sealed class ToolSettingsDefinition
+// Change 'class' to 'record'
+public sealed record ToolSettingsDefinition
 {
     [JsonPropertyName("id")]
     public required string Id { get; init; }
@@ -40,22 +41,14 @@ public sealed class ToolSettingsDefinition
         {
             foreach (var pair in Defaults)
             {
-                if (pair.Value is null)
-                {
-                    continue;
-                }
-
+                if (pair.Value is null) continue;
                 root[pair.Key] = pair.Value.DeepClone();
             }
         }
 
         foreach (var field in Fields)
         {
-            if (field.DefaultValue is null || root.ContainsKey(field.Key))
-            {
-                continue;
-            }
-
+            if (field.DefaultValue is null || root.ContainsKey(field.Key)) continue;
             root[field.Key] = field.DefaultValue.DeepClone();
         }
 

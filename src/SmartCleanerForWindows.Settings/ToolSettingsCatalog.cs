@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace SmartCleanerForWindows.Settings;
 
-public sealed class ToolSettingsCatalog
+public sealed class ToolSettingsCatalog(string? definitionRoot = null)
 {
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
@@ -13,12 +13,7 @@ public sealed class ToolSettingsCatalog
         Converters = { new JsonStringEnumConverter() }
     };
 
-    private readonly string _definitionRoot;
-
-    public ToolSettingsCatalog(string? definitionRoot = null)
-    {
-        _definitionRoot = definitionRoot ?? ToolSettingsPaths.GetDefinitionRoot();
-    }
+    private readonly string _definitionRoot = definitionRoot ?? ToolSettingsPaths.GetDefinitionRoot();
 
     public IReadOnlyList<ToolSettingsDefinition> LoadDefinitions()
     {
@@ -39,7 +34,7 @@ public sealed class ToolSettingsCatalog
                     continue;
                 }
 
-                definitions.Add(definition with { DefinitionPath = file });
+                definitions.Add(definition with { DefinitionPath = file }); // FIXME: The receiver type 'SmartCleanerForWindows.Settings.ToolSettingsDefinition' is not a valid record or value type
             }
             catch
             {
