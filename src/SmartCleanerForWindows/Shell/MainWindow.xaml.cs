@@ -127,7 +127,6 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4
 AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4
 AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4
 AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4
-AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4
 AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
 """;
     private static readonly string[] AccentResourceKeys =
@@ -354,9 +353,16 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             }
         }
 
+        var fallbackInfoBrush = new SolidColorBrush(Colors.Gray);
+        if (Application.Current?.Resources?.TryGetValue("TextFillColorSecondaryBrush", out var resourceValue) == true
+            && resourceValue is SolidColorBrush resolvedBrush)
+        {
+            fallbackInfoBrush = resolvedBrush;
+        }
+
         Content = new Grid
         {
-            Background = Application.Current.Resources["ApplicationPageBackgroundThemeBrush"] as Brush,
+            Background = Application.Current?.Resources?["ApplicationPageBackgroundThemeBrush"] as Brush,
             Children =
             {
                 new StackPanel
@@ -385,7 +391,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                             TextWrapping = TextWrapping.Wrap,
                             MaxWidth = 480,
                             HorizontalAlignment = HorizontalAlignment.Center,
-                            Foreground = Application.Current.Resources["TextFillColorSecondaryBrush"] as Brush
+                            Foreground = fallbackInfoBrush
                         }
                     }
                 }
@@ -396,26 +402,40 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     private void OnClosed(object sender, WindowEventArgs args)
     {
         Activated -= OnWindowActivated;
-        _cts?.Cancel();
-        _cts?.Dispose();
-        _cts = null;
+
+        _cts = SafeCancelAndDispose(_cts);
+
         _mica?.Dispose();
         _mica = null;
         _backdropConfig = null;
-        _diskCleanupCts?.Cancel();
-        _diskCleanupCts?.Dispose();
-        _diskCleanupCts = null;
-        _largeFilesCts?.Cancel();
-        _largeFilesCts?.Dispose();
-        _largeFilesCts = null;
-        _internetRepairCts?.Cancel();
-        _internetRepairCts?.Dispose();
-        _internetRepairCts = null;
-        _storageOverviewCts?.Cancel();
-        _storageOverviewCts?.Dispose();
-        _storageOverviewCts = null;
+
+        _diskCleanupCts = SafeCancelAndDispose(_diskCleanupCts);
+        _largeFilesCts = SafeCancelAndDispose(_largeFilesCts);
+        _internetRepairCts = SafeCancelAndDispose(_internetRepairCts);
+        _storageOverviewCts = SafeCancelAndDispose(_storageOverviewCts);
+
         _toolSettingsService.SettingsChanged -= OnToolSettingsChanged;
         _toolSettingsService.Dispose();
+    }
+
+    private static CancellationTokenSource? SafeCancelAndDispose(CancellationTokenSource? cts)
+    {
+        if (cts is null)
+        {
+            return null;
+        }
+
+        try
+        {
+            cts.Cancel();
+        }
+        catch (ObjectDisposedException)
+        {
+            // Ignored.
+        }
+
+        cts.Dispose();
+        return null;
     }
 
     private void OnNavigationLoaded(object sender, RoutedEventArgs e)
@@ -587,7 +607,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         ShowPage(target);
     }
 
-    private void NavigateToTool(string toolId)
+private void NavigateToTool(string toolId)
     {
         var target = FindNavigationItem(toolId);
         if (target is null)
@@ -873,7 +893,17 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         {
             var picker = new FolderPicker();
             picker.FileTypeFilter.Add("*");
-            InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
+            
+            try
+            {
+                InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to initialize folder picker.");
+                // Optionally, show a user-friendly error message here.
+            }
+
             var folder = await picker.PickSingleFolderAsync();
             if (folder is null)
             {
