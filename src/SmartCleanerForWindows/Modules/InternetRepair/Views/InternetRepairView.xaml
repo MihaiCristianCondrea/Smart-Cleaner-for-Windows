@@ -9,7 +9,7 @@
 
                 <ScrollViewer
                     HorizontalScrollBarVisibility="Disabled">
-                    <Grid Padding="{StaticResource Padding.Page}" RowSpacing="{StaticResource Spacing.Size240}">
+                    <Grid Padding="32" RowSpacing="24">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
@@ -18,10 +18,10 @@
                         <Border
                             x:Name="InternetRepairStatusHero" x:FieldModifier="internal"
                             Grid.Row="0"
-                            Background="{StaticResource Brush.Hero.Neutral}"
+                            Background="{ThemeResource AccentFillColorTertiaryBrush}"
                             CornerRadius="28"
-                            Padding="{StaticResource Padding.Hero}">
-                            <Grid ColumnSpacing="{StaticResource Spacing.Size240}">
+                            Padding="28">
+                            <Grid ColumnSpacing="24">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
@@ -42,7 +42,7 @@
                                         VerticalAlignment="Center" />
                                 </Border>
 
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="{StaticResource Spacing.Size80}">
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="8">
                                     <TextBlock Text="Internet repair" Foreground="#B3FFFFFF" FontWeight="SemiBold" />
                                     <TextBlock
                                         x:Name="InternetRepairStatusTitle" x:FieldModifier="internal"
@@ -58,7 +58,7 @@
                                         TextWrapping="WrapWholeWords" />
                                 </StackPanel>
 
-                                <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="{StaticResource Spacing.Size40}">
+                                <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="4">
                                     <TextBlock Text="Selected repairs" Foreground="#B3FFFFFF" />
                                     <InfoBadge
                                         x:Name="InternetRepairResultBadge" x:FieldModifier="internal"
@@ -77,7 +77,7 @@
                         <Grid
                             x:Name="InternetRepairLayout"
                             Grid.Row="1"
-                            ColumnSpacing="{StaticResource Spacing.Size240}">
+                            ColumnSpacing="24">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
@@ -95,7 +95,7 @@
                                         </VisualState.StateTriggers>
                                         <VisualState.Setters>
                                             <Setter Target="InternetRepairSecondaryColumn.Width" Value="0" />
-                                            <Setter Target="InternetRepairLayout.ColumnSpacing" Value="{StaticResource Spacing.Size160}" />
+                                            <Setter Target="InternetRepairLayout.ColumnSpacing" Value="16" />
                                             <Setter Target="InternetRepairPrimaryPanel.(Grid.ColumnSpan)" Value="2" />
                                             <Setter Target="InternetRepairSecondaryPanel.(Grid.Row)" Value="1" />
                                             <Setter Target="InternetRepairSecondaryPanel.(Grid.Column)" Value="0" />
@@ -108,7 +108,7 @@
                                         </VisualState.StateTriggers>
                                         <VisualState.Setters>
                                             <Setter Target="InternetRepairSecondaryColumn.Width" Value="360" />
-                                            <Setter Target="InternetRepairLayout.ColumnSpacing" Value="{StaticResource Spacing.Size240}" />
+                                            <Setter Target="InternetRepairLayout.ColumnSpacing" Value="24" />
                                             <Setter Target="InternetRepairPrimaryPanel.(Grid.ColumnSpan)" Value="1" />
                                             <Setter Target="InternetRepairSecondaryPanel.(Grid.Row)" Value="0" />
                                             <Setter Target="InternetRepairSecondaryPanel.(Grid.Column)" Value="1" />
@@ -121,10 +121,10 @@
                             <StackPanel
                                 x:Name="InternetRepairPrimaryPanel"
                                 Grid.Column="0"
-                                Spacing="{StaticResource Spacing.Size160}">
-                                <Border Style="{StaticResource CardStyle}">
-                                    <StackPanel Spacing="{StaticResource Spacing.Size200}">
-                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                Spacing="16">
+                                <Border Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="20" Padding="24">
+                                    <StackPanel Spacing="20">
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
                                             <Border
                                                 Width="40"
                                                 Height="40"
@@ -146,22 +146,22 @@
                                             </StackPanel>
                                         </StackPanel>
 
-                                        <StackPanel Spacing="{StaticResource Spacing.Size120}">
+                                        <StackPanel Spacing="12">
                                             <TextBlock
                                                 x:Name="InternetRepairActivityText" x:FieldModifier="internal"
                                                 Text="Waiting to start a repair."
                                                 Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                 TextWrapping="Wrap" />
                                             <ProgressBar x:Name="InternetRepairProgress" x:FieldModifier="internal" Height="6" Minimum="0" Maximum="100" Visibility="Collapsed" />
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{StaticResource Spacing.Size80}">
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
                                                 <Button x:Name="InternetRepairRunBtn" x:FieldModifier="internal" Click="OnInternetRepairRun">
-                                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6">
                                                         <SymbolIcon Symbol="Play" />
                                                         <TextBlock Text="Fix now" />
                                                     </StackPanel>
                                                 </Button>
                                                 <Button x:Name="InternetRepairCancelBtn" x:FieldModifier="internal" Click="OnInternetRepairCancel" Visibility="Collapsed" IsEnabled="False">
-                                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6">
                                                         <SymbolIcon Symbol="Cancel" />
                                                         <TextBlock Text="Cancel" />
                                                     </StackPanel>
@@ -171,9 +171,9 @@
                                     </StackPanel>
                                 </Border>
 
-                                <Border Style="{StaticResource CardStyle}">
-                                    <StackPanel Spacing="{StaticResource Spacing.Size200}">
-                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                <Border Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="20" Padding="24">
+                                    <StackPanel Spacing="20">
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
                                             <Border
                                                 Width="40"
                                                 Height="40"
@@ -195,7 +195,7 @@
                                             </StackPanel>
                                         </StackPanel>
 
-                                        <StackPanel Spacing="{StaticResource Spacing.Size120}">
+                                        <StackPanel Spacing="12">
                                             <TextBlock
                                                 x:Name="InternetRepairLogPlaceholder" x:FieldModifier="internal"
                                                 Text="Log entries will appear here once you run a repair."
@@ -206,12 +206,12 @@
                                                 MinHeight="200">
                                                 <ListView.ItemTemplate>
                                                     <DataTemplate x:DataType="ir:InternetRepairLogEntry">
-                                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                                        <StackPanel Orientation="Horizontal" Spacing="12">
                                                             <SymbolIcon
                                                                 Symbol="{x:Bind Icon}"
                                                                 Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                                 VerticalAlignment="Center" />
-                                                            <StackPanel Spacing="{StaticResource Spacing.Size40}">
+                                                            <StackPanel Spacing="4">
                                                                 <TextBlock Text="{x:Bind Title}" FontWeight="SemiBold" TextWrapping="Wrap" />
                                                                 <TextBlock
                                                                     Text="{x:Bind Description}"
@@ -232,10 +232,10 @@
                                 x:Name="InternetRepairSecondaryPanel"
                                 Grid.Row="0"
                                 Grid.Column="1"
-                                Spacing="{StaticResource Spacing.Size160}">
-                                <Border Style="{StaticResource CardStyle}">
-                                    <StackPanel Spacing="{StaticResource Spacing.Size200}">
-                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                Spacing="16">
+                                <Border Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="20" Padding="24">
+                                    <StackPanel Spacing="20">
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
                                             <Border
                                                 Width="40"
                                                 Height="40"
@@ -257,13 +257,13 @@
                                             </StackPanel>
                                         </StackPanel>
 
-                                        <StackPanel Spacing="{StaticResource Spacing.Size160}">
+                                        <StackPanel Spacing="16">
                                             <CheckBox
                                                 x:Name="InternetRepairWinsockChk" x:FieldModifier="internal"
                                                 Tag="winsock"
                                                 Checked="OnInternetRepairActionSelectionChanged"
                                                 Unchecked="OnInternetRepairActionSelectionChanged">
-                                                <StackPanel Spacing="{StaticResource Spacing.Size40}">
+                                                <StackPanel Spacing="4">
                                                     <TextBlock Text="Reset Winsock catalog" FontWeight="SemiBold" />
                                                     <TextBlock
                                                         Text="Repairs socket corruption that can break connectivity."
@@ -277,7 +277,7 @@
                                                 Tag="ipreset"
                                                 Checked="OnInternetRepairActionSelectionChanged"
                                                 Unchecked="OnInternetRepairActionSelectionChanged">
-                                                <StackPanel Spacing="{StaticResource Spacing.Size40}">
+                                                <StackPanel Spacing="4">
                                                     <TextBlock Text="Reset TCP/IP stack" FontWeight="SemiBold" />
                                                     <TextBlock
                                                         Text="Rebuilds the IP stack and reverts advanced network tweaks."
@@ -291,7 +291,7 @@
                                                 Tag="dnsflush"
                                                 Checked="OnInternetRepairActionSelectionChanged"
                                                 Unchecked="OnInternetRepairActionSelectionChanged">
-                                                <StackPanel Spacing="{StaticResource Spacing.Size40}">
+                                                <StackPanel Spacing="4">
                                                     <TextBlock Text="Flush DNS cache" FontWeight="SemiBold" />
                                                     <TextBlock
                                                         Text="Clears cached DNS records to resolve name lookup issues."
@@ -305,7 +305,7 @@
                                                 Tag="iprelease"
                                                 Checked="OnInternetRepairActionSelectionChanged"
                                                 Unchecked="OnInternetRepairActionSelectionChanged">
-                                                <StackPanel Spacing="{StaticResource Spacing.Size40}">
+                                                <StackPanel Spacing="4">
                                                     <TextBlock Text="Release IP address" FontWeight="SemiBold" />
                                                     <TextBlock
                                                         Text="Drops the current lease so you can request a fresh address."
@@ -319,7 +319,7 @@
                                                 Tag="iprenew"
                                                 Checked="OnInternetRepairActionSelectionChanged"
                                                 Unchecked="OnInternetRepairActionSelectionChanged">
-                                                <StackPanel Spacing="{StaticResource Spacing.Size40}">
+                                                <StackPanel Spacing="4">
                                                     <TextBlock Text="Renew IP address" FontWeight="SemiBold" />
                                                     <TextBlock
                                                         Text="Requests a new DHCP lease from the network."
@@ -333,7 +333,7 @@
                                                 Tag="proxy"
                                                 Checked="OnInternetRepairActionSelectionChanged"
                                                 Unchecked="OnInternetRepairActionSelectionChanged">
-                                                <StackPanel Spacing="{StaticResource Spacing.Size40}">
+                                                <StackPanel Spacing="4">
                                                     <TextBlock Text="Reset WinHTTP proxy" FontWeight="SemiBold" />
                                                     <TextBlock
                                                         Text="Clears system proxy settings that might block traffic."
@@ -345,9 +345,9 @@
                                     </StackPanel>
                                 </Border>
 
-                                <Border Style="{StaticResource CardStyle}">
-                                    <StackPanel Spacing="{StaticResource Spacing.Size200}">
-                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                <Border Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="20" Padding="24">
+                                    <StackPanel Spacing="20">
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
                                             <Border
                                                 Width="40"
                                                 Height="40"
@@ -369,15 +369,15 @@
                                             </StackPanel>
                                         </StackPanel>
 
-                                        <StackPanel Spacing="{StaticResource Spacing.Size120}">
-                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
+                                        <StackPanel Spacing="12">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
                                                 <SymbolIcon Symbol="Shop" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                                 <TextBlock
                                                     Text="Run Smart Cleaner as an administrator for the best results."
                                                     Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                     TextWrapping="Wrap" />
                                             </StackPanel>
-                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
                                                 <SymbolIcon Symbol="Refresh" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                                 <TextBlock
                                                     Text="Restart Windows after applying repairs if you still have trouble."

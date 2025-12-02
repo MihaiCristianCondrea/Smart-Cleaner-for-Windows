@@ -505,14 +505,17 @@ public sealed partial class MainWindow
         _ = _toolSettingsService.UpdateAsync(DashboardToolId, snapshot.Values);
     }
 
-    private static Color GetZestAccentColor()
+    private static Color GetZestAccentColor() => GetSystemAccentColor();
+
+    private static Color GetSystemAccentColor(double opacity = 1)
     {
-        if (Application.Current.Resources.TryGetValue("Color.BrandPrimary", out var value) && value is Color color)
+        if (Application.Current.Resources.TryGetValue("SystemAccentColor", out var value) && value is Color color)
         {
-            return color;
+            return Color.FromArgb((byte)Math.Round(255 * opacity), color.R, color.G, color.B);
         }
 
-        return Color.FromArgb(255, 0x00, 0x67, 0xC0);
+        var fallback = Color.FromArgb(255, 0, 120, 215);
+        return Color.FromArgb((byte)Math.Round(255 * opacity), fallback.R, fallback.G, fallback.B);
     }
 
     private void CaptureDefaultAccentColors()

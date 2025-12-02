@@ -8,7 +8,7 @@
 
                 <ScrollViewer
                     HorizontalScrollBarVisibility="Disabled">
-                    <Grid Padding="{StaticResource Padding.Page}" RowSpacing="{StaticResource Spacing.Size240}">
+                    <Grid Padding="32" RowSpacing="24">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
@@ -17,10 +17,10 @@
                         <Border
                             x:Name="LargeFilesStatusHero" x:FieldModifier="internal"
                             Grid.Row="0"
-                            Background="{StaticResource Brush.Hero.Neutral}"
+                            Background="{ThemeResource AccentFillColorTertiaryBrush}"
                             CornerRadius="28"
-                            Padding="{StaticResource Padding.Hero}">
-                            <Grid ColumnSpacing="{StaticResource Spacing.Size240}">
+                            Padding="28">
+                            <Grid ColumnSpacing="24">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
@@ -41,7 +41,7 @@
                                         VerticalAlignment="Center" />
                                 </Border>
 
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="{StaticResource Spacing.Size80}">
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="8">
                                     <TextBlock Text="Largest files" Foreground="#B3FFFFFF" FontWeight="SemiBold" />
                                     <TextBlock
                                         x:Name="LargeFilesStatusTitle" x:FieldModifier="internal"
@@ -57,7 +57,7 @@
                                         TextWrapping="WrapWholeWords" />
                                 </StackPanel>
 
-                                <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="{StaticResource Spacing.Size40}">
+                                <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="4">
                                     <TextBlock Text="Current results" Foreground="#B3FFFFFF" />
                                 <InfoBadge
                                     x:Name="LargeFilesResultBadge" x:FieldModifier="internal"
@@ -76,7 +76,7 @@
                         <Grid
                             x:Name="LargeFilesLayout"
                             Grid.Row="1"
-                            ColumnSpacing="{StaticResource Spacing.Size240}">
+                            ColumnSpacing="24">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*" />
                                 <RowDefinition Height="Auto" />
@@ -94,7 +94,7 @@
                                         </VisualState.StateTriggers>
                                         <VisualState.Setters>
                                             <Setter Target="LargeFilesOptionsColumn.Width" Value="0" />
-                                            <Setter Target="LargeFilesLayout.ColumnSpacing" Value="{StaticResource Spacing.Size160}" />
+                                            <Setter Target="LargeFilesLayout.ColumnSpacing" Value="16" />
                                             <Setter Target="LargeFilesResultsPanel.(Grid.ColumnSpan)" Value="2" />
                                             <Setter Target="LargeFilesOptionsPanel.(Grid.Row)" Value="1" />
                                             <Setter Target="LargeFilesOptionsPanel.(Grid.Column)" Value="0" />
@@ -107,7 +107,7 @@
                                         </VisualState.StateTriggers>
                                         <VisualState.Setters>
                                             <Setter Target="LargeFilesOptionsColumn.Width" Value="360" />
-                                            <Setter Target="LargeFilesLayout.ColumnSpacing" Value="{StaticResource Spacing.Size240}" />
+                                            <Setter Target="LargeFilesLayout.ColumnSpacing" Value="24" />
                                             <Setter Target="LargeFilesResultsPanel.(Grid.ColumnSpan)" Value="1" />
                                             <Setter Target="LargeFilesOptionsPanel.(Grid.Row)" Value="0" />
                                             <Setter Target="LargeFilesOptionsPanel.(Grid.Column)" Value="1" />
@@ -120,10 +120,10 @@
                             <StackPanel
                                 x:Name="LargeFilesResultsPanel"
                                 Grid.Column="0"
-                                Spacing="{StaticResource Spacing.Size160}">
-                                <Border Style="{StaticResource CardStyle}">
-                                    <StackPanel Spacing="{StaticResource Spacing.Size160}">
-                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                Spacing="16">
+                                <Border Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="20" Padding="24">
+                                    <StackPanel Spacing="16">
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
                                             <Border
                                                 Width="40"
                                                 Height="40"
@@ -149,13 +149,13 @@
                                         <ItemsControl x:Name="LargeFilesGroupList" x:FieldModifier="internal">
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
-                                                    <StackPanel Spacing="{StaticResource Spacing.Size160}" />
+                                                    <StackPanel Spacing="16" />
                                                 </ItemsPanelTemplate>
                                             </ItemsControl.ItemsPanel>
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
-                                                    <StackPanel Spacing="{StaticResource Spacing.Size120}">
-                                                        <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
+                                                    <StackPanel Spacing="12">
+                                                        <Grid ColumnSpacing="12">
                                                             <Grid.ColumnDefinitions>
                                                                 <ColumnDefinition Width="*" />
                                                                 <ColumnDefinition Width="Auto" />
@@ -170,19 +170,19 @@
                                                         <ItemsControl ItemsSource="{Binding Items}">
                                                             <ItemsControl.ItemsPanel>
                                                                 <ItemsPanelTemplate>
-                                                                    <StackPanel Spacing="{StaticResource Spacing.Size120}" />
+                                                                    <StackPanel Spacing="12" />
                                                                 </ItemsPanelTemplate>
                                                             </ItemsControl.ItemsPanel>
                                                             <ItemsControl.ItemTemplate>
                                                                 <DataTemplate>
                                                                     <Border Padding="16" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="12">
-                                                                        <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
+                                                                        <Grid ColumnSpacing="12">
                                                                             <Grid.ColumnDefinitions>
                                                                                 <ColumnDefinition Width="*" />
                                                                                 <ColumnDefinition Width="Auto" />
                                                                             </Grid.ColumnDefinitions>
-                                                                            <StackPanel Spacing="{StaticResource Spacing.Size80}">
-                                                                                <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
+                                                                            <StackPanel Spacing="8">
+                                                                                <Grid ColumnSpacing="12">
                                                                                     <Grid.ColumnDefinitions>
                                                                                         <ColumnDefinition Width="*" />
                                                                                         <ColumnDefinition Width="Auto" />
@@ -199,8 +199,8 @@
                                                                                     TextWrapping="Wrap"
                                                                                     TextTrimming="CharacterEllipsis"
                                                                                     ToolTipService.ToolTip="{Binding Directory}" />
-                                                                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
-                                                                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                                                                    <StackPanel Orientation="Horizontal" Spacing="6">
                                                                                         <Border
                                                                                             Background="{ThemeResource AccentFillColorTertiaryBrush}"
                                                                                             CornerRadius="8"
@@ -215,21 +215,21 @@
                                                                                             Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                                                                             TextTrimming="CharacterEllipsis" />
                                                                                     </StackPanel>
-                                                                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}" HorizontalAlignment="Right">
+                                                                                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
                                                                                         <Button Tag="{Binding}" Click="OnLargeFileOpen">
-                                                                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                                                            <StackPanel Orientation="Horizontal" Spacing="6">
                                                                                                 <SymbolIcon Symbol="OpenFile" />
                                                                                                 <TextBlock Text="Open" />
                                                                                             </StackPanel>
                                                                                         </Button>
                                                                                         <Button Tag="{Binding}" Click="OnLargeFileDelete">
-                                                                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                                                            <StackPanel Orientation="Horizontal" Spacing="6">
                                                                                                 <SymbolIcon Symbol="Delete" />
                                                                                                 <TextBlock Text="Delete" />
                                                                                             </StackPanel>
                                                                                         </Button>
                                                                                         <Button Tag="{Binding}" Click="OnLargeFileExclude">
-                                                                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                                                            <StackPanel Orientation="Horizontal" Spacing="6">
                                                                                                 <SymbolIcon Symbol="BlockContact" />
                                                                                                 <TextBlock Text="Exclude" />
                                                                                             </StackPanel>
@@ -254,10 +254,10 @@
                                 x:Name="LargeFilesOptionsPanel"
                                 Grid.Row="0"
                                 Grid.Column="1"
-                                Spacing="{StaticResource Spacing.Size160}">
-                                <Border Style="{StaticResource CardStyle}">
-                                    <StackPanel Spacing="{StaticResource Spacing.Size200}">
-                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                Spacing="16">
+                                <Border Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="20" Padding="24">
+                                    <StackPanel Spacing="20">
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
                                             <Border
                                                 Width="40"
                                                 Height="40"
@@ -279,8 +279,8 @@
                                             </StackPanel>
                                         </StackPanel>
 
-                                        <StackPanel Spacing="{StaticResource Spacing.Size160}">
-                                            <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
+                                        <StackPanel Spacing="16">
+                                            <Grid ColumnSpacing="12">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
@@ -291,7 +291,7 @@
                                                     PlaceholderText="Select a root folder…"
                                                     TextChanged="OnLargeFilesRootPathChanged" />
                                                 <Button x:Name="LargeFilesBrowseBtn" x:FieldModifier="internal" Grid.Column="1" Click="OnLargeFilesBrowse">
-                                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6">
                                                         <SymbolIcon Symbol="OpenFile" />
                                                         <TextBlock Text="Browse" />
                                                     </StackPanel>
@@ -299,27 +299,27 @@
                                             </Grid>
 
                                             <Button x:Name="LargeFilesScanBtn" x:FieldModifier="internal" Click="OnLargeFilesScan">
-                                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
                                                     <SymbolIcon Symbol="Find" />
                                                     <TextBlock Text="Scan for large files" />
                                                 </StackPanel>
                                             </Button>
 
                                             <CheckBox x:Name="LargeFilesIncludeSubfoldersCheck" x:FieldModifier="internal" IsChecked="True">
-                                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
                                                     <SymbolIcon Symbol="AllApps" />
                                                     <TextBlock Text="Include subfolders" />
                                                 </StackPanel>
                                             </CheckBox>
 
                                             <CheckBox x:Name="LargeFilesRecycleChk" x:FieldModifier="internal" IsChecked="True">
-                                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size80}">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
                                                     <SymbolIcon Symbol="Delete" />
                                                     <TextBlock Text="Send deleted files to Recycle Bin" />
                                                 </StackPanel>
                                             </CheckBox>
 
-                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}" VerticalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                                                 <SymbolIcon
                                                     Symbol="Sort"
                                                     Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
@@ -332,7 +332,7 @@
                                                     Value="100" />
                                             </StackPanel>
 
-                                            <StackPanel Spacing="{StaticResource Spacing.Size40}">
+                                            <StackPanel Spacing="4">
                                                 <TextBlock Text="Exclude patterns" FontWeight="SemiBold" />
                                                 <TextBox
                                                     x:Name="LargeFilesExclusionsBox" x:FieldModifier="internal"
@@ -347,9 +347,9 @@
                                     </StackPanel>
                                 </Border>
 
-                                <Border Style="{StaticResource CardStyle}">
-                                    <StackPanel Spacing="{StaticResource Spacing.Size200}">
-                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                <Border Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="20" Padding="24">
+                                    <StackPanel Spacing="20">
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
                                             <Border
                                                 Width="40"
                                                 Height="40"
@@ -379,7 +379,7 @@
 
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                             <Button x:Name="LargeFilesCancelBtn" x:FieldModifier="internal" Click="OnLargeFilesCancel" Visibility="Collapsed" IsEnabled="False">
-                                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
                                                     <SymbolIcon Symbol="Cancel" />
                                                     <TextBlock Text="Cancel" />
                                                 </StackPanel>
@@ -390,9 +390,9 @@
                                     </StackPanel>
                                 </Border>
 
-                                <Border Style="{StaticResource CardStyle}">
-                                    <StackPanel Spacing="{StaticResource Spacing.Size200}">
-                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                <Border Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="20" Padding="24">
+                                    <StackPanel Spacing="20">
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
                                             <Border
                                                 Width="40"
                                                 Height="40"
@@ -420,7 +420,7 @@
                                             SelectionMode="None">
                                             <ListView.ItemTemplate>
                                                 <DataTemplate>
-                                                    <Grid ColumnSpacing="{StaticResource Spacing.Size120}">
+                                                    <Grid ColumnSpacing="12">
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="*" />
                                                             <ColumnDefinition Width="Auto" />
@@ -431,7 +431,7 @@
                                                             TextWrapping="Wrap"
                                                             ToolTipService.ToolTip="{Binding}" />
                                                         <Button Grid.Column="1" Tag="{Binding}" Click="OnLargeFilesRemoveExclusion">
-                                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                            <StackPanel Orientation="Horizontal" Spacing="6">
                                                                 <SymbolIcon Symbol="Delete" />
                                                                 <TextBlock Text="Remove" />
                                                             </StackPanel>
@@ -448,7 +448,7 @@
 
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                             <Button x:Name="LargeFilesClearExclusionsBtn" x:FieldModifier="internal" Click="OnLargeFilesClearExclusions" IsEnabled="False">
-                                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
                                                     <SymbolIcon Symbol="Clear" />
                                                     <TextBlock Text="Clear all" />
                                                 </StackPanel>

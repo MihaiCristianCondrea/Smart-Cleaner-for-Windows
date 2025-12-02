@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
@@ -34,6 +35,23 @@ public sealed partial class App
         {
             OnLaunchedInvoked = true;
             Log.Information("App.OnLaunched entered. Launch arguments: {Arguments}", args.Arguments);
+            var resources = Application.Current.Resources;
+            string[] keysToCheck =
+            {
+                "TextFillColorSecondaryBrush"
+            };
+
+            foreach (var key in keysToCheck)
+            {
+                if (!resources.TryGetValue(key, out var value))
+                {
+                    Debug.WriteLine($"[RESOURCE] MISSING: {key}");
+                }
+                else
+                {
+                    Debug.WriteLine($"[RESOURCE] FOUND: {key} -> {value?.GetType().FullName ?? "<null>"}");
+                }
+            }
             _window = new MainWindow();
             Log.Information("MainWindow instance created. Activating window.");
             _window.Activate();

@@ -9,12 +9,12 @@ The XAML loader is throwing `FileNotFoundException` during `MainWindow.Initializ
 
 ## Fix applied
 - Added guarded XAML initialization with detailed logging of the missing file/parse error and a fallback shell so the app no longer terminates on startup while you investigate.
-- Kept `Shell/Themes/DesignTokens.xaml` compiled and merged from `App.xaml` to satisfy known resource lookups.
+- Removed dependency on custom theme dictionaries so the app now relies on built-in WinUI resources for theming.
 
 ## How to verify
 1. Clean and rebuild the app (packaged or unpackaged).
 2. Launch the app. If the main XAML still fails to load, a fallback shell will appear instead of the process exiting. Check the log for the exact missing file (`Fatal exception during app launch (missing file during XAML load)` or `Fatal XAML parse during app launch`).
-3. Confirm in build output (or the generated `.pri`) that `Shell/Themes/DesignTokens.xaml` appears as a compiled Page resource.
+3. Confirm in build output (or the generated `.pri`) that all referenced XAML files are compiled Page resources.
 
 ## Maintenance tips
 - When `EnableDefaultPageItems` is `false`, **every** XAML page or resource dictionary must be explicitly included with `<Page Include=...>`. Using `Update` only modifies existing items and will silently skip files that are not already included.

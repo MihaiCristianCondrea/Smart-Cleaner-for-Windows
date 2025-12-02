@@ -8,7 +8,7 @@
 
                 <ScrollViewer
                     HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel Padding="{StaticResource Padding.Page}" Spacing="{StaticResource Spacing.Size240}">
+                    <StackPanel Padding="32" Spacing="24">
                         <StackPanel Spacing="4">
                             <TextBlock Text="Settings" FontSize="32" FontWeight="SemiBold" />
                             <TextBlock
@@ -16,10 +16,10 @@
                                 Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                         </StackPanel>
 
-                        <Border Style="{StaticResource CardStyle}">
-                            <StackPanel Spacing="{StaticResource Spacing.Size200}">
+                        <Border Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="20" Padding="24">
+                            <StackPanel Spacing="20">
                                 <TextBlock Text="About" FontSize="22" FontWeight="SemiBold" />
-                                <StackPanel Spacing="{StaticResource Spacing.Size40}">
+                                <StackPanel Spacing="4">
                                     <TextBlock Text="Smart Cleaner for Windows" FontWeight="SemiBold" />
                                     <TextBlock
                                         Text="A modern utility for tidying empty folders and reclaiming disk space."
@@ -34,16 +34,16 @@
                                     </StackPanel>
                                 </StackPanel>
 
-                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
                                     <HyperlinkButton Content="Documentation" NavigateUri="https://github.com/MihaiCristianCondrea/Smart-Cleaner-for-Windows" />
                                     <HyperlinkButton Content="Privacy policy" NavigateUri="https://github.com/MihaiCristianCondrea/Smart-Cleaner-for-Windows/blob/main/PRIVACY.md" />
                                 </StackPanel>
                             </StackPanel>
                         </Border>
 
-                        <Border Style="{StaticResource CardStyle}">
-                            <StackPanel Spacing="{StaticResource Spacing.Size200}">
-                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                        <Border Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="20" Padding="24">
+                            <StackPanel Spacing="20">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
                                     <Border
                                         Width="40"
                                         Height="40"
@@ -65,7 +65,7 @@
                                     </StackPanel>
                                 </StackPanel>
 
-                                <StackPanel Spacing="{StaticResource Spacing.Size160}">
+                                <StackPanel Spacing="16">
                                     <TextBlock
                                         x:Name="CleanerDefaultsSummaryText" x:FieldModifier="internal"
                                         Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
@@ -78,7 +78,7 @@
                                         OffContent="Delete permanently"
                                         Toggled="OnCleanerRecyclePreferenceToggled" />
 
-                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}" VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                                         <SymbolIcon
                                             Symbol="Sort"
                                             Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
@@ -91,7 +91,7 @@
                                             ValueChanged="OnCleanerDepthPreferenceChanged" />
                                     </StackPanel>
 
-                                    <StackPanel Spacing="{StaticResource Spacing.Size40}">
+                                    <StackPanel Spacing="4">
                                         <TextBlock Text="Default exclusions" FontWeight="SemiBold" />
                                         <TextBox
                                             x:Name="CleanerExclusionsPreferenceBox" x:FieldModifier="internal"
@@ -105,7 +105,7 @@
 
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                                         <Button Click="OnApplyCleanerDefaults">
-                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
                                                 <SymbolIcon Symbol="Sync" />
                                                 <TextBlock Text="Apply to current session" />
                                             </StackPanel>
@@ -117,9 +117,9 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Style="{StaticResource CardStyle}">
-                            <StackPanel Spacing="{StaticResource Spacing.Size200}">
-                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                        <Border Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="20" Padding="24">
+                            <StackPanel Spacing="20">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
                                     <Border
                                         Width="40"
                                         Height="40"
@@ -141,7 +141,7 @@
                                     </StackPanel>
                                 </StackPanel>
 
-                                <StackPanel Spacing="{StaticResource Spacing.Size160}">
+                                <StackPanel Spacing="16">
                                     <TextBlock
                                         x:Name="AutomationSummaryText" x:FieldModifier="internal"
                                         Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
@@ -160,9 +160,9 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Style="{StaticResource CardStyle}">
-                            <StackPanel Spacing="{StaticResource Spacing.Size200}">
-                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                        <Border Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="20" Padding="24">
+                            <StackPanel Spacing="20">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
                                     <Border
                                         Width="40"
                                         Height="40"
@@ -184,7 +184,7 @@
                                     </StackPanel>
                                 </StackPanel>
 
-                                <StackPanel Spacing="{StaticResource Spacing.Size160}">
+                                <StackPanel Spacing="16">
                                     <TextBlock
                                         x:Name="NotificationSummaryText" x:FieldModifier="internal"
                                         Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
@@ -204,9 +204,9 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Style="{StaticResource CardStyle}">
-                            <StackPanel Spacing="{StaticResource Spacing.Size200}">
-                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                        <Border Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="20" Padding="24">
+                            <StackPanel Spacing="20">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
                                     <Border
                                         Width="40"
                                         Height="40"
@@ -228,13 +228,13 @@
                                     </StackPanel>
                                 </StackPanel>
 
-                                <StackPanel Spacing="{StaticResource Spacing.Size160}">
+                                <StackPanel Spacing="16">
                                     <TextBlock
                                         x:Name="HistoryRetentionSummaryText" x:FieldModifier="internal"
                                         Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                         Text="Keep history for 30 days" />
 
-                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}" VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
                                         <SymbolIcon
                                             Symbol="Calendar"
                                             Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
@@ -256,9 +256,9 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Style="{StaticResource CardStyle}">
-                            <StackPanel Spacing="{StaticResource Spacing.Size200}">
-                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                        <Border Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="20" Padding="24">
+                            <StackPanel Spacing="20">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
                                     <Border
                                         Width="40"
                                         Height="40"
@@ -280,21 +280,21 @@
                                     </StackPanel>
                                 </StackPanel>
 
-                                <Grid ColumnSpacing="{StaticResource Spacing.Size200}">
+                                <Grid ColumnSpacing="20">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="2*" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
 
-                                    <StackPanel Grid.Column="0" Spacing="{StaticResource Spacing.Size160}">
-                                        <StackPanel Spacing="{StaticResource Spacing.Size80}">
-                                            <Grid ColumnSpacing="{StaticResource Spacing.Size160}">
+                                    <StackPanel Grid.Column="0" Spacing="16">
+                                        <StackPanel Spacing="8">
+                                            <Grid ColumnSpacing="16">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
 
-                                                <StackPanel Spacing="{StaticResource Spacing.Size40}">
+                                                <StackPanel Spacing="4">
                                                     <TextBlock Text="App theme" FontSize="18" FontWeight="SemiBold" />
                                                     <TextBlock
                                                         Text="Choose how Smart Cleaner looks."
@@ -320,14 +320,14 @@
                                             </RadioButtons>
                                         </StackPanel>
 
-                                        <StackPanel Spacing="{StaticResource Spacing.Size80}">
-                                            <Grid ColumnSpacing="{StaticResource Spacing.Size160}">
+                                        <StackPanel Spacing="8">
+                                            <Grid ColumnSpacing="16">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
 
-                                                <StackPanel Spacing="{StaticResource Spacing.Size40}">
+                                                <StackPanel Spacing="4">
                                                     <TextBlock Text="Accent color" FontSize="18" FontWeight="SemiBold" />
                                                     <TextBlock
                                                         Text="Personalize buttons and highlights with a custom accent."
@@ -353,15 +353,15 @@
                                         </StackPanel>
                                     </StackPanel>
 
-                                    <StackPanel Grid.Column="1" Spacing="{StaticResource Spacing.Size120}" VerticalAlignment="Center">
+                                    <StackPanel Grid.Column="1" Spacing="12" VerticalAlignment="Center">
                                         <TextBlock Text="Preview" FontWeight="SemiBold" />
                                         <Border
                                             Padding="16"
                                             CornerRadius="12"
                                             Background="{ThemeResource LayerFillColorDefaultBrush}">
-                                            <StackPanel Spacing="{StaticResource Spacing.Size80}">
+                                            <StackPanel Spacing="8">
                                                 <Rectangle Height="12" Fill="{ThemeResource AccentFillColorDefaultBrush}" RadiusX="4" RadiusY="4" />
-                                                <StackPanel Spacing="{StaticResource Spacing.Size60}">
+                                                <StackPanel Spacing="6">
                                                     <Rectangle Height="8" Fill="{ThemeResource SystemControlForegroundBaseHighBrush}" RadiusX="4" RadiusY="4" />
                                                     <Rectangle Height="8" Fill="{ThemeResource SystemControlForegroundBaseMediumBrush}" RadiusX="4" RadiusY="4" />
                                                     <Rectangle Height="8" Fill="{ThemeResource SystemControlForegroundBaseMediumBrush}" RadiusX="4" RadiusY="4" Width="120" />

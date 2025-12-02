@@ -3,39 +3,9 @@
     x:Class="SmartCleanerForWindows.Shell.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:converters="using:SmartCleanerForWindows.Common.Converters">
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls">
+
     <Application.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
-                <!--
-                    Use an app-relative pack URI so the design token dictionary resolves correctly
-                    regardless of the deployment root. The previous absolute ms-appx path could fail
-                    to locate the file at runtime, causing a XAML parse exception during startup.
-                -->
-                <ResourceDictionary Source="Themes/DesignTokens.xaml" />
-                <!-- Other merged dictionaries here -->
-            </ResourceDictionary.MergedDictionaries>
-            <!-- Other app resources here -->
-            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-            <SolidColorBrush x:Key="WindowCaptionBackground" Color="Transparent" />
-            <SolidColorBrush x:Key="WindowCaptionBackgroundDisabled" Color="Transparent" />
-            <SolidColorBrush x:Key="WindowCaptionForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="WindowCaptionForegroundDisabled" Color="#66FFFFFF" />
-            <ResourceDictionary.ThemeDictionaries>
-                <ResourceDictionary x:Key="Light">
-                    <SolidColorBrush x:Key="WindowCaptionBackground" Color="Transparent" />
-                    <SolidColorBrush x:Key="WindowCaptionBackgroundDisabled" Color="Transparent" />
-                    <SolidColorBrush x:Key="WindowCaptionForeground" Color="#000000" />
-                    <SolidColorBrush x:Key="WindowCaptionForegroundDisabled" Color="#66000000" />
-                </ResourceDictionary>
-                <ResourceDictionary x:Key="Dark">
-                    <SolidColorBrush x:Key="WindowCaptionBackground" Color="Transparent" />
-                    <SolidColorBrush x:Key="WindowCaptionBackgroundDisabled" Color="Transparent" />
-                    <SolidColorBrush x:Key="WindowCaptionForeground" Color="#FFFFFFFF" />
-                    <SolidColorBrush x:Key="WindowCaptionForegroundDisabled" Color="#66FFFFFF" />
-                </ResourceDictionary>
-            </ResourceDictionary.ThemeDictionaries>
-        </ResourceDictionary>
+        <controls:XamlControlsResources />
     </Application.Resources>
 </Application>

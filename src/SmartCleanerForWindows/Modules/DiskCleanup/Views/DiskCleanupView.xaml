@@ -8,14 +8,14 @@
 
                 <ScrollViewer
                     HorizontalScrollBarVisibility="Disabled">
-                    <Grid Padding="{StaticResource Padding.Page}" RowSpacing="{StaticResource Spacing.Size240}">
+                    <Grid Padding="32" RowSpacing="24">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <Border Grid.Row="0" Background="{StaticResource Brush.Hero.Neutral}" CornerRadius="28" Padding="{StaticResource Padding.Hero}">
-                            <Grid ColumnSpacing="{StaticResource Spacing.Size240}">
+                <Border Grid.Row="0" Background="{ThemeResource AccentFillColorTertiaryBrush}" CornerRadius="28" Padding="28">
+                            <Grid ColumnSpacing="24">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
@@ -35,7 +35,7 @@
                                         VerticalAlignment="Center" />
                                 </Border>
 
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="{StaticResource Spacing.Size80}">
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="8">
                                     <TextBlock Text="Disk cleanup" Foreground="#B3FFFFFF" FontWeight="SemiBold" />
                                     <TextBlock
                                         x:Name="DiskCleanupIntro" x:FieldModifier="internal"
@@ -51,9 +51,9 @@
                             </Grid>
                         </Border>
 
-                        <Border Grid.Row="1" Style="{StaticResource CardStyle}">
-                            <StackPanel Spacing="{StaticResource Spacing.Size160}">
-                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size120}">
+                        <Border Grid.Row="1" Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="20" Padding="24">
+                            <StackPanel Spacing="16">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
                                     <Border
                                         Width="40"
                                         Height="40"
@@ -76,21 +76,21 @@
                                     Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
                                     TextWrapping="Wrap" />
 
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="{StaticResource Spacing.Size80}">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
                                     <Button x:Name="DiskCleanupAnalyzeBtn" x:FieldModifier="internal" Click="OnDiskCleanupAnalyze">
-                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
                                             <SymbolIcon Symbol="Refresh" />
                                             <TextBlock Text="Analyze" />
                                         </StackPanel>
                                     </Button>
                                     <Button x:Name="DiskCleanupCleanBtn" x:FieldModifier="internal" Click="OnDiskCleanupClean" IsEnabled="False">
-                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
                                             <SymbolIcon Symbol="Delete" />
                                             <TextBlock Text="Clean selected" />
                                         </StackPanel>
                                     </Button>
                                     <Button x:Name="DiskCleanupCancelBtn" x:FieldModifier="internal" Click="OnCancel" Visibility="Collapsed" IsEnabled="False">
-                                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Spacing.Size60}">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
                                             <SymbolIcon Symbol="Cancel" />
                                             <TextBlock Text="Cancel" />
                                         </StackPanel>
