@@ -17,6 +17,8 @@
         <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
         <ProjectPriFileName>SmartCleanerForWindows.pri</ProjectPriFileName>
         <EnableDefaultPageItems>false</EnableDefaultPageItems>
+        <!-- Ensure compiled XAML resources (XBF) are embedded so LoadComponent can find them at runtime. -->
+        <DisableEmbeddedXbf>false</DisableEmbeddedXbf>
 
         <!-- VITAL FIX: Explicitly tell the compiler to use your custom Program class -->
         <StartupObject>SmartCleanerForWindows.Program</StartupObject>

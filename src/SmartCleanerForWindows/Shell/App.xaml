@@ -6,6 +6,18 @@
     xmlns:controls="using:Microsoft.UI.Xaml.Controls">
 
     <Application.Resources>
-        <controls:XamlControlsResources />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <controls:XamlControlsResources />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Provide legacy brush aliases used by the views to avoid runtime XAML resource failures. -->
+            <SolidColorBrush
+                x:Key="SystemControlForegroundBaseMediumBrush"
+                Color="{ThemeResource TextFillColorSecondary}" />
+            <SolidColorBrush
+                x:Key="ApplicationPageBackgroundThemeBrush"
+                Color="{ThemeResource LayerFillColorDefault}" />
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
