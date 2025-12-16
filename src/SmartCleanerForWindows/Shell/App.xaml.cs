@@ -2,10 +2,12 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Markup;
-using SmartCleanerForWindows.Diagnostics;
 using Serilog;
+using SmartCleanerForWindows.Diagnostics;
 
 namespace SmartCleanerForWindows.Shell;
 
@@ -22,10 +24,17 @@ public sealed partial class App
     {
         Log.Information("App constructor invoked. Setting up global exception handlers.");
         InitializeComponent();
+
         StartupDiagnostics.Initialize();
         StartupDiagnostics.AttachToApplication(this);
-        AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+
+        // AppDomain handler MUST use System.UnhandledExceptionEventArgs + non-null sender.
+        AppDomain.CurrentDomain.UnhandledException += OnAppDomainUnhandledException;
+
+        // This one is fine as-is.
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
+
+        // WinUI Application.UnhandledException uses Microsoft.UI.Xaml.UnhandledExceptionEventArgs.
         UnhandledException += OnApplicationUnhandledException;
     }
 
@@ -35,23 +44,20 @@ public sealed partial class App
         {
             OnLaunchedInvoked = true;
             Log.Information("App.OnLaunched entered. Launch arguments: {Arguments}", args.Arguments);
+
             var resources = Application.Current.Resources;
             string[] keysToCheck =
-            {
+            [
                 "TextFillColorSecondaryBrush"
-            };
+            ];
 
             foreach (var key in keysToCheck)
             {
-                if (!resources.TryGetValue(key, out var value))
-                {
-                    Debug.WriteLine($"[RESOURCE] MISSING: {key}");
-                }
-                else
-                {
-                    Debug.WriteLine($"[RESOURCE] FOUND: {key} -> {value?.GetType().FullName ?? "<null>"}");
-                }
+                Debug.WriteLine(!resources.TryGetValue(key, out var value)
+                    ? $"[RESOURCE] MISSING: {key}"
+                    : $"[RESOURCE] FOUND: {key} -> {value?.GetType().FullName ?? "<null>"}");
             }
+
             _window = new MainWindow();
             Log.Information("MainWindow instance created. Activating window.");
             _window.Activate();
@@ -60,12 +66,21 @@ public sealed partial class App
         catch (FileNotFoundException fileEx)
         {
             Log.Error(fileEx, "Fatal XAML load failed: missing file during app launch. Message={Message}", fileEx.Message);
-            CrashHandler.HandleFatalException("app launch (missing file during XAML load)", fileEx, terminateProcess: true);
+            ShowFatalErrorWindow(
+                "A required application file could not be found. Please reinstall Smart Cleaner for Windows.",
+                fileEx);
         }
         catch (XamlParseException xamlEx)
         {
-            Log.Error(xamlEx, "Fatal XAML parse during app launch. HResult={HResult}, Inner={InnerMessage}", xamlEx.HResult, xamlEx.InnerException?.Message);
-            CrashHandler.HandleFatalException("app launch (XAML parse)", xamlEx, terminateProcess: true);
+            Log.Error(
+                xamlEx,
+                "Fatal XAML parse during app launch. HResult={HResult}, Inner={InnerMessage}",
+                xamlEx.HResult,
+                xamlEx.InnerException?.Message);
+
+            ShowFatalErrorWindow(
+                "Smart Cleaner for Windows could not build its interface. The packaged resources may be corrupted.",
+                xamlEx);
         }
         catch (Exception ex)
         {
@@ -73,10 +88,8 @@ public sealed partial class App
         }
     }
 
-    private static void OnUnhandledException(object? sender, System.UnhandledExceptionEventArgs e)
-    {
-        HandleUnhandledException(e.ExceptionObject as Exception, "AppDomain.UnhandledException");
-    }
+    private static void OnAppDomainUnhandledException(object sender, System.UnhandledExceptionEventArgs e)
+        => HandleUnhandledException(e.ExceptionObject as Exception, "AppDomain.UnhandledException");
 
     private static void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
@@ -84,7 +97,7 @@ public sealed partial class App
         e.SetObserved();
     }
 
-    private static void OnApplicationUnhandledException(object? sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+    private static void OnApplicationUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
         HandleUnhandledException(e.Exception, "Application.UnhandledException");
         e.Handled = true;
@@ -92,11 +105,39 @@ public sealed partial class App
 
     private static void HandleUnhandledException(Exception? exception, string source)
     {
-        if (exception is null)
-        {
-            return;
-        }
-
+        if (exception is null) return;
         CrashHandler.HandleFatalException(source, exception, terminateProcess: true);
+    }
+
+    private void ShowFatalErrorWindow(string friendlyMessage, Exception exception)
+    {
+        CrashHandler.HandleFatalException("app launch (non-fatal)", exception, terminateProcess: false);
+
+        var fallbackWindow = new Window
+        {
+            Content = new StackPanel
+            {
+                Padding = new Thickness(32),
+                Spacing = 12,
+                Children =
+                {
+                    new TextBlock
+                    {
+                        Text = friendlyMessage,
+                        TextWrapping = TextWrapping.Wrap,
+                        FontSize = 20,
+                        FontWeight = FontWeights.SemiBold
+                    },
+                    new TextBlock
+                    {
+                        Text = "The app will stay open so you can read the error above. You can close it after reviewing the logs.",
+                        TextWrapping = TextWrapping.Wrap
+                    }
+                }
+            }
+        };
+
+        _window = fallbackWindow;
+        _window.Activate();
     }
 }
