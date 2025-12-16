@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -20,6 +19,10 @@ public static class ToolSettingsBootstrapper
 
         var catalog = new ToolSettingsCatalog(definitionRoot);
         var definitions = catalog.LoadDefinitions();
+        Trace.TraceInformation(
+            "Tool settings bootstrapper discovered {0} definition(s) under '{1}'.",
+            definitions.Count,
+            definitionRoot);
         if (definitions.Count == 0)
         {
             Trace.TraceWarning(

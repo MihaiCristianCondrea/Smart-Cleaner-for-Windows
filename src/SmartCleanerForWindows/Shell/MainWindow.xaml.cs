@@ -329,9 +329,14 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         {
             Log.Error(
                 xamlEx,
-                "XAML parse failed while constructing MainWindow. HResult={HResult}, Inner={InnerMessage}",
+                "XAML parse failed while constructing MainWindow. HResult={HResult}, Line={Line}, Position={Position}, Inner={InnerMessage}, Message={Message}",
                 xamlEx.HResult,
-                xamlEx.InnerException?.Message);
+                xamlEx.Data,
+                xamlEx.StackTrace,
+                xamlEx.Source,
+                xamlEx.InnerException?.TargetSite,
+                xamlEx.InnerException?.Message,
+                xamlEx.Message);
             failure = xamlEx;
         }
         catch (Exception ex)

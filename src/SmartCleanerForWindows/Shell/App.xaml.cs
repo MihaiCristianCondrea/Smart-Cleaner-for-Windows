@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using System.Runtime.ExceptionServices;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -31,6 +32,7 @@ public sealed partial class App
 
         // AppDomain handler MUST use System.UnhandledExceptionEventArgs + non-null sender.
         AppDomain.CurrentDomain.UnhandledException += OnAppDomainUnhandledException;
+        AppDomain.CurrentDomain.FirstChanceException += OnFirstChanceException;
 
         // This one is fine as-is.
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
@@ -45,6 +47,12 @@ public sealed partial class App
         {
             OnLaunchedInvoked = true;
             Log.Information("App.OnLaunched entered. Launch arguments: {Arguments}", args.Arguments);
+
+            var baseDirectory = AppContext.BaseDirectory;
+            Log.Information(
+                "Resolved AppContext.BaseDirectory={BaseDirectory}. PRI present: {PriExists}",
+                baseDirectory,
+                File.Exists(Path.Combine(baseDirectory, "SmartCleanerForWindows.pri")));
 
             try
             {
@@ -117,6 +125,18 @@ public sealed partial class App
     {
         if (exception is null) return;
         CrashHandler.HandleFatalException(source, exception, terminateProcess: true);
+    }
+
+    private static void OnFirstChanceException(object? sender, FirstChanceExceptionEventArgs e)
+    {
+        if (e.Exception is FileNotFoundException fileNotFound)
+        {
+            // Surface the missing file path during startup so we know which resource is absent.
+            Trace.TraceError(
+                "[FirstChance] FileNotFoundException during startup. Message={0}, FileName={1}",
+                fileNotFound.Message,
+                fileNotFound.FileName ?? "<unknown>");
+        }
     }
 
     private void ShowFatalErrorWindow(string friendlyMessage, Exception exception)
