@@ -170,7 +170,9 @@
                                                     TextChanged="RootPathBox_TextChanged" />
                                                 <Button x:Name="BrowseBtn" x:FieldModifier="internal" Grid.Column="1" Click="OnBrowse">
                                                     <StackPanel Orientation="Horizontal" Spacing="6">
-                                                        <SymbolIcon Symbol="OpenFile" />
+                                                        <FontIcon
+                                                            Glyph="&#xE8E5;"
+                                                            FontFamily="Segoe MDL2 Assets" />
                                                         <TextBlock Text="Browse" />
                                                     </StackPanel>
                                                 </Button>
@@ -178,7 +180,7 @@
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
                                                 <Button x:Name="PreviewBtn" x:FieldModifier="internal" Click="OnPreview">
                                                     <StackPanel Orientation="Horizontal" Spacing="6">
-                                                        <SymbolIcon Symbol="PreviewLink" />
+                                                        <SymbolIcon Symbol="Preview" />
                                                         <TextBlock Text="Preview" />
                                                     </StackPanel>
                                                 </Button>
@@ -321,7 +323,7 @@
 
                                         <StackPanel Spacing="12">
                                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                                <SymbolIcon Symbol="PreviewLink" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                                                <SymbolIcon Symbol="Preview" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
                                                 <TextBlock
                                                     Text="Preview empty directories before committing to a cleanup."
                                                     Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"

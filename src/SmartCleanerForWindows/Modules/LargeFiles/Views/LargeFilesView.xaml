@@ -218,7 +218,9 @@
                                                                                     <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
                                                                                         <Button Tag="{Binding}" Click="OnLargeFileOpen">
                                                                                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                                                                                <SymbolIcon Symbol="OpenFile" />
+                                                                                                <FontIcon
+                                                                                                    Glyph="&#xE8E5;"
+                                                                                                    FontFamily="Segoe MDL2 Assets" />
                                                                                                 <TextBlock Text="Open" />
                                                                                             </StackPanel>
                                                                                         </Button>
@@ -292,7 +294,9 @@
                                                     TextChanged="OnLargeFilesRootPathChanged" />
                                                 <Button x:Name="LargeFilesBrowseBtn" x:FieldModifier="internal" Grid.Column="1" Click="OnLargeFilesBrowse">
                                                     <StackPanel Orientation="Horizontal" Spacing="6">
-                                                        <SymbolIcon Symbol="OpenFile" />
+                                                        <FontIcon
+                                                            Glyph="&#xE8E5;"
+                                                            FontFamily="Segoe MDL2 Assets" />
                                                         <TextBlock Text="Browse" />
                                                     </StackPanel>
                                                 </Button>

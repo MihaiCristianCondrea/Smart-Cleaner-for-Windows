@@ -18,6 +18,14 @@
             <SolidColorBrush
                 x:Key="ApplicationPageBackgroundThemeBrush"
                 Color="{ThemeResource LayerFillColorDefault}" />
+
+            <!-- Local resources used throughout the views. -->
+            <SolidColorBrush
+                x:Key="HeroCardOverlayBrush"
+                Opacity="0.2"
+                Color="{ThemeResource SolidBackgroundFillColorBase}" />
+
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>
