@@ -43,13 +43,27 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="Assets\SplashScreen.scale-200.png"/>
-        <Content Include="Assets\LockScreenLogo.scale-200.png"/>
-        <Content Include="Assets\Square150x150Logo.scale-200.png"/>
-        <Content Include="Assets\Square44x44Logo.scale-200.png"/>
-        <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png"/>
-        <Content Include="Assets\StoreLogo.png"/>
-        <Content Include="Assets\Wide310x150Logo.scale-200.png"/>
+        <!--
+          Ensure every asset (icons, logos, etc.) is packaged and copied to the
+          output directory. Missing assets can surface as XAML parse failures at
+          startup when WinUI resolves image resources declared in XAML or the
+          app manifest.
+        -->
+        <Content Include="Assets\**">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <PackagePath>Assets\%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
+        </Content>
+
+        <!--
+          Ship the settings definition JSON files inside the packaged app instead of
+          leaving them out as design-time only items. Using Content + PackagePath
+          ensures LoadComponent can find the files when AppContext.BaseDirectory
+          points to the installed MSIX location.
+        -->
+        <Content Include="..\SettingsDefinitions\**\*.json"
+                 Link="SettingsDefinitions\%(RecursiveDir)%(Filename)%(Extension)"
+                 CopyToOutputDirectory="PreserveNewest"
+                 PackagePath="SettingsDefinitions\%(RecursiveDir)%(Filename)%(Extension)" />
     </ItemGroup>
 
     <ItemGroup>
@@ -78,27 +92,11 @@
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
         </Page>
-        <Page Include="Shell\Settings\SettingsView.xaml">
-            <Generator>MSBuild:Compile</Generator>
-            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-        </Page>
-        <Page Include="Modules\Dashboard\Views\DashboardView.xaml">
-            <Generator>MSBuild:Compile</Generator>
-            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-        </Page>
-        <Page Include="Modules\DiskCleanup\Views\DiskCleanupView.xaml">
-            <Generator>MSBuild:Compile</Generator>
-            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-        </Page>
-        <Page Include="Modules\EmptyFolders\Views\EmptyFoldersView.xaml">
-            <Generator>MSBuild:Compile</Generator>
-            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-        </Page>
-        <Page Include="Modules\InternetRepair\Views\InternetRepairView.xaml">
-            <Generator>MSBuild:Compile</Generator>
-            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-        </Page>
-        <Page Include="Modules\LargeFiles\Views\LargeFilesView.xaml">
+    </ItemGroup>
+
+    <ItemGroup>
+        <Page Include="**\*.xaml"
+              Exclude="bin\**\*.xaml;obj\**\*.xaml;Shell\App.xaml;Shell\MainWindow.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
         </Page>
@@ -148,10 +146,6 @@
       <Folder Include="inspiration\Source\Includes\" />
       <Folder Include="Modules\Dashboard\ViewModels\" />
       <Folder Include="Modules\Dashboard\Views\" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Include="..\SettingsDefinitions\**\*.json" Link="SettingsDefinitions\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
     <ItemGroup>

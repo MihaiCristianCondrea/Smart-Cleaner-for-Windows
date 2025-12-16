@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Markup;
 using Serilog;
 using SmartCleanerForWindows.Diagnostics;
+using SmartCleanerForWindows.Settings;
 
 namespace SmartCleanerForWindows.Shell;
 
@@ -44,6 +45,15 @@ public sealed partial class App
         {
             OnLaunchedInvoked = true;
             Log.Information("App.OnLaunched entered. Launch arguments: {Arguments}", args.Arguments);
+
+            try
+            {
+                ToolSettingsBootstrapper.Initialize();
+            }
+            catch (Exception bootstrapFailure)
+            {
+                Log.Warning(bootstrapFailure, "Settings bootstrap failed; continuing startup with defaults where possible.");
+            }
 
             var resources = Application.Current.Resources;
             string[] keysToCheck =

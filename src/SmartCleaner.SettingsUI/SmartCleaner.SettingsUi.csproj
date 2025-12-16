@@ -21,6 +21,9 @@
     <Page Include="MainWindow.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\SettingsDefinitions\**\*.json" Link="SettingsDefinitions\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\SettingsDefinitions\**\*.json"
+             Link="SettingsDefinitions\%(RecursiveDir)%(Filename)%(Extension)"
+             CopyToOutputDirectory="PreserveNewest"
+             PackagePath="SettingsDefinitions\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 </Project>

@@ -9,7 +9,7 @@ public sealed class ToolSettingsService : IDisposable
     private readonly ConcurrentDictionary<string, ToolSettingsSnapshot> _snapshots = new(StringComparer.OrdinalIgnoreCase);
     private bool _disposed;
 
-    private ToolSettingsService(string? definitionRoot = null, string? userRoot = null)
+    private ToolSettingsService(string definitionRoot, string userRoot)
     {
         _store = new ToolSettingsStore(userRoot);
         var catalog = new ToolSettingsCatalog(definitionRoot);
@@ -119,7 +119,8 @@ public sealed class ToolSettingsService : IDisposable
 
     public static ToolSettingsService CreateDefault()
     {
-        return new ToolSettingsService();
+        var (definitionRoot, userRoot) = ToolSettingsBootstrapper.Initialize();
+        return new ToolSettingsService(definitionRoot, userRoot);
     }
 
     private static JsonObject CloneValues(JsonObject source)
