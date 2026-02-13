@@ -24,9 +24,13 @@ using SmartCleanerForWindows.Modules.Dashboard.ViewModels;
 using SmartCleanerForWindows.Modules.DiskCleanup.ViewModels;
 using SmartCleanerForWindows.Modules.EmptyFolders;
 using SmartCleanerForWindows.Modules.EmptyFolders.Contracts;
+using SmartCleanerForWindows.Modules.EmptyFolders.Views;
 using SmartCleanerForWindows.Modules.EmptyFolders.ViewModels;
 using SmartCleanerForWindows.Modules.LargeFiles.ViewModels;
 using SmartCleanerForWindows.Modules.InternetRepair.ViewModels;
+using SmartCleanerForWindows.Modules.InternetRepair.Views;
+using SmartCleanerForWindows.Modules.DiskCleanup.Views;
+using SmartCleanerForWindows.Modules.LargeFiles.Views;
 using Serilog;
 using Windows.Storage;
 using Windows.Storage.Pickers;
@@ -36,6 +40,7 @@ using System.Security.Principal;
 using Microsoft.UI.Xaml.Markup;
 using SmartCleanerForWindows.Core.DiskCleanup;
 using SmartCleanerForWindows.Settings;
+using SmartCleanerForWindows.Shell.Settings;
 using AppDataPaths = SmartCleanerForWindows.Diagnostics.AppDataPaths;
 
 namespace SmartCleanerForWindows.Shell;
@@ -94,11 +99,16 @@ public sealed partial class MainWindow : IEmptyFolderCleanupView
     private bool _isSystemTitleBarInitialized;
     private readonly ToolSettingsService _toolSettingsService = ToolSettingsService.CreateDefault();
     private readonly ObservableCollection<NavigationViewItem> _navigationItems = [];
-    private readonly Dictionary<string, UIElement> _toolViewLookup = new(StringComparer.OrdinalIgnoreCase);
-    private readonly Dictionary<string, UIElement> _viewKeyLookup = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, Func<UIElement?>> _toolViewLookup = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, Func<UIElement?>> _viewFactoryLookup = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, ToolSettingsSnapshot> _settingsSnapshots = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<UIElement> _allViews = [];
     private string? _currentToolId;
+    private bool _emptyFoldersViewInitialized;
+    private bool _largeFilesViewInitialized;
+    private bool _diskCleanupViewInitialized;
+    private bool _internetRepairViewInitialized;
+    private bool _settingsViewInitialized;
 
     private const string ThemePreferenceKey = "Settings.ThemePreference";
     private const string AccentPreferenceKey = "Settings.AccentPreference";
@@ -197,104 +207,17 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         }
 
         _emptyFolderController = new EmptyFolderCleanupController(directoryCleaner1, this);
-        EmptyFoldersView.CandidatesTree.ItemsSource = _filteredEmptyFolderRoots;
-
-        LargeFilesView.LargeFilesGroupList.ItemsSource = _largeFileGroups;
 
         DashboardView.NavigateToEmptyFoldersRequested += (_, _) => NavigateToTool(EmptyFoldersToolId);
         DashboardView.NavigateToLargeFilesRequested += (_, _) => NavigateToTool(LargeFilesToolId);
         DashboardView.NavigateToDiskCleanupRequested += (_, _) => NavigateToTool(DiskCleanupToolId);
         DashboardView.NavigateToInternetRepairRequested += (_, _) => NavigateToTool(InternetRepairToolId);
 
-        EmptyFoldersView.BrowseRequested += OnBrowse;
-        EmptyFoldersView.CancelRequested += OnCancel;
-        EmptyFoldersView.CandidatesSelectionChanged += OnCandidatesSelectionChanged;
-        EmptyFoldersView.InlineExclusionsCleared += OnClearInlineExclusions;
-        EmptyFoldersView.ResultFiltersCleared += OnClearResultFilters;
-        EmptyFoldersView.DeleteRequested += OnDelete;
-        EmptyFoldersView.ExcludeSelectedRequested += OnExcludeSelected;
-        EmptyFoldersView.IncludeSelectedRequested += OnIncludeSelected;
-        EmptyFoldersView.PreviewRequested += OnPreview;
-        EmptyFoldersView.ResultSearchChanged += OnResultSearchChanged;
-        EmptyFoldersView.ResultSortChanged += OnResultSortChanged;
-        EmptyFoldersView.RootPathTextChanged += RootPathBox_TextChanged;
-        EmptyFoldersView.HideExcludedToggled += OnHideExcludedToggled;
-
-        LargeFilesView.BrowseRequested += OnLargeFilesBrowse;
-        LargeFilesView.CancelRequested += OnLargeFilesCancel;
-        LargeFilesView.ClearExclusionsRequested += OnLargeFilesClearExclusions;
-        LargeFilesView.RootPathChanged += OnLargeFilesRootPathChanged;
-        LargeFilesView.ScanRequested += OnLargeFilesScan;
-        LargeFilesView.DeleteRequested += OnLargeFileDelete;
-        LargeFilesView.ExcludeRequested += OnLargeFileExclude;
-        LargeFilesView.OpenRequested += OnLargeFileOpen;
-        LargeFilesView.RemoveExclusionRequested += OnLargeFilesRemoveExclusion;
-
-        DiskCleanupView.AnalyzeRequested += OnDiskCleanupAnalyze;
-        DiskCleanupView.CleanRequested += OnDiskCleanupClean;
-        DiskCleanupView.CancelRequested += OnCancel;
-
-        InternetRepairView.RunRequested += OnInternetRepairRun;
-        InternetRepairView.CancelRequested += OnInternetRepairCancel;
-        InternetRepairView.ActionSelectionChanged += OnInternetRepairActionSelectionChanged;
-
-        SettingsView.ThemeSelectionChanged += OnThemeSelectionChanged;
-        SettingsView.AccentPreferenceChanged += OnAccentPreferenceChanged;
-        SettingsView.CleanerDefaultsApplied += OnApplyCleanerDefaults;
-        SettingsView.CleanerRecyclePreferenceToggled += OnCleanerRecyclePreferenceToggled;
-        SettingsView.CleanerExclusionsPreferenceChanged += OnCleanerExclusionsPreferenceChanged;
-        SettingsView.CleanerDepthPreferenceChanged += OnCleanerDepthPreferenceChanged;
-        SettingsView.AutomationPreferenceToggled += OnAutomationPreferenceToggled;
-        SettingsView.NotificationPreferenceToggled += OnNotificationPreferenceToggled;
-        SettingsView.HistoryRetentionChanged += OnHistoryRetentionChanged;
-
         CaptureDefaultAccentColors();
         LoadPreferences();
 
-        LargeFilesView.LargeFilesExclusionsList.ItemsSource = _largeFileExclusions;
-        LoadLargeFilePreferences();
-
-        InitializeInternetRepair();
-
-        SetLargeFilesStatus(
-            Symbol.SaveLocal,
-            Localize("LargeFilesStatusReadyTitle", "Ready to explore large files"),
-            Localize("LargeFilesStatusReadyDescription", "Choose a location to find the biggest files grouped by type."));
-        SetLargeFilesActivity(Localize("ActivityIdle", "Waiting for the next action."));
-        UpdateLargeFilesSummary();
-        UpdateLargeFilesExclusionState();
-
         DashboardView.DriveUsageListControl.ItemsSource = _driveUsage;
         _ = UpdateStorageOverviewAsync();
-
-        if (Application.Current.Resources.TryGetValue("AccentButtonStyle", out var accentStyleObj) &&
-            accentStyleObj is Style accentStyle)
-        {
-            EmptyFoldersView.DeleteBtn.Style = accentStyle;
-            DiskCleanupView.DiskCleanupCleanBtn.Style = accentStyle;
-            LargeFilesView.LargeFilesScanBtn.Style = accentStyle;
-            InternetRepairView.InternetRepairRunBtn.Style = accentStyle;
-        }
-
-        SetStatus(
-            Symbol.Folder,
-            Localize("StatusReadyTitle", "Ready when you are"),
-            Localize("StatusReadyDescription", "Select a folder to begin."));
-        SetActivity(Localize("ActivityIdle", "Waiting for the next action."));
-        UpdateResultsSummary(0, Localize("ResultsPlaceholder", "Preview results will appear here once you run a scan."));
-
-        DiskCleanupView.DiskCleanupList.ItemsSource = _diskCleanupItems;
-        DiskCleanupView.DiskCleanupStatusText.Text = LocalizeFormat(
-            "DiskCleanupStatusReady",
-            "Ready to analyze disk cleanup handlers for {0}.",
-            _diskCleanupVolume);
-        if (!IsAdministrator())
-        {
-            DiskCleanupView.DiskCleanupIntro.Text = Localize(
-                "DiskCleanupView.DiskCleanupIntro",
-                "Analyze Windows cleanup handlers. Some categories require Administrator privileges.");
-        }
-        UpdateDiskCleanupActionState();
 
         TryEnableMica();
         ApplyThemePreference(_themePreference, save: false);
@@ -334,9 +257,7 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 xamlEx.Data,
                 xamlEx.StackTrace,
                 xamlEx.Source,
-                xamlEx.InnerException?.TargetSite,
-                xamlEx.InnerException?.Message,
-                xamlEx.Message);
+                xamlEx.InnerException?.TargetSite);
             failure = xamlEx;
         }
         catch (Exception ex)
@@ -488,23 +409,15 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
     private void InitializeViewRegistry()
     {
-        _viewKeyLookup.Clear();
-        _viewKeyLookup["Dashboard"] = DashboardView;
-        _viewKeyLookup["EmptyFolders"] = EmptyFoldersView;
-        _viewKeyLookup["LargeFiles"] = LargeFilesView;
-        _viewKeyLookup["DiskCleanup"] = DiskCleanupView;
-        _viewKeyLookup["InternetRepair"] = InternetRepairView;
+        _viewFactoryLookup.Clear();
+        _viewFactoryLookup["Dashboard"] = () => DashboardView;
+        _viewFactoryLookup["EmptyFolders"] = EnsureEmptyFoldersView;
+        _viewFactoryLookup["LargeFiles"] = EnsureLargeFilesView;
+        _viewFactoryLookup["DiskCleanup"] = EnsureDiskCleanupView;
+        _viewFactoryLookup["InternetRepair"] = EnsureInternetRepairView;
 
         _allViews.Clear();
-        foreach (var view in _viewKeyLookup.Values.Distinct())
-        {
-            _allViews.Add(view);
-        }
-
-        if (!_allViews.Contains(SettingsView))
-        {
-            _allViews.Add(SettingsView);
-        }
+        _allViews.Add(DashboardView);
     }
 
     private void BuildToolNavigation()
@@ -519,14 +432,14 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 continue;
             }
 
-            if (!_viewKeyLookup.TryGetValue(definition.ViewKey!, out var view))
+            if (!_viewFactoryLookup.TryGetValue(definition.ViewKey!, out var viewFactory))
             {
                 continue;
             }
 
             var navItem = CreateNavigationItem(definition);
             _navigationItems.Add(navItem);
-            _toolViewLookup[definition.Id] = view;
+            _toolViewLookup[definition.Id] = viewFactory;
 
             if (_toolSettingsService.GetSnapshot(definition.Id) is { } snapshot)
             {
@@ -591,15 +504,25 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             ? exclusionsNode?.ToString() ?? string.Empty
             : string.Empty;
         _automationAutoPreview = values.TryGetPropertyValue("previewAutomatically", out var previewNode) && previewNode?.GetValue<bool>() == true;
-        UpdateCleanerSettingsView();
-        ApplyCleanerDefaultsToSession();
+        if (_settingsViewInitialized)
+        {
+            UpdateCleanerSettingsView();
+        }
+
+        if (_emptyFoldersViewInitialized)
+        {
+            ApplyCleanerDefaultsToSession();
+        }
     }
 
     private void ApplyDashboardSettings(JsonObject values)
     {
         _automationWeeklyReminder = values.TryGetPropertyValue("remindWeekly", out var reminderNode) && reminderNode?.GetValue<bool>() == true;
-        UpdateAutomationSettingsView();
-        UpdateAutomationSummary();
+        if (_settingsViewInitialized)
+        {
+            UpdateAutomationSettingsView();
+            UpdateAutomationSummary();
+        }
     }
 
     private void ApplyLargeFilesSettings(JsonObject values)
@@ -620,7 +543,10 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
             }
         }
 
-        UpdateLargeFilesExclusionState();
+        if (_largeFilesViewInitialized)
+        {
+            UpdateLargeFilesExclusionState();
+        }
     }
 
     private void OnToolSettingsChanged(object? sender, ToolSettingsChangedEventArgs e)
@@ -662,12 +588,16 @@ private void NavigateToTool(string toolId)
         if (settingsItem is not null && Equals(item, settingsItem))
         {
             _currentToolId = null;
-            ActivateView(SettingsView);
+            var settingsView = EnsureSettingsView();
+            if (settingsView is not null)
+            {
+                ActivateView(settingsView);
+            }
             return;
         }
 
         if (item is not NavigationViewItem { Tag: string toolId } ||
-            !_toolViewLookup.TryGetValue(toolId, out var view))
+            !_toolViewLookup.TryGetValue(toolId, out var viewFactory))
         {
             return;
         }
@@ -678,6 +608,12 @@ private void NavigateToTool(string toolId)
         }
 
         _currentToolId = toolId;
+        var view = viewFactory();
+        if (view is null)
+        {
+            return;
+        }
+
         ActivateView(view);
 
         if (string.Equals(toolId, DashboardToolId, StringComparison.OrdinalIgnoreCase))
@@ -694,6 +630,189 @@ private void NavigateToTool(string toolId)
         }
 
         PlayEntranceTransition(target);
+    }
+
+    private Style? GetAccentButtonStyle()
+    {
+        if (Application.Current.Resources.TryGetValue("AccentButtonStyle", out var accentStyleObj) &&
+            accentStyleObj is Style accentStyle)
+        {
+            return accentStyle;
+        }
+
+        return null;
+    }
+    
+    private FrameworkElement? GetRootElement()
+        => Content as FrameworkElement; // Window.Content is UIElement :contentReference[oaicite:2]{index=2}
+
+// Replace EnsureView<T> with this version
+    private T? EnsureView<T>(string viewName, ref bool initialized, Action<T>? initialize)
+        where T : UIElement
+    {
+        var root = GetRootElement();
+        if (root is null)
+        {
+            Log.Warning("Window content root is not a FrameworkElement; cannot resolve {ViewName}", viewName);
+            return null;
+        }
+
+        var view = root.FindName(viewName) as T; // FindName is on FrameworkElement :contentReference[oaicite:3]{index=3}
+        if (view is null)
+        {
+            Log.Warning("Failed to materialize view {ViewName} via FindName", viewName);
+            return null;
+        }
+
+        if (!_allViews.Contains(view))
+            _allViews.Add(view);
+
+        if (!initialized)
+        {
+            Log.Information("Materialized {ViewName} on demand", viewName);
+            initialize?.Invoke(view);
+            initialized = true;
+        }
+
+        return view;
+    }
+
+    private EmptyFoldersView? EnsureEmptyFoldersView()
+    {
+        return EnsureView<EmptyFoldersView>(nameof(EmptyFoldersView), ref _emptyFoldersViewInitialized, view =>
+        {
+            view.CandidatesTree.ItemsSource = _filteredEmptyFolderRoots;
+
+            view.BrowseRequested += OnBrowse;
+            view.CancelRequested += OnCancel;
+            view.CandidatesSelectionChanged += OnCandidatesSelectionChanged;
+            view.InlineExclusionsCleared += OnClearInlineExclusions;
+            view.ResultFiltersCleared += OnClearResultFilters;
+            view.DeleteRequested += OnDelete;
+            view.ExcludeSelectedRequested += OnExcludeSelected;
+            view.IncludeSelectedRequested += OnIncludeSelected;
+            view.PreviewRequested += OnPreview;
+            view.ResultSearchChanged += OnResultSearchChanged;
+            view.ResultSortChanged += OnResultSortChanged;
+            view.RootPathTextChanged += RootPathBox_TextChanged;
+            view.HideExcludedToggled += OnHideExcludedToggled;
+
+            if (GetAccentButtonStyle() is { } accentStyle)
+            {
+                view.DeleteBtn.Style = accentStyle;
+            }
+
+            SetStatus(
+                Symbol.Folder,
+                Localize("StatusReadyTitle", "Ready when you are"),
+                Localize("StatusReadyDescription", "Select a folder to begin."));
+            SetActivity(Localize("ActivityIdle", "Waiting for the next action."));
+            UpdateResultsSummary(0, Localize("ResultsPlaceholder", "Preview results will appear here once you run a scan."));
+            ApplyCleanerDefaultsToSession();
+        });
+    }
+
+    private LargeFilesView? EnsureLargeFilesView()
+    {
+        return EnsureView<LargeFilesView>(nameof(LargeFilesView), ref _largeFilesViewInitialized, view =>
+        {
+            view.LargeFilesGroupList.ItemsSource = _largeFileGroups;
+            view.LargeFilesExclusionsList.ItemsSource = _largeFileExclusions;
+
+            view.BrowseRequested += OnLargeFilesBrowse;
+            view.CancelRequested += OnLargeFilesCancel;
+            view.ClearExclusionsRequested += OnLargeFilesClearExclusions;
+            view.RootPathChanged += OnLargeFilesRootPathChanged;
+            view.ScanRequested += OnLargeFilesScan;
+            view.DeleteRequested += OnLargeFileDelete;
+            view.ExcludeRequested += OnLargeFileExclude;
+            view.OpenRequested += OnLargeFileOpen;
+            view.RemoveExclusionRequested += OnLargeFilesRemoveExclusion;
+
+            if (GetAccentButtonStyle() is { } accentStyle)
+            {
+                view.LargeFilesScanBtn.Style = accentStyle;
+            }
+
+            LoadLargeFilePreferences();
+
+            SetLargeFilesStatus(
+                Symbol.SaveLocal,
+                Localize("LargeFilesStatusReadyTitle", "Ready to explore large files"),
+                Localize("LargeFilesStatusReadyDescription", "Choose a location to find the biggest files grouped by type."));
+            SetLargeFilesActivity(Localize("ActivityIdle", "Waiting for the next action."));
+            UpdateLargeFilesSummary();
+            UpdateLargeFilesExclusionState();
+        });
+    }
+
+    private DiskCleanupView? EnsureDiskCleanupView()
+    {
+        return EnsureView<DiskCleanupView>(nameof(DiskCleanupView), ref _diskCleanupViewInitialized, view =>
+        {
+            view.AnalyzeRequested += OnDiskCleanupAnalyze;
+            view.CleanRequested += OnDiskCleanupClean;
+            view.CancelRequested += OnCancel;
+            view.DiskCleanupList.ItemsSource = _diskCleanupItems;
+            view.DiskCleanupStatusText.Text = LocalizeFormat(
+                "DiskCleanupStatusReady",
+                "Ready to analyze disk cleanup handlers for {0}.",
+                _diskCleanupVolume);
+
+            if (!IsAdministrator())
+            {
+                view.DiskCleanupIntro.Text = Localize(
+                    "DiskCleanupView.DiskCleanupIntro",
+                    "Analyze Windows cleanup handlers. Some categories require Administrator privileges.");
+            }
+
+            UpdateDiskCleanupActionState();
+
+            if (GetAccentButtonStyle() is { } accentStyle)
+            {
+                view.DiskCleanupCleanBtn.Style = accentStyle;
+            }
+        });
+    }
+
+    private InternetRepairView? EnsureInternetRepairView()
+    {
+        return EnsureView<InternetRepairView>(nameof(InternetRepairView), ref _internetRepairViewInitialized, view =>
+        {
+            view.RunRequested += OnInternetRepairRun;
+            view.CancelRequested += OnInternetRepairCancel;
+            view.ActionSelectionChanged += OnInternetRepairActionSelectionChanged;
+
+            if (GetAccentButtonStyle() is { } accentStyle)
+            {
+                view.InternetRepairRunBtn.Style = accentStyle;
+            }
+
+            InitializeInternetRepair();
+        });
+    }
+
+    private SettingsView? EnsureSettingsView()
+    {
+        return EnsureView<SettingsView>(nameof(SettingsView), ref _settingsViewInitialized, view =>
+        {
+            view.ThemeSelectionChanged += OnThemeSelectionChanged;
+            view.AccentPreferenceChanged += OnAccentPreferenceChanged;
+            view.CleanerDefaultsApplied += OnApplyCleanerDefaults;
+            view.CleanerRecyclePreferenceToggled += OnCleanerRecyclePreferenceToggled;
+            view.CleanerExclusionsPreferenceChanged += OnCleanerExclusionsPreferenceChanged;
+            view.CleanerDepthPreferenceChanged += OnCleanerDepthPreferenceChanged;
+            view.AutomationPreferenceToggled += OnAutomationPreferenceToggled;
+            view.NotificationPreferenceToggled += OnNotificationPreferenceToggled;
+            view.HistoryRetentionChanged += OnHistoryRetentionChanged;
+
+            UpdateCleanerSettingsView();
+            UpdateAutomationSettingsView();
+            UpdateAutomationSummary();
+            UpdateNotificationSummary();
+            UpdateCleanerDefaultsSummary();
+            UpdateHistoryRetentionSummary();
+        });
     }
 
     private static void SetViewVisibility(UIElement view, bool shouldBeVisible)
@@ -1057,14 +1176,7 @@ private void NavigateToTool(string toolId)
                 break;
             default:
             {
-                if (_notificationDesktopAlerts)
-                {
-                    summary = Localize("SettingsNotificationsDesktopOnly", "Desktop alerts only");
-                }
-                else
-                {
-                    summary = Localize("SettingsNotificationsMuted", "Notifications muted");
-                }
+                summary = _notificationDesktopAlerts ? Localize("SettingsNotificationsDesktopOnly", "Desktop alerts only") : Localize("SettingsNotificationsMuted", "Notifications muted");
 
                 break;
             }

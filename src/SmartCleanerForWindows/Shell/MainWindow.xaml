@@ -42,19 +42,19 @@
                 <Grid>
                     <dashboard:DashboardView x:Name="DashboardView" />
 
-                <emptyViews:EmptyFoldersView x:Name="EmptyFoldersView" Visibility="Collapsed" />
+                <emptyViews:EmptyFoldersView x:Name="EmptyFoldersView" x:Load="False" />
 
 
-                <largeViews:LargeFilesView x:Name="LargeFilesView" Visibility="Collapsed" />
+                <largeViews:LargeFilesView x:Name="LargeFilesView" x:Load="False" />
 
 
-                <internetViews:InternetRepairView x:Name="InternetRepairView" Visibility="Collapsed" />
+                <internetViews:InternetRepairView x:Name="InternetRepairView" x:Load="False" />
 
 
-                <diskViews:DiskCleanupView x:Name="DiskCleanupView" Visibility="Collapsed" />
+                <diskViews:DiskCleanupView x:Name="DiskCleanupView" x:Load="False" />
 
 
-                <settingsViews:SettingsView x:Name="SettingsView" Visibility="Collapsed" />
+                <settingsViews:SettingsView x:Name="SettingsView" x:Load="False" />
 
             </Grid>
         </NavigationView.Content>
