@@ -2,6 +2,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Windows.Foundation;
 
+using SmartCleanerForWindows.Diagnostics;
+
 namespace SmartCleanerForWindows.Modules.EmptyFolders.Views;
 
 public sealed partial class EmptyFoldersView
@@ -9,6 +11,7 @@ public sealed partial class EmptyFoldersView
     public EmptyFoldersView()
     {
         InitializeComponent();
+        UiConstructionLog.AttachFrameworkElementDiagnostics(this, "EmptyFoldersView");
         RegisterLayoutElements();
     }
 

@@ -1,5 +1,7 @@
 using Microsoft.UI.Xaml;
 
+using SmartCleanerForWindows.Diagnostics;
+
 namespace SmartCleanerForWindows.Modules.DiskCleanup.Views;
 
 public sealed partial class DiskCleanupView
@@ -7,6 +9,7 @@ public sealed partial class DiskCleanupView
     public DiskCleanupView()
     {
         InitializeComponent();
+        UiConstructionLog.AttachFrameworkElementDiagnostics(this, "DiskCleanupView");
     }
 
     public event RoutedEventHandler? AnalyzeRequested;

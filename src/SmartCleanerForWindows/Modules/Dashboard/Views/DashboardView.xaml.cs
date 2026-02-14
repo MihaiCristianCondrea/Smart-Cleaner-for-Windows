@@ -2,6 +2,8 @@ using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
+using SmartCleanerForWindows.Diagnostics;
+
 namespace SmartCleanerForWindows.Modules.Dashboard.Views;
 
 public sealed partial class DashboardView
@@ -9,6 +11,7 @@ public sealed partial class DashboardView
     public DashboardView()
     {
         InitializeComponent();
+        UiConstructionLog.AttachFrameworkElementDiagnostics(this, "DashboardView");
     }
 
     public TextBlock StorageSummaryTextBlock => StorageSummaryText;

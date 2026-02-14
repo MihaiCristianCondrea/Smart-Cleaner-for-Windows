@@ -4,16 +4,16 @@ using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml;
+using Serilog;
 using UnhandledExceptionEventArgs = System.UnhandledExceptionEventArgs;
 
 namespace SmartCleanerForWindows.Diagnostics;
 
 internal static class StartupDiagnostics
 {
-    private const int FirstChanceSampleLimit = 20;
     private static int _initialized;
-    private static int _firstChanceCount;
     private static readonly Lock SyncRoot = new();
 
     public static void Initialize()
@@ -74,13 +74,29 @@ internal static class StartupDiagnostics
 
     private static void OnFirstChanceException(object? sender, FirstChanceExceptionEventArgs e)
     {
-        var count = Interlocked.Increment(ref _firstChanceCount);
-        if (count > FirstChanceSampleLimit)
+        if (!IsInterestingFirstChanceException(e.Exception))
         {
             return;
         }
 
-        WriteException($"FirstChance#{count}", e.Exception);
+        Log.Error(
+            e.Exception,
+            "FirstChance: {Type} 0x{HResult:X8}: {Message}",
+            e.Exception.GetType().Name,
+            e.Exception.HResult,
+            e.Exception.Message);
+        WriteException("FirstChance", e.Exception);
+    }
+
+    private static bool IsInterestingFirstChanceException(Exception exception)
+    {
+        if (exception is XamlParseException || exception is FileNotFoundException)
+        {
+            return true;
+        }
+
+        return exception.Message.Contains("ms-appx://", StringComparison.OrdinalIgnoreCase)
+               || exception.Message.Contains("Cannot locate resource", StringComparison.OrdinalIgnoreCase);
     }
 
     private static void WriteException(string category, Exception exception)

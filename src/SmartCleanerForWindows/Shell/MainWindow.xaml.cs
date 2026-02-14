@@ -40,6 +40,7 @@ using System.Security.Principal;
 using Microsoft.UI.Xaml.Markup;
 using SmartCleanerForWindows.Core.DiskCleanup;
 using SmartCleanerForWindows.Settings;
+using SmartCleanerForWindows.Diagnostics;
 using SmartCleanerForWindows.Shell.Settings;
 using AppDataPaths = SmartCleanerForWindows.Diagnostics.AppDataPaths;
 
@@ -242,27 +243,17 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         }
         catch (FileNotFoundException fileEx)
         {
-            Log.Error(
-                fileEx,
-                "XAML load failed: missing file referenced by markup (likely resource dictionary or asset). Message={Message}",
-                fileEx.Message);
+            Log.Error("XAML load failed while constructing MainWindow.\n{Details}", XamlDiagnostics.Format(fileEx));
             failure = fileEx;
         }
         catch (XamlParseException xamlEx)
         {
-            Log.Error(
-                xamlEx,
-                "XAML parse failed while constructing MainWindow. HResult={HResult}, Line={Line}, Position={Position}, Inner={InnerMessage}, Message={Message}",
-                xamlEx.HResult,
-                xamlEx.Data,
-                xamlEx.StackTrace,
-                xamlEx.Source,
-                xamlEx.InnerException?.TargetSite);
+            Log.Error("XAML parse failed while constructing MainWindow.\n{Details}", XamlDiagnostics.Format(xamlEx));
             failure = xamlEx;
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Unexpected failure during MainWindow InitializeComponent.");
+            Log.Error("Unexpected failure during MainWindow InitializeComponent.\n{Details}", XamlDiagnostics.Format(ex));
             failure = ex;
         }
 
