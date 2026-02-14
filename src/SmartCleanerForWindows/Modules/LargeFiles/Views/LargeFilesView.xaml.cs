@@ -1,6 +1,8 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
+using SmartCleanerForWindows.Diagnostics;
+
 namespace SmartCleanerForWindows.Modules.LargeFiles.Views;
 
 public sealed partial class LargeFilesView
@@ -8,6 +10,7 @@ public sealed partial class LargeFilesView
     public LargeFilesView()
     {
         InitializeComponent();
+        UiConstructionLog.AttachFrameworkElementDiagnostics(this, "LargeFilesView");
         RegisterLayoutElements();
     }
 

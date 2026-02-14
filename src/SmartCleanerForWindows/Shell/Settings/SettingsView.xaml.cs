@@ -2,6 +2,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Windows.Foundation;
 
+using SmartCleanerForWindows.Diagnostics;
+
 namespace SmartCleanerForWindows.Shell.Settings;
 
 public sealed partial class SettingsView
@@ -9,6 +11,7 @@ public sealed partial class SettingsView
     public SettingsView()
     {
         InitializeComponent();
+        UiConstructionLog.AttachFrameworkElementDiagnostics(this, "SettingsView");
     }
 
     public event SelectionChangedEventHandler? ThemeSelectionChanged;

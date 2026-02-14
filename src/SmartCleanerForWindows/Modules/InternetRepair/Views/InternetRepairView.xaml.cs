@@ -1,5 +1,7 @@
 using Microsoft.UI.Xaml;
 
+using SmartCleanerForWindows.Diagnostics;
+
 namespace SmartCleanerForWindows.Modules.InternetRepair.Views;
 
 public sealed partial class InternetRepairView
@@ -7,6 +9,7 @@ public sealed partial class InternetRepairView
     public InternetRepairView()
     {
         InitializeComponent();
+        UiConstructionLog.AttachFrameworkElementDiagnostics(this, "InternetRepairView");
         RegisterLayoutElements();
     }
 
