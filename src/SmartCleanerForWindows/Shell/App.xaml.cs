@@ -1,13 +1,18 @@
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using SmartCleanerForWindows.Modules.Dashboard.Views;
+using SmartCleanerForWindows.Modules.DiskCleanup.Views;
+using SmartCleanerForWindows.Modules.EmptyFolders.Views;
+using SmartCleanerForWindows.Modules.InternetRepair.Views;
+using SmartCleanerForWindows.Modules.LargeFiles.Views;
 using Serilog;
 using SmartCleanerForWindows.Diagnostics;
 using SmartCleanerForWindows.Settings;
+using SmartCleanerForWindows.Shell.Settings;
 
 namespace SmartCleanerForWindows.Shell;
 
@@ -63,17 +68,36 @@ public sealed partial class App
             var resources = Application.Current.Resources;
             string[] keysToCheck =
             [
-                "TextFillColorSecondaryBrush"
+                "TextFillColorSecondaryBrush",
+                "ApplicationPageBackgroundThemeBrush",
+                "SystemControlForegroundBaseMediumBrush"
             ];
 
             foreach (var key in keysToCheck)
             {
-                Debug.WriteLine(!resources.TryGetValue(key, out var value)
-                    ? $"[RESOURCE] MISSING: {key}"
-                    : $"[RESOURCE] FOUND: {key} -> {value?.GetType().FullName ?? "<null>"}");
+                Log.Information(!resources.TryGetValue(key, out var value)
+                    ? "Startup resource probe missing: {ResourceKey}"
+                    : "Startup resource probe found: {ResourceKey} ({ValueType})",
+                    key,
+                    value?.GetType().FullName ?? "<null>");
             }
 
+            ProbePackagedAsset("Assets/Square44x44Logo.scale-200.png");
+            ProbeViewInitialization();
+
             _window = UiConstructionLog.Create(() => new MainWindow(), "MainWindow");
+            if (_window is MainWindow { IsFallbackShellActive: true } fallbackWindow)
+            {
+                Log.Warning(
+                    "MainWindow started in fallback mode due to XAML initialization failure: {FailureType} {FailureMessage}",
+                    fallbackWindow.InitializationFailure?.GetType().Name ?? "Unknown",
+                    fallbackWindow.InitializationFailure?.Message ?? "(none)");
+            }
+            else
+            {
+                Log.Information("MainWindow started in normal mode (XAML initialization succeeded).");
+            }
+
             Log.Information("MainWindow instance created. Activating window.");
             _window.Activate();
             Log.Information("MainWindow activation requested.");
@@ -90,6 +114,70 @@ public sealed partial class App
             Log.Error("MainWindow creation failed.\n{Details}", XamlDiagnostics.Format(ex));
             CrashHandler.HandleFatalException("app launch", ex, terminateProcess: true);
         }
+    }
+
+
+    private static void ProbePackagedAsset(string relativePath)
+    {
+        var normalizedPath = relativePath.Replace('/', Path.DirectorySeparatorChar);
+        var absolutePath = Path.Combine(AppContext.BaseDirectory, normalizedPath);
+        Log.Information(
+            "Startup asset probe: {RelativePath} exists={Exists} absolute={AbsolutePath}",
+            relativePath,
+            File.Exists(absolutePath),
+            absolutePath);
+    }
+
+    private static void ProbeViewInitialization()
+    {
+        if (!ShouldRunViewInitializationProbes())
+        {
+            Log.Information("Startup view probes disabled. Set SMARTCLEANER_PROBE_VIEWS=1 to enable troubleshooting probes.");
+            return;
+        }
+
+        var probes = new[]
+        {
+            (Name: "DashboardView", Factory: (Func<FrameworkElement>)(() => new DashboardView())),
+            (Name: "EmptyFoldersView", Factory: (Func<FrameworkElement>)(() => new EmptyFoldersView())),
+            (Name: "LargeFilesView", Factory: (Func<FrameworkElement>)(() => new LargeFilesView())),
+            (Name: "InternetRepairView", Factory: (Func<FrameworkElement>)(() => new InternetRepairView())),
+            (Name: "DiskCleanupView", Factory: (Func<FrameworkElement>)(() => new DiskCleanupView())),
+            (Name: "SettingsView", Factory: (Func<FrameworkElement>)(() => new SettingsView()))
+        };
+
+        foreach (var probe in probes)
+        {
+            try
+            {
+                _ = probe.Factory();
+                Log.Information("Startup view probe succeeded: {ViewName}", probe.Name);
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Startup view probe failed: {ViewName}\n{Details}", probe.Name, XamlDiagnostics.Format(ex));
+            }
+        }
+    }
+
+    private static bool ShouldRunViewInitializationProbes()
+    {
+#if DEBUG
+        const bool debugDefault = true;
+#else
+        const bool debugDefault = false;
+#endif
+
+        var configured = Environment.GetEnvironmentVariable("SMARTCLEANER_PROBE_VIEWS");
+        if (string.IsNullOrWhiteSpace(configured))
+        {
+            return debugDefault;
+        }
+
+        return configured.Equals("1", StringComparison.OrdinalIgnoreCase)
+               || configured.Equals("true", StringComparison.OrdinalIgnoreCase)
+               || configured.Equals("yes", StringComparison.OrdinalIgnoreCase)
+               || configured.Equals("on", StringComparison.OrdinalIgnoreCase);
     }
 
     private static void OnAppDomainUnhandledException(object sender, System.UnhandledExceptionEventArgs e)

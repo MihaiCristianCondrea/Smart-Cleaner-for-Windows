@@ -153,6 +153,9 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         "SystemAccentColorDark3"
     ];
 
+    internal bool IsFallbackShellActive { get; private set; }
+    internal Exception? InitializationFailure { get; private set; }
+
     public MainWindow()
         : this(
             DirectoryCleanerFactory.CreateDefault(),
@@ -203,6 +206,8 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         if (!TryInitializeComponentWithDiagnostics(out var xamlFailure))
         {
             _toolSettingsService.Dispose();
+            IsFallbackShellActive = true;
+            InitializationFailure = xamlFailure;
             BuildFallbackShell(xamlFailure);
             return;
         }
@@ -248,6 +253,11 @@ AP/UeAD/1HgA/9R4AP/UeAD/1HgA/9R4AP/UeAD/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         }
         catch (XamlParseException xamlEx)
         {
+            if (xamlEx.InnerException is FileNotFoundException innerFileEx)
+            {
+                Log.Error("XAML parse failed with inner FileNotFoundException while constructing MainWindow.\n{Details}", XamlDiagnostics.Format(innerFileEx));
+            }
+
             Log.Error("XAML parse failed while constructing MainWindow.\n{Details}", XamlDiagnostics.Format(xamlEx));
             failure = xamlEx;
         }

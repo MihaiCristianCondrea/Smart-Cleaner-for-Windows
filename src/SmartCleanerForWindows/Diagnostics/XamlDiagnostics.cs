@@ -46,6 +46,19 @@ internal static partial class XamlDiagnostics
         sb.AppendLine($"Message: {ex.Message}");
         sb.AppendLine($"HResult: 0x{ex.HResult:X8}");
 
+        if (ex is System.IO.FileNotFoundException fileNotFound)
+        {
+            if (!string.IsNullOrWhiteSpace(fileNotFound.FileName))
+            {
+                sb.AppendLine($"FileName: {fileNotFound.FileName}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(fileNotFound.FusionLog))
+            {
+                sb.AppendLine($"FusionLog: {fileNotFound.FusionLog}");
+            }
+        }
+
         if (!string.IsNullOrWhiteSpace(ex.Source))
         {
             sb.AppendLine($"Source: {ex.Source}");
