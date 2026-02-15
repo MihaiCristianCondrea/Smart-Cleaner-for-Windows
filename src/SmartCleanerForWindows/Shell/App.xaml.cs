@@ -31,7 +31,6 @@ public sealed partial class App
     {
         InitializeComponent();
         Trace.AutoFlush = true;
-
         TraceInformation("App constructor invoked. Registering global exception handlers.");
         RegisterGlobalExceptionHandlers();
     }
