@@ -1,24 +1,26 @@
 using System;
+using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using SmartCleanerForWindows.Modules.Dashboard.Views;
-using SmartCleanerForWindows.Modules.DiskCleanup.Views;
-using SmartCleanerForWindows.Modules.EmptyFolders.Views;
-using SmartCleanerForWindows.Modules.InternetRepair.Views;
-using SmartCleanerForWindows.Modules.LargeFiles.Views;
-using Serilog;
-using SmartCleanerForWindows.Diagnostics;
-using SmartCleanerForWindows.Settings;
-using SmartCleanerForWindows.Shell.Settings;
 
 namespace SmartCleanerForWindows.Shell;
 
 /// <summary>
-/// App is declared partial because InitializeComponent is generated from App.xaml at build time.
+/// Represents the WinUI application.
 /// </summary>
+/// <remarks>
+/// <para>
+/// The <see cref="InitializeComponent"/> method is generated from <c>App.xaml</c> at build time.
+/// </para>
+/// <para>
+/// This type registers global exception handlers and creates the main <see cref="Window"/> in
+/// <see cref="OnLaunched(LaunchActivatedEventArgs)"/>.
+/// </para>
+/// </remarks>
 public sealed partial class App
 {
     private Window? _window;
@@ -27,185 +29,162 @@ public sealed partial class App
 
     public App()
     {
-        Log.Information("App constructor invoked. Setting up global exception handlers.");
         InitializeComponent();
+        Trace.AutoFlush = true;
 
-        StartupDiagnostics.Initialize();
-        StartupDiagnostics.AttachToApplication(this);
-
-        // AppDomain handler MUST use System.UnhandledExceptionEventArgs + non-null sender.
-        AppDomain.CurrentDomain.UnhandledException += OnAppDomainUnhandledException;
-
-        // This one is fine as-is.
-        TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
-
-        // WinUI Application.UnhandledException uses Microsoft.UI.Xaml.UnhandledExceptionEventArgs.
-        UnhandledException += OnApplicationUnhandledException;
+        TraceInformation("App constructor invoked. Registering global exception handlers.");
+        RegisterGlobalExceptionHandlers();
     }
 
+    /// <inheritdoc />
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         try
         {
             OnLaunchedInvoked = true;
-            Log.Information("App.OnLaunched entered. Launch arguments: {Arguments}", args.Arguments);
+            TraceInformation($"App.OnLaunched entered. Launch arguments: \"{args.Arguments}\"");
 
-            var baseDirectory = AppContext.BaseDirectory;
-            Log.Information(
-                "Resolved AppContext.BaseDirectory={BaseDirectory}. PRI present: {PriExists}",
-                baseDirectory,
-                File.Exists(Path.Combine(baseDirectory, "SmartCleanerForWindows.pri")));
-
-            try
-            {
-                ToolSettingsBootstrapper.Initialize();
-            }
-            catch (Exception bootstrapFailure)
-            {
-                Log.Warning(bootstrapFailure, "Settings bootstrap failed; continuing startup with defaults where possible.");
-            }
-
-            var resources = Application.Current.Resources;
-            string[] keysToCheck =
-            [
+            ProbeAppEnvironment();
+            ProbeResources(
                 "BooleanToVisibilityConverter",
                 "ApplicationPageBackgroundThemeBrush",
-                "SystemControlForegroundBaseMediumBrush"
-            ];
-
-            foreach (var key in keysToCheck)
-            {
-                Log.Information(!resources.TryGetValue(key, out var value)
-                    ? "Startup resource probe missing: {ResourceKey}"
-                    : "Startup resource probe found: {ResourceKey} ({ValueType})",
-                    key,
-                    value?.GetType().FullName ?? "<null>");
-            }
+                "SystemControlForegroundBaseMediumBrush");
 
             ProbePackagedAsset("Assets/Square44x44Logo.scale-200.png");
-            ProbeViewInitialization();
 
-            _window = UiConstructionLog.Create(() => new MainWindow(), "MainWindow");
-            if (_window is MainWindow { IsFallbackShellActive: true } fallbackWindow)
-            {
-                Log.Warning(
-                    "MainWindow started in fallback mode due to XAML initialization failure: {FailureType} {FailureMessage}",
-                    fallbackWindow.InitializationFailure?.GetType().Name ?? "Unknown",
-                    fallbackWindow.InitializationFailure?.Message ?? "(none)");
-            }
-            else
-            {
-                Log.Information("MainWindow started in normal mode (XAML initialization succeeded).");
-            }
-
-            Log.Information("MainWindow instance created. Activating window.");
+            _window ??= CreateMainWindow();
+            TraceInformation("Main window created. Activating window.");
             _window.Activate();
-            Log.Information("MainWindow activation requested.");
-        }
-        catch (FileNotFoundException fileEx)
-        {
-            Log.Error("MainWindow creation failed.\n{Details}", XamlDiagnostics.Format(fileEx));
-            ShowFatalErrorWindow(
-                "A required application file could not be found. Please reinstall Smart Cleaner for Windows.",
-                fileEx);
+            TraceInformation("Main window activation requested.");
         }
         catch (Exception ex)
         {
-            Log.Error("MainWindow creation failed.\n{Details}", XamlDiagnostics.Format(ex));
-            CrashHandler.HandleFatalException("app launch", ex, terminateProcess: true);
+            TraceError("Fatal error during application launch.", ex);
+            ShowFatalErrorWindow(
+                "Smart Cleaner for Windows encountered a fatal error during app launch.",
+                ex);
         }
     }
 
-
-    private static void ProbePackagedAsset(string relativePath)
+    private static void RegisterGlobalExceptionHandlers()
     {
-        var normalizedPath = relativePath.Replace('/', Path.DirectorySeparatorChar);
-        var absolutePath = Path.Combine(AppContext.BaseDirectory, normalizedPath);
-        Log.Information(
-            "Startup asset probe: {RelativePath} exists={Exists} absolute={AbsolutePath}",
-            relativePath,
-            File.Exists(absolutePath),
-            absolutePath);
-    }
+        // AppDomain handler uses System.UnhandledExceptionEventArgs.
+        AppDomain.CurrentDomain.UnhandledException += OnAppDomainUnhandledException;
 
-    private static void ProbeViewInitialization()
-    {
-        if (!ShouldRunViewInitializationProbes())
-        {
-            Log.Information("Startup view probes disabled. Set SMARTCLEANER_PROBE_VIEWS=1 to enable troubleshooting probes.");
-            return;
-        }
+        // Observes exceptions that were not awaited/observed.
+        TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
 
-        var probes = new[]
-        {
-            (Name: "DashboardView", Factory: (Func<FrameworkElement>)(() => new DashboardView())),
-            (Name: "EmptyFoldersView", Factory: (Func<FrameworkElement>)(() => new EmptyFoldersView())),
-            (Name: "LargeFilesView", Factory: (Func<FrameworkElement>)(() => new LargeFilesView())),
-            (Name: "InternetRepairView", Factory: (Func<FrameworkElement>)(() => new InternetRepairView())),
-            (Name: "DiskCleanupView", Factory: (Func<FrameworkElement>)(() => new DiskCleanupView())),
-            (Name: "SettingsView", Factory: (Func<FrameworkElement>)(() => new SettingsView()))
-        };
-
-        foreach (var probe in probes)
-        {
-            try
-            {
-                _ = probe.Factory();
-                Log.Information("Startup view probe succeeded: {ViewName}", probe.Name);
-            }
-            catch (Exception ex)
-            {
-                Log.Error("Startup view probe failed: {ViewName}\n{Details}", probe.Name, XamlDiagnostics.Format(ex));
-            }
-        }
-    }
-
-    private static bool ShouldRunViewInitializationProbes()
-    {
-#if DEBUG
-        const bool debugDefault = true;
-#else
-        const bool debugDefault = false;
-#endif
-
-        var configured = Environment.GetEnvironmentVariable("SMARTCLEANER_PROBE_VIEWS");
-        if (string.IsNullOrWhiteSpace(configured))
-        {
-            return debugDefault;
-        }
-
-        return configured.Equals("1", StringComparison.OrdinalIgnoreCase)
-               || configured.Equals("true", StringComparison.OrdinalIgnoreCase)
-               || configured.Equals("yes", StringComparison.OrdinalIgnoreCase)
-               || configured.Equals("on", StringComparison.OrdinalIgnoreCase);
+        // WinUI handler uses Microsoft.UI.Xaml.UnhandledExceptionEventArgs.
+        Current.UnhandledException += OnApplicationUnhandledException;
     }
 
     private static void OnAppDomainUnhandledException(object sender, System.UnhandledExceptionEventArgs e)
-        => HandleUnhandledException(e.ExceptionObject as Exception, "AppDomain.UnhandledException");
+    {
+        var exception = e.ExceptionObject as Exception;
+        if (exception is null)
+        {
+            TraceError($"Unhandled exception from AppDomain.UnhandledException (non-Exception object: {e.ExceptionObject}).", null);
+            Environment.FailFast("Unhandled exception from AppDomain.UnhandledException (non-Exception object).");
+            return;
+        }
+
+        TraceError("Unhandled exception from AppDomain.UnhandledException.", exception);
+        Environment.FailFast("Unhandled exception from AppDomain.UnhandledException.", exception);
+    }
 
     private static void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
-        HandleUnhandledException(e.Exception, "TaskScheduler.UnobservedTaskException");
+        TraceError("Unobserved task exception from TaskScheduler.UnobservedTaskException.", e.Exception);
+
+        // Prevents the process from being terminated due to escalation of the unobserved exception.
         e.SetObserved();
     }
 
     private static void OnApplicationUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
-        HandleUnhandledException(e.Exception, "Application.UnhandledException");
+        TraceError("Unhandled exception from Application.UnhandledException.", e.Exception);
+
+        // Mark as handled only if you can safely continue execution.
+        // WinUI/Windows App SDK may still terminate the process for certain exception sources.
         e.Handled = true;
     }
 
-    private static void HandleUnhandledException(Exception? exception, string source)
+    private static void ProbeAppEnvironment()
     {
-        if (exception is null) return;
-        CrashHandler.HandleFatalException(source, exception, terminateProcess: true);
+        var baseDirectory = AppContext.BaseDirectory;
+        TraceInformation($"Resolved AppContext.BaseDirectory=\"{baseDirectory}\"");
+
+        var anyPri = false;
+        try
+        {
+            foreach (var _ in Directory.EnumerateFiles(baseDirectory, "*.pri", SearchOption.TopDirectoryOnly))
+            {
+                anyPri = true;
+                break;
+            }
+        }
+        catch (Exception ex)
+        {
+            TraceError("Failed to enumerate PRI files in the base directory.", ex);
+        }
+
+        TraceInformation($"PRI present: {anyPri}");
+    }
+
+    private static void ProbeResources(params string[] keysToCheck)
+    {
+        var resources = Current.Resources;
+
+        foreach (var key in keysToCheck)
+        {
+            var found = resources.TryGetValue(key, out var value);
+            TraceInformation(
+                found
+                    ? $"Startup resource probe found: \"{key}\" (Type={value?.GetType().FullName ?? "<null>"})"
+                    : $"Startup resource probe missing: \"{key}\"");
+        }
+    }
+
+    private static void ProbePackagedAsset(string relativePath)
+    {
+        var normalizedPath = relativePath.Replace('/', Path.DirectorySeparatorChar);
+        var absolutePath = Path.Combine(AppContext.BaseDirectory, normalizedPath);
+
+        TraceInformation(
+            $"Startup asset probe: \"{relativePath}\" exists={File.Exists(absolutePath)} absolute=\"{absolutePath}\"");
+    }
+
+    private static Window CreateMainWindow()
+    {
+        // Self-contained default window content (no external view/window types referenced).
+        return new Window
+        {
+            Content = new StackPanel
+            {
+                Padding = new Thickness(24),
+                Spacing = 12,
+                Children =
+                {
+                    new TextBlock
+                    {
+                        Text = "Smart Cleaner for Windows",
+                        FontSize = 22,
+                        FontWeight = FontWeights.SemiBold,
+                        TextWrapping = TextWrapping.Wrap
+                    },
+                    new TextBlock
+                    {
+                        Text = "The application started successfully.",
+                        TextWrapping = TextWrapping.Wrap
+                    }
+                }
+            }
+        };
     }
 
     private void ShowFatalErrorWindow(string friendlyMessage, Exception exception)
     {
-        CrashHandler.HandleFatalException("app launch (non-fatal)", exception, terminateProcess: false);
-
-        var fallbackWindow = new Window
+        _window = new Window
         {
             Content = new StackPanel
             {
@@ -222,14 +201,54 @@ public sealed partial class App
                     },
                     new TextBlock
                     {
-                        Text = "The app will stay open so you can read the error above. You can close it after reviewing the logs.",
+                        Text = "Details:",
+                        FontWeight = FontWeights.SemiBold
+                    },
+                    new TextBox
+                    {
+                        Text = FormatException(exception),
+                        IsReadOnly = true,
+                        TextWrapping = TextWrapping.Wrap,
+                        HorizontalAlignment = HorizontalAlignment.Stretch
+                    },
+                    new TextBlock
+                    {
+                        Text = "The app will stay open so you can read the error details above. You can close it after reviewing the logs.",
                         TextWrapping = TextWrapping.Wrap
                     }
                 }
             }
         };
 
-        _window = fallbackWindow;
         _window.Activate();
+    }
+
+    private static string FormatException(Exception exception)
+    {
+        var sb = new StringBuilder();
+
+        sb.AppendLine(exception.ToString());
+
+        if (exception is FileNotFoundException fnf && !string.IsNullOrWhiteSpace(fnf.FileName))
+        {
+            sb.AppendLine();
+            sb.Append("FileName: ");
+            sb.AppendLine(fnf.FileName);
+        }
+
+        return sb.ToString();
+    }
+
+    private static void TraceInformation(string message) => Trace.TraceInformation(message);
+
+    private static void TraceError(string message, Exception? exception)
+    {
+        if (exception is null)
+        {
+            Trace.TraceError(message);
+            return;
+        }
+
+        Trace.TraceError($"{message}{Environment.NewLine}{FormatException(exception)}");
     }
 }
