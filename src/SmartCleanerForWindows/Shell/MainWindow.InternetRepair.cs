@@ -338,7 +338,11 @@ public sealed partial class MainWindow
                     Localize("InternetRepairLogCancelled", "Cancelled."));
                 break;
             default:
-                throw new ArgumentOutOfRangeException();
+                var exception = new ArgumentOutOfRangeException();
+                exception.HelpLink = null;
+                exception.HResult = 0;
+                exception.Source = null;
+                throw exception;
         }
     }
 

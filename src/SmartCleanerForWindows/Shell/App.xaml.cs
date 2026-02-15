@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.UI.Text;
@@ -74,8 +75,7 @@ public sealed partial class App
 
     private static void OnAppDomainUnhandledException(object sender, System.UnhandledExceptionEventArgs e)
     {
-        var exception = e.ExceptionObject as Exception;
-        if (exception is null)
+        if (e.ExceptionObject is not Exception exception)
         {
             TraceError($"Unhandled exception from AppDomain.UnhandledException (non-Exception object: {e.ExceptionObject}).", null);
             Environment.FailFast("Unhandled exception from AppDomain.UnhandledException (non-Exception object).");
@@ -106,10 +106,9 @@ public sealed partial class App
         var anyPri = false;
         try
         {
-            foreach (var _ in Directory.EnumerateFiles(baseDirectory, "*.pri", SearchOption.TopDirectoryOnly))
+            if (Directory.EnumerateFiles(baseDirectory, "*.pri", SearchOption.TopDirectoryOnly).Any())
             {
                 anyPri = true;
-                break;
             }
         }
         catch (Exception ex)
@@ -201,12 +200,10 @@ public sealed partial class App
 
         sb.AppendLine(exception.ToString());
 
-        if (exception is FileNotFoundException fnf && !string.IsNullOrWhiteSpace(fnf.FileName))
-        {
-            sb.AppendLine();
-            sb.Append("FileName: ");
-            sb.AppendLine(fnf.FileName);
-        }
+        if (exception is not FileNotFoundException fnf || string.IsNullOrWhiteSpace(fnf.FileName)) return sb.ToString();
+        sb.AppendLine();
+        sb.Append("FileName: ");
+        sb.AppendLine(fnf.FileName);
 
         return sb.ToString();
     }

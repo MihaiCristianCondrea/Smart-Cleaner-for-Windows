@@ -164,7 +164,7 @@ public sealed partial class MainWindow
         emptyFoldersView.Info.IsOpen = true;
     }
 
-    private Brush GetStatusHeroBrush(Symbol symbol)
+    private static Brush GetStatusHeroBrush(Symbol symbol)
     {
         return symbol switch
         {
@@ -175,7 +175,7 @@ public sealed partial class MainWindow
         };
     }
 
-    private Brush GetStatusGlyphBrush(Symbol symbol)
+    private static Brush GetStatusGlyphBrush(Symbol symbol)
     {
         return symbol switch
         {

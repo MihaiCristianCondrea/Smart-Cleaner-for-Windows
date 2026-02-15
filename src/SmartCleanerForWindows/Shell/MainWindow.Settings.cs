@@ -295,13 +295,11 @@ public sealed partial class MainWindow
     {
         if (_isInitializingSettings) return;
 
-        if (sender is TextBox textBox)
-        {
-            _cleanerExclusions = textBox.Text?.Trim() ?? string.Empty;
-            PersistEmptyFolderSettings();
-            UpdateCleanerDefaultsSummary();
-            ApplyCleanerDefaultsToSession();
-        }
+        if (sender is not TextBox textBox) return;
+        _cleanerExclusions = textBox.Text?.Trim() ?? string.Empty;
+        PersistEmptyFolderSettings();
+        UpdateCleanerDefaultsSummary();
+        ApplyCleanerDefaultsToSession();
     }
 
     private void OnApplyCleanerDefaults(object sender, RoutedEventArgs e)
