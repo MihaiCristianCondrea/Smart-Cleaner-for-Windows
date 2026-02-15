@@ -26,7 +26,7 @@
             SelectionFollowsFocus="Disabled"
             AlwaysShowHeader="False"
             IsTitleBarAutoPaddingEnabled="False"
-            SelectionChanged="OnNavigationSelectionChanged"
+            SelectionChanged="OnNavigationSelectionChanged" 
             Loaded="OnNavigationLoaded">
 
             <!-- Native way: style ONLY nav menu containers (does not leak to inner lists) -->

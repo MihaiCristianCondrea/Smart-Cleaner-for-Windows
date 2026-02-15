@@ -476,6 +476,39 @@ public sealed partial class MainWindow
         UpdateLargeFilesExclusionState();
     }
 
+    private void ApplyLargeFilesSettings(System.Text.Json.Nodes.JsonObject values)
+    {
+        var exclusions = values.TryGetPropertyValue("excludedPaths", out var exclusionsNode)
+            ? exclusionsNode?.GetValue<string>()
+            : null;
+
+        if (!string.IsNullOrWhiteSpace(exclusions))
+        {
+            foreach (var exclusion in exclusions.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                AddLargeFileExclusion(exclusion, save: false, showMessageOnError: false);
+            }
+
+            LargeFilesView.LargeFilesExclusionsBox.Text = exclusions;
+        }
+
+        if (values.TryGetPropertyValue("minimumSizeMb", out var minimumSizeNode))
+        {
+            var maxItems = minimumSizeNode switch
+            {
+                System.Text.Json.Nodes.JsonValue value when value.TryGetValue<double>(out var sizeValue) =>
+                    Math.Clamp((int)Math.Round(sizeValue, MidpointRounding.AwayFromZero), 1, 5000),
+                System.Text.Json.Nodes.JsonValue value when value.TryGetValue<int>(out var sizeValue) =>
+                    Math.Clamp(sizeValue, 1, 5000),
+                _ => (int)LargeFilesView.LargeFilesMaxItemsBox.Value
+            };
+
+            LargeFilesView.LargeFilesMaxItemsBox.Value = maxItems;
+        }
+
+        UpdateLargeFilesExclusionState();
+    }
+
     private void PersistLargeFileExclusions()
     {
         if (!_settingsSnapshots.TryGetValue(LargeFilesToolId, out var snapshot))
@@ -617,4 +650,3 @@ public sealed partial class MainWindow
     }
 
 }
-
