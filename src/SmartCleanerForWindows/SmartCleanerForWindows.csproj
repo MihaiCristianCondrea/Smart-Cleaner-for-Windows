@@ -92,7 +92,6 @@
         <!-- Ensure runtime views are always compiled into PRI/XBF as Page items. -->
         <None Remove="Shell\MainWindow.xaml" />
         <Content Remove="Shell\MainWindow.xaml" />
-        <Page Include="Shell\MainWindow.xaml" />
 
         <None Remove="Shell\Settings\SettingsView.xaml" />
         <Content Remove="Shell\Settings\SettingsView.xaml" />

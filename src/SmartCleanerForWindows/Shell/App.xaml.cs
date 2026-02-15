@@ -67,13 +67,8 @@ public sealed partial class App
 
     private static void RegisterGlobalExceptionHandlers()
     {
-        // AppDomain handler uses System.UnhandledExceptionEventArgs.
         AppDomain.CurrentDomain.UnhandledException += OnAppDomainUnhandledException;
-
-        // Observes exceptions that were not awaited/observed.
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
-
-        // WinUI handler uses Microsoft.UI.Xaml.UnhandledExceptionEventArgs.
         Current.UnhandledException += OnApplicationUnhandledException;
     }
 
@@ -94,17 +89,12 @@ public sealed partial class App
     private static void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
         TraceError("Unobserved task exception from TaskScheduler.UnobservedTaskException.", e.Exception);
-
-        // Prevents the process from being terminated due to escalation of the unobserved exception.
         e.SetObserved();
     }
 
     private static void OnApplicationUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
         TraceError("Unhandled exception from Application.UnhandledException.", e.Exception);
-
-        // Mark as handled only if you can safely continue execution.
-        // WinUI/Windows App SDK may still terminate the process for certain exception sources.
         e.Handled = true;
     }
 
@@ -155,30 +145,7 @@ public sealed partial class App
 
     private static Window CreateMainWindow()
     {
-        // Self-contained default window content (no external view/window types referenced).
-        return new Window
-        {
-            Content = new StackPanel
-            {
-                Padding = new Thickness(24),
-                Spacing = 12,
-                Children =
-                {
-                    new TextBlock
-                    {
-                        Text = "Smart Cleaner for Windows",
-                        FontSize = 22,
-                        FontWeight = FontWeights.SemiBold,
-                        TextWrapping = TextWrapping.Wrap
-                    },
-                    new TextBlock
-                    {
-                        Text = "The application started successfully.",
-                        TextWrapping = TextWrapping.Wrap
-                    }
-                }
-            }
-        };
+        return new MainWindow();
     }
 
     private void ShowFatalErrorWindow(string friendlyMessage, Exception exception)
