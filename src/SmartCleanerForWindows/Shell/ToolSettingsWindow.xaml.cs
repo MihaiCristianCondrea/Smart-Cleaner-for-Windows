@@ -5,8 +5,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Numerics;
-using System.Security.Principal;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,7 +12,6 @@ using Microsoft.UI;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.Windows.ApplicationModel.Resources;
@@ -26,7 +23,6 @@ using SmartCleanerForWindows.Core.Networking;
 using SmartCleanerForWindows.Core.Storage;
 using SmartCleanerForWindows.Diagnostics;
 using SmartCleanerForWindows.Modules.Dashboard.ViewModels;
-using SmartCleanerForWindows.Modules.Dashboard.Views;
 using SmartCleanerForWindows.Modules.DiskCleanup.ViewModels;
 using SmartCleanerForWindows.Modules.DiskCleanup.Views;
 using SmartCleanerForWindows.Modules.EmptyFolders;
@@ -74,7 +70,7 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView
     private string _currentResultSearch = string.Empty;
     private bool _hideExcludedResults;
     private EmptyFolderSortOption _currentResultSort = EmptyFolderSortOption.NameAscending;
-    private bool _isBusy;
+    private bool _isBusy; // FIXME: Field '_isBusy' is never assigned
 
     private readonly ObservableCollection<DriveUsageViewModel> _driveUsage = [];
     private readonly ObservableCollection<DiskCleanupItemViewModel> _diskCleanupItems = [];
@@ -100,7 +96,7 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView
 
     private readonly Dictionary<string, WindowsColor> _defaultAccentColors = new();
 
-    private readonly ResourceLoader? _resources = TryCreateResourceLoader();
+    private readonly ResourceLoader? _resources = TryCreateResourceLoader(); // FIXME: Field '_resources' is never used
     private readonly ApplicationDataContainer? _settings = TryGetLocalSettings();
 
     private bool _isInitializingSettings;
@@ -125,10 +121,10 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView
     private readonly ObservableCollection<NavigationViewItem> _navigationItems = [];
     private readonly Dictionary<string, Func<UIElement?>> _toolViewLookup = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, Func<UIElement?>> _viewFactoryLookup = new(StringComparer.OrdinalIgnoreCase);
-    private readonly Dictionary<string, ToolSettingsSnapshot> _settingsSnapshots = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, ToolSettingsSnapshot> _settingsSnapshots = new(StringComparer.OrdinalIgnoreCase); // FIXME: Content of collection '_settingsSnapshots' is never updated
     private readonly List<UIElement> _allViews = [];
 
-    private string? _currentToolId;
+    private string? _currentToolId; // FIXME: Field '_currentToolId' is assigned but its value is never used
     private bool _emptyFoldersViewInitialized;
     private bool _largeFilesViewInitialized;
     private bool _diskCleanupViewInitialized;
@@ -169,8 +165,8 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView
     private const string DiskCleanupToolId = "diskCleanup";
     private const string InternetRepairToolId = "internetRepair";
 
-    internal bool IsFallbackShellActive { get; private set; }
-    internal Exception? InitializationFailure { get; private set; }
+    internal bool IsFallbackShellActive { get; private set; } // FIXME: Auto-property accessor 'IsFallbackShellActive.get' is never used
+    internal Exception? InitializationFailure { get; private set; } // FIXME: Auto-property accessor 'InitializationFailure.get' is never used
 
     public MainWindow()
         : this(
@@ -242,17 +238,16 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView
 
         _emptyFolderController = new EmptyFolderCleanupController(cleaner, this);
 
-        // ✅ Disambiguate instance member access (prevents type-name confusion if a DashboardView type is also in scope).
-        this.DashboardView.NavigateToEmptyFoldersRequested += (_, _) => NavigateToTool(EmptyFoldersToolId); // FIXME: Cannot resolve symbol 'DashboardView' & Cannot resolve symbol 'NavigateToTool'
-        this.DashboardView.NavigateToLargeFilesRequested += (_, _) => NavigateToTool(LargeFilesToolId); // FIXME: Cannot resolve symbol 'DashboardView' & Cannot resolve symbol 'NavigateToTool'
-        this.DashboardView.NavigateToDiskCleanupRequested += (_, _) => NavigateToTool(DiskCleanupToolId); // FIXME: Cannot resolve symbol 'DashboardView' & Cannot resolve symbol 'NavigateToTool'
-        this.DashboardView.NavigateToInternetRepairRequested += (_, _) => NavigateToTool(InternetRepairToolId); // FIXME: Cannot resolve symbol 'DashboardView' & Cannot resolve symbol 'NavigateToTool'
+        this.DashboardView.NavigateToEmptyFoldersRequested += (_, _) => NavigateToTool(EmptyFoldersToolId); // FIXME: Cannot resolve symbol 'DashboardView' && The delegate type could not be inferred
+        this.DashboardView.NavigateToLargeFilesRequested += (_, _) => NavigateToTool(LargeFilesToolId); // FIXME: Cannot resolve symbol 'DashboardView' && The delegate type could not be inferred
+        this.DashboardView.NavigateToDiskCleanupRequested += (_, _) => NavigateToTool(DiskCleanupToolId); // FIXME: Cannot resolve symbol 'DashboardView' && The delegate type could not be inferred
+        this.DashboardView.NavigateToInternetRepairRequested += (_, _) => NavigateToTool(InternetRepairToolId); // FIXME: Cannot resolve symbol 'DashboardView' && The delegate type could not be inferred
 
         CaptureDefaultAccentColors();
         LoadPreferences();
 
-        this.DashboardView.DriveUsageListControl.ItemsSource = _driveUsage; // FIXME: Cannot resolve symbol 'DashboardView'
-        _ = UpdateStorageOverviewAsync(); // FIXME: Cannot resolve symbol 'UpdateStorageOverviewAsync'
+        this.DashboardView.DriveUsageListControl.ItemsSource = _driveUsage; // FIXME: Cannot resolve symbol 'DashboardView' && The delegate type could not be inferred
+        _ = UpdateStorageOverviewAsync();
 
         // Your existing implementations in other partial(s):
         TryEnableMica();
@@ -260,7 +255,6 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView
         TryConfigureAppWindow();
         InitializeSystemTitleBar();
 
-        // ✅ Now compiles because Window exposes these events. :contentReference[oaicite:1]{index=1}
         Activated += OnWindowActivated;
         Closed += OnClosed;
 
@@ -427,32 +421,218 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView
     // Navigation + view materialization (unchanged, relies on XAML x:Name fields)
     // ----------------------------
 
-    private void OnNavigationLoaded(object sender, RoutedEventArgs e)
+    private void OnNavigationSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args) // FIXME: Method 'OnNavigationSelectionChanged' is never used && Parameter 'sender' is never used
     {
-        if (RootNavigation.SelectedItem is null && _navigationItems.Count > 0)
+        if (args.IsSettingsSelected)
         {
-            RootNavigation.SelectedItem = _navigationItems[0];
-            ShowPage(_navigationItems[0]); // FIXME:" Cannot resolve symbol 'ShowPage'
+            ShowPage(this.SettingsView); // FIXME: Cannot resolve symbol 'SettingsView'
+            _currentToolId = nameof(SettingsView);
             return;
         }
 
-        if (RootNavigation.SelectedItem is not null)
+        if (args.SelectedItem is NavigationViewItem item)
         {
-            ShowPage(RootNavigation.SelectedItem);
+            ShowPage(item);
+        }
+    }
+
+    private void OnNavigationLoaded(object sender, RoutedEventArgs e) // FIXME: Method 'OnNavigationLoaded' is never used && Parameter 'sender' is never used && Parameter 'e' is never used
+    {
+        if (this.RootNavigation.SelectedItem is null && _navigationItems.Count > 0) // FIXME: Cannot resolve symbol 'RootNavigation'
+        {
+            this.RootNavigation.SelectedItem = _navigationItems[0]; // FIXME: Cannot resolve symbol 'RootNavigation'
+            ShowPage(_navigationItems[0]);
+            return;
+        }
+
+        if (this.RootNavigation.SelectedItem is not null) // FIXME: Cannot resolve symbol 'RootNavigation'
+        {
+            ShowPage(this.RootNavigation.SelectedItem); // FIXME: Cannot resolve symbol 'RootNavigation'
         }
     }
 
     private void InitializeViewRegistry()
     {
         _viewFactoryLookup.Clear();
-        _viewFactoryLookup["Dashboard"] = () => this.DashboardView; // FIXME: Cannot resolve symbol 'DashboardView'
-        _viewFactoryLookup["EmptyFolders"] = EnsureEmptyFoldersView; // FIXMEL Cannot resolve symbol 'EnsureEmptyFoldersView'
-        _viewFactoryLookup["LargeFiles"] = EnsureLargeFilesView; // FIXME: Cannot resolve symbol 'EnsureLargeFilesView'
-        _viewFactoryLookup["DiskCleanup"] = EnsureDiskCleanupView; // FIXME: Cannot resolve symbol 'EnsureDiskCleanupView'
-        _viewFactoryLookup["InternetRepair"] = EnsureInternetRepairView; // FIXME: Cannot resolve symbol 'EnsureInternetRepairView'
+        _viewFactoryLookup["Dashboard"] = () => this.DashboardView;
+        _viewFactoryLookup["EmptyFolders"] = EnsureEmptyFoldersView;
+        _viewFactoryLookup["LargeFiles"] = EnsureLargeFilesView;
+        _viewFactoryLookup["DiskCleanup"] = EnsureDiskCleanupView;
+        _viewFactoryLookup["InternetRepair"] = EnsureInternetRepairView;
 
         _allViews.Clear();
         _allViews.Add(this.DashboardView);
+    }
+
+    private void NavigateToTool(string toolId)
+    {
+        if (!_toolViewLookup.TryGetValue(toolId, out _))
+        {
+            return;
+        }
+
+        var item = _navigationItems.FirstOrDefault(candidate =>
+            candidate.Tag is string tag && string.Equals(tag, toolId, StringComparison.OrdinalIgnoreCase));
+
+        if (item is null)
+        {
+            return;
+        }
+
+        this.RootNavigation.SelectedItem = item;
+        ShowPage(item);
+    }
+
+    private void ShowPage(object? selection)
+    {
+        UIElement? selectedView = selection switch
+        {
+            NavigationViewItem { Tag: string toolId } when _toolViewLookup.TryGetValue(toolId, out var viewFactory) => viewFactory(),
+            UIElement directView => directView,
+            _ => null
+        };
+
+        if (selectedView is null)
+        {
+            return;
+        }
+
+        foreach (var view in _allViews)
+        {
+            if (view != selectedView)
+            {
+                view.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        if (!_allViews.Contains(selectedView))
+        {
+            _allViews.Add(selectedView);
+        }
+
+        selectedView.Visibility = Visibility.Visible;
+    }
+
+    private TView? EnsureView<TView>(string elementName, ref bool initialized, Action<TView>? configure = null)
+        where TView : class
+    {
+        var view = this.FindName(elementName) as TView;
+        if (view is null)
+        {
+            return null;
+        }
+
+        if (!initialized)
+        {
+            configure?.Invoke(view);
+            initialized = true;
+        }
+
+        if (view is UIElement element)
+        {
+            element.Visibility = Visibility.Visible;
+        }
+
+        return view;
+    }
+
+    private EmptyFoldersView? EnsureEmptyFoldersView()
+    {
+        return EnsureView<EmptyFoldersView>(nameof(EmptyFoldersView), ref _emptyFoldersViewInitialized, _ =>
+        {
+            this.EmptyFoldersView.CandidatesTree.ItemsSource = _filteredEmptyFolderRoots;
+            UpdateResultsActionState();
+        });
+    }
+
+    private LargeFilesView? EnsureLargeFilesView()
+    {
+        return EnsureView<LargeFilesView>(nameof(LargeFilesView), ref _largeFilesViewInitialized, _ =>
+        {
+            this.LargeFilesView.LargeFilesGroupList.ItemsSource = _largeFileGroups;
+            this.LargeFilesView.LargeFilesExclusionsList.ItemsSource = _largeFileExclusions;
+        });
+    }
+
+    private DiskCleanupView? EnsureDiskCleanupView()
+    {
+        return EnsureView<DiskCleanupView>(nameof(DiskCleanupView), ref _diskCleanupViewInitialized, _ =>
+        {
+            this.DiskCleanupView.DiskCleanupList.ItemsSource = _diskCleanupItems;
+        });
+    }
+
+    private InternetRepairView? EnsureInternetRepairView()
+    {
+        return EnsureView<InternetRepairView>(nameof(InternetRepairView), ref _internetRepairViewInitialized, _ =>
+        {
+            this.InternetRepairView.InternetRepairLogList.ItemsSource = _internetRepairLog;
+        });
+    }
+
+    private void OnToolSettingsNavigationLoaded(object sender, RoutedEventArgs e) // FIXME: Method 'OnToolSettingsNavigationLoaded' is never used && Parameter 'sender' is never used && Parameter 'e' is never used
+    {
+        // Embedded tool settings host is initialized through SettingsView once it is loaded.
+    }
+
+    private async Task UpdateStorageOverviewAsync()
+    {
+        _storageOverviewCts = SafeCancelAndDispose(_storageOverviewCts);
+        _storageOverviewCts = new CancellationTokenSource();
+
+        try
+        {
+            var result = await _storageOverviewService.GetDriveUsageAsync(_storageOverviewCts.Token).ConfigureAwait(true);
+
+            _driveUsage.Clear();
+            foreach (var drive in result.Drives)
+            {
+                var usedBytes = drive.TotalSize > drive.FreeSpace ? drive.TotalSize - drive.FreeSpace : 0UL;
+                var usedPercentage = drive.TotalSize == 0
+                    ? 0
+                    : Math.Clamp((double)usedBytes / drive.TotalSize * 100.0, 0, 100);
+
+                var details = string.IsNullOrWhiteSpace(drive.VolumeLabel)
+                    ? drive.Name
+                    : string.Format(CultureInfo.CurrentCulture, "{0} ({1})", drive.Name, drive.VolumeLabel);
+
+                var usageSummary = string.Format(
+                    CultureInfo.CurrentCulture,
+                    "{0} used of {1}",
+                    FormatStorageSize(usedBytes),
+                    FormatStorageSize(drive.TotalSize));
+
+                _driveUsage.Add(new DriveUsageViewModel(drive.Name, details, usedPercentage, usageSummary));
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Ignore cancellation.
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Unable to refresh dashboard storage overview.");
+            _driveUsage.Clear();
+        }
+        finally
+        {
+            _storageOverviewCts = SafeCancelAndDispose(_storageOverviewCts);
+        }
+    }
+
+    private static string FormatStorageSize(ulong bytes)
+    {
+        string[] units = ["B", "KB", "MB", "GB", "TB", "PB"];
+        double value = bytes;
+        var unitIndex = 0;
+
+        while (value >= 1024 && unitIndex < units.Length - 1)
+        {
+            value /= 1024;
+            unitIndex++;
+        }
+
+        return string.Format(CultureInfo.CurrentCulture, "{0:0.#} {1}", value, units[unitIndex]);
     }
 
     private void BuildToolNavigation()
@@ -475,10 +655,10 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView
             }
         }
 
-        RootNavigation.MenuItems.Clear();
+        this.RootNavigation.MenuItems.Clear(); // FIXME: Cannot resolve symbol 'RootNavigation'
         foreach (var item in _navigationItems)
         {
-            RootNavigation.MenuItems.Add(item);
+            RootNavigation.MenuItems.Add(item); // FIXME: Cannot resolve symbol 'RootNavigation'
         }
     }
 
@@ -504,7 +684,7 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView
     {
         DispatcherQueue.TryEnqueue(() =>
         {
-            ApplySnapshot(e.Snapshot);
+            ApplySnapshot(e.Snapshot); // FIXME: Cannot resolve symbol 'ApplySnapshot'
 
             if (_toolSettingsUiInitialized &&
                 _toolSettingsActiveDefinition is not null &&
@@ -519,33 +699,32 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView
     // ----------------------------
     // Folder picker: native WinUI desktop pattern
     // ----------------------------
-    private async void OnBrowse(object sender, RoutedEventArgs e)
+    private async void OnBrowse(object sender, RoutedEventArgs e) // FIXME: Method 'OnBrowse' is never used && Parameter 'sender' is never used && Parameter 'e' is never used
     {
         try
         {
             var picker = new FolderPicker();
             picker.FileTypeFilter.Add("*");
 
-            // ✅ Required on WinUI 3 desktop: initialize picker with this window handle. :contentReference[oaicite:2]{index=2}
             InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
 
             var folder = await picker.PickSingleFolderAsync();
             if (folder is null) return;
 
-            EmptyFoldersView.RootPathBox.Text = folder.Path;
+            this.EmptyFoldersView.RootPathBox.Text = folder.Path; // FIXME: Cannot resolve symbol 'EmptyFoldersView'
 
             UpdateResultsActionState();
-            SetStatus(Symbol.Folder,
-                Localize("StatusFolderSelectedTitle", "Folder selected"),
-                Localize("StatusFolderSelectedDescription", "Run Preview to identify empty directories."));
-            SetActivity(Localize("ActivityReadyToScan", "Ready to scan the selected folder."));
-            UpdateResultsSummary(0, Localize("ResultsPlaceholder", "Preview results will appear here once you run a scan."));
+            SetStatus(Symbol.Folder, // FIXME: Cannot resolve symbol 'SetStatus'
+                Localize("StatusFolderSelectedTitle", "Folder selected"), // FIXME: Cannot resolve symbol 'Localize'
+                Localize("StatusFolderSelectedDescription", "Run Preview to identify empty directories.")); // FIXME: Cannot resolve symbol 'Localize'
+            SetActivity(Localize("ActivityReadyToScan", "Ready to scan the selected folder.")); // FIXME: Cannot resolve symbol 'SetActivity' && Cannot resolve symbol 'Localize'
+            UpdateResultsSummary(0, Localize("ResultsPlaceholder", "Preview results will appear here once you run a scan.")); // FIXME: Cannot resolve symbol 'UpdateResultsSummary' && Cannot resolve symbol 'Localize'
         }
         catch (Exception ex)
         {
-            ShowInfo(
+            ShowInfo( // FIXME: Cannot resolve symbol 'ShowInfo'
                 string.Format(CultureInfo.CurrentCulture,
-                    Localize("InfoBrowseFailed", "Couldn't select a folder: {0}"),
+                    Localize("InfoBrowseFailed", "Couldn't select a folder: {0}"), // FIXME: Cannot resolve symbol 'Localize'
                     ex.Message),
                 InfoBarSeverity.Error);
         }
@@ -555,7 +734,7 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView
     // MERGED: ToolSettingsWindow logic (dynamic tool settings UI inside SettingsView)
     // =========================================================================================
 
-    private SettingsView? EnsureSettingsView()
+    private SettingsView? EnsureSettingsView() // FIXME: Method 'EnsureSettingsView' is never used
     {
         return EnsureView<SettingsView>(nameof(SettingsView), ref _settingsViewInitialized, view =>
         {
@@ -571,27 +750,27 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView
 
             UpdateCleanerSettingsView();
             UpdateAutomationSettingsView();
-            UpdateAutomationSummary();
-            UpdateNotificationSummary();
-            UpdateCleanerDefaultsSummary();
-            UpdateHistoryRetentionSummary();
+            UpdateAutomationSummary(); // FIXME: Cannot resolve symbol 'UpdateAutomationSummary'
+            UpdateNotificationSummary(); // FIXME: Cannot resolve symbol 'UpdateNotificationSummary'
+            UpdateCleanerDefaultsSummary(); // FIXME: Cannot resolve symbol 'UpdateCleanerDefaultsSummary'
+            UpdateHistoryRetentionSummary(); // FIXME: Cannot resolve symbol 'UpdateCleanerDefaultsSummary'
 
             // ✅ IMPORTANT: do this after the SettingsView is actually loaded (namescope + template applied).
             RoutedEventHandler? loaded = null;
             loaded = (_, _) =>
             {
                 view.Loaded -= loaded;
-                InitializeToolSettingsUi(view);
+                InitializeToolSettingsUi();
             };
             view.Loaded += loaded;
         });
     }
 
-    private void InitializeToolSettingsUi(SettingsView settingsView)
+    private void InitializeToolSettingsUi()
     {
         // Prefer namescope lookup first (native, fast).
-        _toolSettingsNavigation ??= settingsView.FindName("ToolsNavigation") as NavigationView;
-        _toolSettingsFieldsHost ??= settingsView.FindName("FieldsHost") as Panel;
+        _toolSettingsNavigation ??= this.FindName("ToolsNavigation") as NavigationView; // FIXME: Cannot resolve symbol 'FindName'
+        _toolSettingsFieldsHost ??= this.FindName("FieldsHost") as Panel; // FIXME: Cannot resolve symbol 'FindName'
 
         if (_toolSettingsNavigation is null || _toolSettingsFieldsHost is null)
         {
@@ -631,7 +810,7 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView
             {
                 Content = definition.Title,
                 Tag = definition.Id,
-                ToolTip = definition.Description,
+                ToolTip = definition.Description, // FIXME: Cannot resolve symbol 'ToolTip'
                 Icon = TryCreateToolSettingsIcon(definition.Icon)
             };
 
