@@ -167,8 +167,8 @@ public sealed partial class MainWindow : IEmptyFolderCleanupView
     private const string DiskCleanupToolId = "diskCleanup";
     private const string InternetRepairToolId = "internetRepair";
 
-    internal bool IsFallbackShellActive { get; private set; } // FIXME: Auto-property accessor 'IsFallbackShellActive.get' is never used
-    internal Exception? InitializationFailure { get; private set; } // FIXME: Auto-property accessor 'InitializationFailure.get' is never used
+    internal bool IsFallbackShellActive { get; private set; }
+    internal Exception? InitializationFailure { get; private set; }
 
     public MainWindow()
         : this(

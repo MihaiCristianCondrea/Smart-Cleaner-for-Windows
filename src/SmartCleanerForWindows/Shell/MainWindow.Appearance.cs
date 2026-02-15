@@ -212,9 +212,10 @@ public sealed partial class MainWindow
                 return appIconPath;
             }
 
-            var tempPath = Path.Combine(Path.GetTempPath(), TitleBarIconTempFileName);
+            // TODO: Search online abbout the correct implementation 
+            var tempPath = Path.Combine(Path.GetTempPath(), TitleBarIconTempFileName); // FIXME: Cannot resolve symbol 'TitleBarIconTempFileName'
             if (File.Exists(tempPath)) return tempPath;
-            var iconBytes = Convert.FromBase64String(TitleBarIconBase64);
+            var iconBytes = Convert.FromBase64String(TitleBarIconBase64); // FIXME: Cannot resolve symbol 'TitleBarIconBase64'
             File.WriteAllBytes(tempPath, iconBytes);
 
             return tempPath;

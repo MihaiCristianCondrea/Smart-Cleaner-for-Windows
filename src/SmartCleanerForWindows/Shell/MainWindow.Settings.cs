@@ -14,6 +14,16 @@ public sealed partial class MainWindow
 {
     private static readonly Color WhiteColor = Color.FromArgb(255, 255, 255, 255);
     private static readonly Color BlackColor = Color.FromArgb(255, 0, 0, 0);
+    private static readonly string[] AccentResourceKeys =
+    [
+        "SystemAccentColor",
+        "SystemAccentColorLight1",
+        "SystemAccentColorLight2",
+        "SystemAccentColorLight3",
+        "SystemAccentColorDark1",
+        "SystemAccentColorDark2",
+        "SystemAccentColorDark3"
+    ];
 
     private static bool ParseBoolSetting(string? value, bool defaultValue)
     {
@@ -79,7 +89,7 @@ public sealed partial class MainWindow
 
         _isInitializingSettings = false;
 
-        ApplyCleanerDefaultsToSession(); // FIXME: Cannot resolve symbol 'ApplyCleanerDefaultsToSession'
+        ApplyCleanerDefaultsToSession();
     }
 
     private void OnThemeSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -260,7 +270,7 @@ public sealed partial class MainWindow
         _cleanerSendToRecycleBin = toggle.IsOn;
         PersistEmptyFolderSettings();
         UpdateCleanerDefaultsSummary();
-        ApplyCleanerDefaultsToSession(); // FIXME: Cannot resolve symbol 'ApplyCleanerDefaultsToSession'
+        ApplyCleanerDefaultsToSession();
     }
 
     private void OnCleanerDepthPreferenceChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
@@ -278,7 +288,7 @@ public sealed partial class MainWindow
         _cleanerDepthLimit = depth;
         PersistEmptyFolderSettings();
         UpdateCleanerDefaultsSummary();
-        ApplyCleanerDefaultsToSession(); // FIXME: Cannot resolve symbol 'ApplyCleanerDefaultsToSession'
+        ApplyCleanerDefaultsToSession();
     }
 
     private void OnCleanerExclusionsPreferenceChanged(object sender, TextChangedEventArgs e)
@@ -290,16 +300,42 @@ public sealed partial class MainWindow
             _cleanerExclusions = textBox.Text?.Trim() ?? string.Empty;
             PersistEmptyFolderSettings();
             UpdateCleanerDefaultsSummary();
-            ApplyCleanerDefaultsToSession(); // FIXME: Cannot resolve symbol 'ApplyCleanerDefaultsToSession'
+            ApplyCleanerDefaultsToSession();
         }
     }
 
     private void OnApplyCleanerDefaults(object sender, RoutedEventArgs e)
     {
-        ApplyCleanerDefaultsToSession(); // FIXME: Cannot resolve symbol 'ApplyCleanerDefaultsToSession'
-        ShowCleanerDefaultsInfo( // FIXME: Cannot resolve symbol 'ShowCleanerDefaultsInfo'
+        ApplyCleanerDefaultsToSession();
+        ShowCleanerDefaultsInfo(
             Localize("SettingsCleanerDefaultsApplied", "Defaults applied to current session."),
             InfoBarSeverity.Success);
+    }
+
+    private void ApplyCleanerDefaultsToSession()
+    {
+        var emptyFoldersView = EnsureEmptyFoldersView();
+        if (emptyFoldersView is null)
+        {
+            return;
+        }
+
+        emptyFoldersView.RecycleChk.IsChecked = _cleanerSendToRecycleBin;
+        emptyFoldersView.DepthBox.Value = _cleanerDepthLimit;
+        emptyFoldersView.ExcludeBox.Text = _cleanerExclusions;
+        UpdateResultsActionState();
+    }
+
+    private void ShowCleanerDefaultsInfo(string message, InfoBarSeverity severity)
+    {
+        if (SettingsView.CleanerDefaultsInfoBar is null)
+        {
+            return;
+        }
+
+        SettingsView.CleanerDefaultsInfoBar.Message = message;
+        SettingsView.CleanerDefaultsInfoBar.Severity = severity;
+        SettingsView.CleanerDefaultsInfoBar.IsOpen = true;
     }
 
     private void OnAutomationPreferenceToggled(object sender, RoutedEventArgs e)
@@ -520,7 +556,7 @@ public sealed partial class MainWindow
 
     private void CaptureDefaultAccentColors()
     {
-        foreach (var key in AccentResourceKeys) // FIXME: Cannot resolve symbol 'AccentResourceKeys'
+        foreach (var key in AccentResourceKeys)
         {
             if (Application.Current.Resources.TryGetValue(key, out var value) && value is Color color)
             {
@@ -531,7 +567,7 @@ public sealed partial class MainWindow
 
     private void RestoreAccentColors()
     {
-        foreach (var key in AccentResourceKeys) // FIXME: Cannot resolve symbol 'AccentResourceKeys'
+        foreach (var key in AccentResourceKeys)
         {
             if (_defaultAccentColors.TryGetValue(key, out var color))
             {
@@ -610,4 +646,3 @@ public sealed partial class MainWindow
         }
     }
 }
-

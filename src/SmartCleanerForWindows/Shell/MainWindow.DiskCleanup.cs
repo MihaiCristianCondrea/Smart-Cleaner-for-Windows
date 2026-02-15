@@ -40,7 +40,7 @@ public sealed partial class MainWindow
                 _diskCleanupCts = null;
             }
 
-            await CancelAndDisposeAsync(previousCts);
+            await CancelAndDisposeAsync(previousCts); // FIXME: Cannot resolve symbol 'CancelAndDisposeAsync'
         }
 
         var cts = new CancellationTokenSource();
@@ -132,7 +132,7 @@ public sealed partial class MainWindow
                 _diskCleanupCts = null;
             }
 
-            await CancelAndDisposeAsync(previousCts);
+            await CancelAndDisposeAsync(previousCts); // FIXME: Cannot resolve symbol 'CancelAndDisposeAsync'
         }
 
         var cts = new CancellationTokenSource();

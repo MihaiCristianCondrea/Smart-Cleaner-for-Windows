@@ -145,7 +145,13 @@ public sealed partial class App
 
     private static Window CreateMainWindow()
     {
-        return new MainWindow();
+        var mainWindow = new MainWindow();
+        if (mainWindow.IsFallbackShellActive)
+        {
+            TraceError("MainWindow initialized in fallback mode.", mainWindow.InitializationFailure);
+        }
+
+        return mainWindow;
     }
 
     private void ShowFatalErrorWindow(string friendlyMessage, Exception exception)

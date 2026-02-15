@@ -446,7 +446,7 @@ public sealed partial class MainWindow
         _inlineExcludedPaths.Clear();
         _totalPreviewCount = 0;
         view.CandidatesTree.SelectedItems?.Clear();
-        UpdateResultBadgeValue(0);
+        UpdateResultBadgeValue(0); // FIXME: Cannot resolve symbol 'UpdateResultBadgeValue'
         UpdateInlineExclusionSummary();
         UpdateResultFilterControls();
         UpdateResultsActionState();
@@ -461,7 +461,7 @@ public sealed partial class MainWindow
         }
     }
 
-    private EmptyFolderNode EnsureNodeForPath(string fullPath)
+    private EmptyFolderNode EnsureNodeForPath(string fullPath) // FIXME: Method 'EnsureNodeForPath' return value is never used
     {
         if (_emptyFolderLookup.TryGetValue(fullPath, out var existing))
         {
@@ -581,7 +581,7 @@ public sealed partial class MainWindow
 
         var visibleIncludedCount = CountVisibleNodes(_filteredEmptyFolderRoots, includeExcluded: false);
         UpdateResultsSummary(visibleIncludedCount, null, _totalPreviewCount == 0 ? null : _totalPreviewCount);
-        UpdateResultBadgeValue(visibleIncludedCount);
+        UpdateResultBadgeValue(visibleIncludedCount); // FIXME: Cannot resolve symbol 'UpdateResultBadgeValue'
         UpdatePreviewCandidatesFromTree();
         UpdateInlineExclusionSummary();
         UpdateResultFilterControls();
@@ -734,7 +734,7 @@ public sealed partial class MainWindow
 
     private void OnClearResultFilters(object sender, RoutedEventArgs e)
     {
-        var previousSearch = _currentResultSearch;
+        var previousSearch = _currentResultSearch; // FIXME: Local variable 'previousSearch' is never used
         var previousHide = _hideExcludedResults;
 
         EmptyFoldersView.ResultsSearchBox.Text = string.Empty;
