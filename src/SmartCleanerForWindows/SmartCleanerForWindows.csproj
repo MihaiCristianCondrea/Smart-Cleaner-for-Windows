@@ -11,6 +11,7 @@
         <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
         <PublishProfile>win-$(Platform).pubxml</PublishProfile>
         <UseWinUI>true</UseWinUI>
+        <EnableDefaultPageItems>false</EnableDefaultPageItems>
         <EnableMsixTooling>true</EnableMsixTooling>
         <Nullable>enable</Nullable>
         <DefaultLanguage>en-US</DefaultLanguage>
@@ -81,11 +82,20 @@
     </ItemGroup>
 
     <ItemGroup>
+        <None Remove="Shell\**\*.xaml" />
+        <Content Remove="Shell\**\*.xaml" />
+        <None Remove="Modules\**\Views\**\*.xaml" />
+        <Content Remove="Modules\**\Views\**\*.xaml" />
+
         <ApplicationDefinition Include="Shell\App.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
         </ApplicationDefinition>
         <Page Remove="Shell\App.xaml" />
+
+        <Page Include="Shell\MainWindow.xaml" />
+        <Page Include="Shell\Settings\SettingsView.xaml" />
+        <Page Include="Modules\**\Views\**\*.xaml" />
     </ItemGroup>
 
     <ItemGroup>

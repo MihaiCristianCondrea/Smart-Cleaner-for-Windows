@@ -68,7 +68,7 @@ public sealed partial class App
             var resources = Application.Current.Resources;
             string[] keysToCheck =
             [
-                "TextFillColorSecondaryBrush",
+                "TextFillColorSecondary",
                 "ApplicationPageBackgroundThemeBrush",
                 "SystemControlForegroundBaseMediumBrush"
             ];
