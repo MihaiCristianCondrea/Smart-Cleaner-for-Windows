@@ -40,7 +40,7 @@ public sealed partial class MainWindow
                 _diskCleanupCts = null;
             }
 
-            await CancelAndDisposeAsync(previousCts); // FIXME: Cannot resolve symbol 'CancelAndDisposeAsync'
+            await CancelAndDisposeAsync(previousCts);
         }
 
         var cts = new CancellationTokenSource();
@@ -132,7 +132,7 @@ public sealed partial class MainWindow
                 _diskCleanupCts = null;
             }
 
-            await CancelAndDisposeAsync(previousCts); // FIXME: Cannot resolve symbol 'CancelAndDisposeAsync'
+            await CancelAndDisposeAsync(previousCts);
         }
 
         var cts = new CancellationTokenSource();
@@ -205,6 +205,28 @@ public sealed partial class MainWindow
             cts.Dispose();
             UpdateDiskCleanupActionState();
         }
+    }
+
+
+    private static Task CancelAndDisposeAsync(CancellationTokenSource cancellationTokenSource)
+    {
+        try
+        {
+            if (!cancellationTokenSource.IsCancellationRequested)
+            {
+                cancellationTokenSource.Cancel();
+            }
+        }
+        catch (ObjectDisposedException)
+        {
+            // Already disposed by another path.
+        }
+        finally
+        {
+            cancellationTokenSource.Dispose();
+        }
+
+        return Task.CompletedTask;
     }
 
     private void ApplyDiskCleanupResults(IReadOnlyCollection<DiskCleanupItem> items)

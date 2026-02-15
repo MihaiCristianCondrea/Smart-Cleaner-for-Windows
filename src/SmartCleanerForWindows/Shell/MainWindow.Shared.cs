@@ -99,6 +99,27 @@ public sealed partial class MainWindow
         }
     }
 
+
+    private void UpdateResultBadgeValue(int visibleCount)
+    {
+        var emptyFoldersView = EnsureEmptyFoldersView();
+        if (emptyFoldersView is null)
+        {
+            return;
+        }
+
+        if (visibleCount > 0)
+        {
+            emptyFoldersView.ResultBadge.Value = visibleCount;
+            emptyFoldersView.ResultBadge.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            emptyFoldersView.ResultBadge.ClearValue(InfoBadge.ValueProperty);
+            emptyFoldersView.ResultBadge.Visibility = Visibility.Collapsed;
+        }
+    }
+
     private void SetActivity(string message)
     {
         var emptyFoldersView = EnsureEmptyFoldersView();

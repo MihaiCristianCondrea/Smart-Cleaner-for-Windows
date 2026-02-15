@@ -446,7 +446,7 @@ public sealed partial class MainWindow
         _inlineExcludedPaths.Clear();
         _totalPreviewCount = 0;
         view.CandidatesTree.SelectedItems?.Clear();
-        UpdateResultBadgeValue(0); // FIXME: Cannot resolve symbol 'UpdateResultBadgeValue'
+        UpdateResultBadgeValue(0);
         UpdateInlineExclusionSummary();
         UpdateResultFilterControls();
         UpdateResultsActionState();
@@ -461,11 +461,11 @@ public sealed partial class MainWindow
         }
     }
 
-    private EmptyFolderNode EnsureNodeForPath(string fullPath) // FIXME: Method 'EnsureNodeForPath' return value is never used
+    private void EnsureNodeForPath(string fullPath)
     {
-        if (_emptyFolderLookup.TryGetValue(fullPath, out var existing))
+        if (_emptyFolderLookup.TryGetValue(fullPath, out _))
         {
-            return existing;
+            return;
         }
 
         var relative = string.IsNullOrEmpty(_currentPreviewRoot)
@@ -477,13 +477,12 @@ public sealed partial class MainWindow
             var rootName = GetNodeName(fullPath);
             var rootNode = new EmptyFolderNode(rootName, fullPath, rootName, depth: 0);
             RegisterNode(rootNode, parent: null);
-            return rootNode;
+            return;
         }
 
         var segments = relative.Split([Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar], StringSplitOptions.RemoveEmptyEntries);
         var currentPath = _currentPreviewRoot;
         EmptyFolderNode? parent = null;
-        EmptyFolderNode? lastNode = null;
         var depth = 0;
 
         foreach (var segment in segments)
@@ -496,7 +495,6 @@ public sealed partial class MainWindow
             if (_emptyFolderLookup.TryGetValue(currentPath, out var node))
             {
                 parent = node;
-                lastNode = node;
                 continue;
             }
 
@@ -508,10 +506,7 @@ public sealed partial class MainWindow
             node = new EmptyFolderNode(segment, currentPath, relativePath, depth);
             RegisterNode(node, parent);
             parent = node;
-            lastNode = node;
         }
-
-        return lastNode!;
     }
 
     private void RegisterNode(EmptyFolderNode node, EmptyFolderNode? parent)
@@ -581,7 +576,7 @@ public sealed partial class MainWindow
 
         var visibleIncludedCount = CountVisibleNodes(_filteredEmptyFolderRoots, includeExcluded: false);
         UpdateResultsSummary(visibleIncludedCount, null, _totalPreviewCount == 0 ? null : _totalPreviewCount);
-        UpdateResultBadgeValue(visibleIncludedCount); // FIXME: Cannot resolve symbol 'UpdateResultBadgeValue'
+        UpdateResultBadgeValue(visibleIncludedCount);
         UpdatePreviewCandidatesFromTree();
         UpdateInlineExclusionSummary();
         UpdateResultFilterControls();
@@ -734,7 +729,6 @@ public sealed partial class MainWindow
 
     private void OnClearResultFilters(object sender, RoutedEventArgs e)
     {
-        var previousSearch = _currentResultSearch; // FIXME: Local variable 'previousSearch' is never used
         var previousHide = _hideExcludedResults;
 
         EmptyFoldersView.ResultsSearchBox.Text = string.Empty;
@@ -749,10 +743,7 @@ public sealed partial class MainWindow
             _hideExcludedResults = false;
         }
 
-        if (!previousHide)
-        {
-            RefreshPreviewTree();
-        }
+        RefreshPreviewTree();
     }
 
     private void OnExcludeSelected(object sender, RoutedEventArgs e)

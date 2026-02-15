@@ -92,31 +92,52 @@
         <!-- Ensure runtime views are always compiled into PRI/XBF as Page items. -->
         <None Remove="Shell\ToolSettingsWindow.xaml" />
         <Content Remove="Shell\ToolSettingsWindow.xaml" />
-        <Page Include="Shell\ToolSettingsWindow.xaml" />
+        <Page Include="Shell\ToolSettingsWindow.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+        </Page>
 
         <None Remove="Shell\Settings\SettingsView.xaml" />
         <Content Remove="Shell\Settings\SettingsView.xaml" />
-        <Page Include="Shell\Settings\SettingsView.xaml" />
+        <Page Include="Shell\Settings\SettingsView.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+        </Page>
 
         <None Remove="Modules\Dashboard\Views\DashboardView.xaml" />
         <Content Remove="Modules\Dashboard\Views\DashboardView.xaml" />
-        <Page Include="Modules\Dashboard\Views\DashboardView.xaml" />
+        <Page Include="Modules\Dashboard\Views\DashboardView.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+        </Page>
 
         <None Remove="Modules\EmptyFolders\Views\EmptyFoldersView.xaml" />
         <Content Remove="Modules\EmptyFolders\Views\EmptyFoldersView.xaml" />
-        <Page Include="Modules\EmptyFolders\Views\EmptyFoldersView.xaml" />
+        <Page Include="Modules\EmptyFolders\Views\EmptyFoldersView.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+        </Page>
 
         <None Remove="Modules\LargeFiles\Views\LargeFilesView.xaml" />
         <Content Remove="Modules\LargeFiles\Views\LargeFilesView.xaml" />
-        <Page Include="Modules\LargeFiles\Views\LargeFilesView.xaml" />
+        <Page Include="Modules\LargeFiles\Views\LargeFilesView.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+        </Page>
 
         <None Remove="Modules\InternetRepair\Views\InternetRepairView.xaml" />
         <Content Remove="Modules\InternetRepair\Views\InternetRepairView.xaml" />
-        <Page Include="Modules\InternetRepair\Views\InternetRepairView.xaml" />
+        <Page Include="Modules\InternetRepair\Views\InternetRepairView.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+        </Page>
 
         <None Remove="Modules\DiskCleanup\Views\DiskCleanupView.xaml" />
         <Content Remove="Modules\DiskCleanup\Views\DiskCleanupView.xaml" />
-        <Page Include="Modules\DiskCleanup\Views\DiskCleanupView.xaml" />
+        <Page Include="Modules\DiskCleanup\Views\DiskCleanupView.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+        </Page>
     </ItemGroup>
 
     <ItemGroup>
