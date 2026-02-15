@@ -82,20 +82,41 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="Shell\**\*.xaml" />
-        <Content Remove="Shell\**\*.xaml" />
-        <None Remove="Modules\**\Views\**\*.xaml" />
-        <Content Remove="Modules\**\Views\**\*.xaml" />
-
+        <!-- Keep App.xaml compiled as the single ApplicationDefinition entry. -->
         <ApplicationDefinition Include="Shell\App.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
         </ApplicationDefinition>
         <Page Remove="Shell\App.xaml" />
 
+        <!-- Ensure runtime views are always compiled into PRI/XBF as Page items. -->
+        <None Remove="Shell\MainWindow.xaml" />
+        <Content Remove="Shell\MainWindow.xaml" />
         <Page Include="Shell\MainWindow.xaml" />
+
+        <None Remove="Shell\Settings\SettingsView.xaml" />
+        <Content Remove="Shell\Settings\SettingsView.xaml" />
         <Page Include="Shell\Settings\SettingsView.xaml" />
-        <Page Include="Modules\**\Views\**\*.xaml" />
+
+        <None Remove="Modules\Dashboard\Views\DashboardView.xaml" />
+        <Content Remove="Modules\Dashboard\Views\DashboardView.xaml" />
+        <Page Include="Modules\Dashboard\Views\DashboardView.xaml" />
+
+        <None Remove="Modules\EmptyFolders\Views\EmptyFoldersView.xaml" />
+        <Content Remove="Modules\EmptyFolders\Views\EmptyFoldersView.xaml" />
+        <Page Include="Modules\EmptyFolders\Views\EmptyFoldersView.xaml" />
+
+        <None Remove="Modules\LargeFiles\Views\LargeFilesView.xaml" />
+        <Content Remove="Modules\LargeFiles\Views\LargeFilesView.xaml" />
+        <Page Include="Modules\LargeFiles\Views\LargeFilesView.xaml" />
+
+        <None Remove="Modules\InternetRepair\Views\InternetRepairView.xaml" />
+        <Content Remove="Modules\InternetRepair\Views\InternetRepairView.xaml" />
+        <Page Include="Modules\InternetRepair\Views\InternetRepairView.xaml" />
+
+        <None Remove="Modules\DiskCleanup\Views\DiskCleanupView.xaml" />
+        <Content Remove="Modules\DiskCleanup\Views\DiskCleanupView.xaml" />
+        <Page Include="Modules\DiskCleanup\Views\DiskCleanupView.xaml" />
     </ItemGroup>
 
     <ItemGroup>
@@ -139,7 +160,6 @@
 
     <ItemGroup>
       <Folder Include="Core\DiskCleanup\" />
-      <Folder Include="inspiration\Source\Includes\" />
       <Folder Include="Modules\Dashboard\ViewModels\" />
       <Folder Include="Modules\Dashboard\Views\" />
     </ItemGroup>
@@ -164,9 +184,17 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Remove="Settings\**\*.cs" />
-      <EmbeddedResource Remove="Settings\**\*.*" />
-      <None Remove="Settings\**\*.*" />
+      <!--
+        Exclude transitive Settings project build artifacts if a local Settings/ mirror or junction exists.
+        These generated files (especially Settings\obj\**\*.cs) can be pulled into this project and cause
+        duplicate assembly attribute errors (CS0579).
+      -->
+      <Compile Remove="Settings\obj\**\*.cs" />
+      <Compile Remove="Settings\bin\**\*.cs" />
+      <EmbeddedResource Remove="Settings\obj\**\*" />
+      <EmbeddedResource Remove="Settings\bin\**\*" />
+      <None Remove="Settings\obj\**\*" />
+      <None Remove="Settings\bin\**\*" />
     </ItemGroup>
 
 </Project>
