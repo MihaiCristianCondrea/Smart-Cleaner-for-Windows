@@ -46,6 +46,9 @@ using AppDataPaths = SmartCleanerForWindows.Diagnostics.AppDataPaths;
 
 namespace SmartCleanerForWindows.Shell;
 
+/// <summary>
+/// Main dashboard window for Smart Cleaner (tools + integrated settings view).
+/// </summary>
 public sealed partial class MainWindow : IEmptyFolderCleanupView
 {
     private readonly IDiskCleanupService _diskCleanupService;

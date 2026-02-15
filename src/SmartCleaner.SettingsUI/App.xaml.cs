@@ -9,7 +9,7 @@ public partial class App : Application
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         base.OnLaunched(args);
-        _window = new MainWindow();
+        _window = new ToolSettingsWindow();
         _window.Activate();
     }
 }

@@ -6,14 +6,14 @@ using System.Text.Json.Nodes;
 
 namespace SmartCleanerForWindows.SettingsUi;
 
-public sealed partial class MainWindow : Window
+public sealed partial class ToolSettingsWindow : Window
 {
     private readonly ToolSettingsService _settingsService;
     private readonly Dictionary<string, JsonObject> _pendingValues = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<NavigationViewItem> _menuItems = new();
     private ToolSettingsDefinition? _activeDefinition;
 
-    public MainWindow()
+    public ToolSettingsWindow()
     {
         InitializeComponent();
         _settingsService = ToolSettingsService.CreateDefault();
