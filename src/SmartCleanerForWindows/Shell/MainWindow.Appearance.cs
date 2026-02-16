@@ -13,16 +13,23 @@ namespace SmartCleanerForWindows.Shell;
 
 public sealed partial class MainWindow
 {
+    // Windows 11+ (build 22000+) is the primary path for SystemBackdrop-based Mica/Acrylic.
+    private static readonly Version Windows11Baseline = new(10, 0, 22000);
+
+    // Legacy MicaController fallback is intentionally restricted to Windows 10 builds where
+    // SystemBackdrop Mica isn't expected to be consistently available.
+    private static readonly Version Windows10LegacyMin = new(10, 0, 19041);
+
     private void TryEnableMica()
     {
-        DisposeBackdropController();
+        ResetBackdropState();
 
         if (!OperatingSystem.IsWindows())
         {
-            SystemBackdrop = null;
             return;
         }
 
+        // Primary path: modern WinUI 3 SystemBackdrop (Windows 11+ with Windows App SDK runtime support).
         if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000) &&
             IsMicaSupported() &&
             TryCreateSystemBackdrop(static () => new MicaBackdrop()))
@@ -30,16 +37,19 @@ public sealed partial class MainWindow
             return;
         }
 
+        // Secondary path: keep legacy controller only on constrained compatibility range.
         if (TryInitializeLegacyMicaController())
         {
             return;
         }
 
+        // Final fallback: DesktopAcrylic SystemBackdrop when available.
         TryEnableDesktopAcrylic();
     }
 
-    private void DisposeBackdropController()
+    private void ResetBackdropState()
     {
+        SystemBackdrop = null;
         _mica?.Dispose();
         _mica = null;
         _backdropConfig = null;
@@ -54,14 +64,15 @@ public sealed partial class MainWindow
         }
         catch
         {
-            SystemBackdrop = null;
+            ResetBackdropState();
             return false;
         }
     }
 
     private bool TryInitializeLegacyMicaController()
     {
-        if (!IsMicaSupported())
+        // Strict compatibility gate for legacy controller fallback.
+        if (!ShouldUseLegacyMicaController() || !IsMicaSupported())
         {
             return false;
         }
@@ -87,21 +98,42 @@ public sealed partial class MainWindow
         }
         catch
         {
-            DisposeBackdropController();
-            SystemBackdrop = null;
+            ResetBackdropState();
             return false;
         }
     }
 
     private void TryEnableDesktopAcrylic()
     {
+        // SystemBackdrop-based DesktopAcrylic is preferred over legacy controller fallback.
         if (!IsDesktopAcrylicSupported())
         {
-            SystemBackdrop = null;
+            ResetBackdropState();
             return;
         }
 
-        _ = TryCreateSystemBackdrop(static () => new DesktopAcrylicBackdrop());
+        if (!TryCreateSystemBackdrop(static () => new DesktopAcrylicBackdrop()))
+        {
+            ResetBackdropState();
+        }
+    }
+
+    private static bool ShouldUseLegacyMicaController()
+    {
+        if (!OperatingSystem.IsWindows())
+        {
+            return false;
+        }
+
+        // Keep fallback for Windows 10 (19041+) only; avoid dual-path complexity on Windows 11+.
+        return OperatingSystem.IsWindowsVersionAtLeast(
+                   Windows10LegacyMin.Major,
+                   Windows10LegacyMin.Minor,
+                   Windows10LegacyMin.Build)
+               && !OperatingSystem.IsWindowsVersionAtLeast(
+                   Windows11Baseline.Major,
+                   Windows11Baseline.Minor,
+                   Windows11Baseline.Build);
     }
 
     private void OnWindowActivated(object sender, WindowActivatedEventArgs args)
@@ -145,7 +177,7 @@ public sealed partial class MainWindow
         }
         catch
         {
-            SystemBackdrop = null;
+            ResetBackdropState();
             return false;
         }
     }
@@ -283,4 +315,3 @@ public sealed partial class MainWindow
     }
 
 }
-

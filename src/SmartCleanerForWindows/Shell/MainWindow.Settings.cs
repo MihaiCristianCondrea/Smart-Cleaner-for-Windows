@@ -6,7 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.Windows.ApplicationModel.Resources;
 using Windows.Storage;
-using Windows.UI;
+using Microsoft.UI;
 
 namespace SmartCleanerForWindows.Shell;
 
@@ -25,71 +25,26 @@ public sealed partial class MainWindow
         "SystemAccentColorDark3"
     ];
 
-    private static bool ParseBoolSetting(string? value, bool defaultValue)
-    {
-        if (string.IsNullOrWhiteSpace(value)) return defaultValue;
-        if (bool.TryParse(value, out var result)) return result;
-        if (int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var numeric)) return numeric != 0;
-        return defaultValue;
-    }
-
-    private static int ParseIntSetting(string? value, int defaultValue, int min, int max)
-    {
-        if (!string.IsNullOrWhiteSpace(value) &&
-            int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed))
-        {
-            defaultValue = parsed;
-        }
-
-        return Math.Clamp(defaultValue, min, max);
-    }
-
     private void LoadPreferences()
     {
         _isInitializingSettings = true;
 
-        var savedTheme = ReadSetting(ThemePreferenceKey);
-        ApplyThemePreference(savedTheme, save: false);
-        SelectThemeOption(_themePreference);
-
-        var savedAccent = ReadSetting(AccentPreferenceKey);
-        ApplyAccentPreference(savedAccent, save: false);
-        SelectAccentOption(_accentPreference);
-
-        _notificationShowCompletion = ParseBoolSetting(ReadSetting(NotificationShowCompletionKey), defaultValue: true);
-        _notificationDesktopAlerts = ParseBoolSetting(ReadSetting(NotificationDesktopAlertsKey), defaultValue: false);
-        _historyRetentionDays = ParseIntSetting(
-            ReadSetting(HistoryRetentionKey),
+        _settingsCoordinator.LoadPreferences(
+            this,
+            ReadSetting,
+            ThemePreferenceKey,
+            AccentPreferenceKey,
+            NotificationShowCompletionKey,
+            NotificationDesktopAlertsKey,
+            HistoryRetentionKey,
             HistoryRetentionDefaultDays,
-            min: HistoryRetentionMinDays,
-            max: HistoryRetentionMaxDays);
-
-        UpdateCleanerSettingsView();
-        UpdateAutomationSettingsView();
-
-        if (SettingsView.NotificationCompletionToggle is not null)
-        {
-            SettingsView.NotificationCompletionToggle.IsOn = _notificationShowCompletion;
-        }
-
-        if (SettingsView.NotificationDesktopToggle is not null)
-        {
-            SettingsView.NotificationDesktopToggle.IsOn = _notificationDesktopAlerts;
-        }
-
-        if (SettingsView.HistoryRetentionNumberBox is not null)
-        {
-            SettingsView.HistoryRetentionNumberBox.Value = _historyRetentionDays;
-        }
-
-        UpdateCleanerDefaultsSummary();
-        UpdateAutomationSummary();
-        UpdateNotificationSummary();
-        UpdateHistoryRetentionSummary();
+            HistoryRetentionMinDays,
+            HistoryRetentionMaxDays,
+            out _notificationShowCompletion,
+            out _notificationDesktopAlerts,
+            out _historyRetentionDays);
 
         _isInitializingSettings = false;
-
-        ApplyCleanerDefaultsToSession();
     }
 
     private void OnThemeSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -191,7 +146,7 @@ public sealed partial class MainWindow
         {
             ApplyAccentColor(GetZestAccentColor());
         }
-        else if (TryParseColor(normalized, out var color))
+        else if (_settingsCoordinator.TryParseColor(normalized, out var color))
         {
             ApplyAccentColor(color);
         }
@@ -609,39 +564,3 @@ public sealed partial class MainWindow
             (byte)(from.G + (to.G - from.G) * amount),
             (byte)(from.B + (to.B - from.B) * amount));
     }
-
-    private static bool TryParseColor(string? value, out Color color)
-    {
-        color = default;
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return false;
-        }
-
-        var span = value.AsSpan();
-        if (span[0] == '#') span = span[1..];
-
-        switch (span.Length)
-        {
-            case 6 when uint.TryParse(span, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var rgb):
-            {
-                var r = (byte)((rgb >> 16) & 0xFF);
-                var g = (byte)((rgb >> 8) & 0xFF);
-                var b = (byte)(rgb & 0xFF);
-                color = Color.FromArgb(255, r, g, b);
-                return true;
-            }
-            case 8 when uint.TryParse(span, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var argb):
-            {
-                var a = (byte)((argb >> 24) & 0xFF);
-                var r = (byte)((argb >> 16) & 0xFF);
-                var g = (byte)((argb >> 8) & 0xFF);
-                var b = (byte)(argb & 0xFF);
-                color = Color.FromArgb(a, r, g, b);
-                return true;
-            }
-            default:
-                return false;
-        }
-    }
-}

@@ -36,10 +36,8 @@ using SmartCleanerForWindows.Modules.LargeFiles.Views;
 using SmartCleanerForWindows.Settings;
 using SmartCleanerForWindows.Shell.Settings;
 using Windows.Storage;
-using Windows.Storage.Pickers;
-using WinRT.Interop;
 using AppDataPaths = SmartCleanerForWindows.Diagnostics.AppDataPaths;
-using WindowsColor = Windows.UI.Color;
+using WindowsColor = Microsoft.UI.Color;
 
 namespace SmartCleanerForWindows.Shell;
 
@@ -47,7 +45,7 @@ namespace SmartCleanerForWindows.Shell;
 /// Main dashboard window for Smart Cleaner (tools + integrated settings view).
 /// ToolSettingsWindow has been merged into this class (dynamic tool settings UI lives inside SettingsView).
 /// </summary>
-public sealed partial class MainWindow : IEmptyFolderCleanupView
+public sealed partial class MainWindow : IEmptyFolderCleanupView, ILargeFilesWorkflowView, ISettingsWorkflowView
 {
     // - XAML namescope resolution (RootNavigation/DashboardView/InitializeComponent) now relies on correct Page include in csproj.
     // - Missing snapshot/application wiring is handled via ApplySnapshot and _settingsSnapshots updates.
@@ -80,11 +78,11 @@ public sealed partial class MainWindow : IEmptyFolderCleanupView
     private readonly ObservableCollection<DriveUsageViewModel> _driveUsage = [];
     private readonly ObservableCollection<DiskCleanupItemViewModel> _diskCleanupItems = [];
     private readonly ObservableCollection<LargeFileGroupViewModel> _largeFileGroups = [];
-    private readonly ObservableCollection<string> _largeFileExclusions = [];
     private readonly ObservableCollection<InternetRepairLogEntry> _internetRepairLog = [];
 
-    private readonly HashSet<string> _largeFileExclusionLookup =
-        new(OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+    private readonly EmptyFoldersWorkflowCoordinator _emptyFoldersWorkflow = new();
+    private readonly SettingsCoordinator _settingsCoordinator = new();
+    private readonly LargeFilesWorkflowCoordinator _largeFilesWorkflow;
 
     private readonly Dictionary<string, InternetRepairAction> _internetRepairActions = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, InternetRepairLogEntry> _internetRepairLogLookup = new(StringComparer.OrdinalIgnoreCase);
@@ -227,6 +225,7 @@ public sealed partial class MainWindow : IEmptyFolderCleanupView
         _internetRepairService = internetRepairService ?? throw new ArgumentNullException(nameof(internetRepairService));
 
         _diskCleanupVolume = _diskCleanupService.GetDefaultVolume();
+        _largeFilesWorkflow = new LargeFilesWorkflowCoordinator(this);
 
         // ✅ This is now valid because the class is a Window and XAML generation works.
         if (!TryInitializeComponentWithDiagnostics(out var xamlFailure))
@@ -568,7 +567,7 @@ public sealed partial class MainWindow : IEmptyFolderCleanupView
         return EnsureView<LargeFilesView>(nameof(LargeFilesView), ref _largeFilesViewInitialized, _ =>
         {
             LargeFilesView.LargeFilesGroupList.ItemsSource = _largeFileGroups;
-            LargeFilesView.LargeFilesExclusionsList.ItemsSource = _largeFileExclusions;
+            LargeFilesView.LargeFilesExclusionsList.ItemsSource = _largeFilesWorkflow.Exclusions;
             LargeFilesView.BrowseRequested += OnLargeFilesBrowse;
             LargeFilesView.ScanRequested += OnLargeFilesScan;
             LargeFilesView.CancelRequested += OnLargeFilesCancel;
@@ -746,15 +745,10 @@ public sealed partial class MainWindow : IEmptyFolderCleanupView
     {
         try
         {
-            var picker = new FolderPicker();
-            picker.FileTypeFilter.Add("*");
+            var folderPath = await PickFolderPathAsync().ConfigureAwait(true);
+            if (folderPath is null) return;
 
-            InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
-
-            var folder = await picker.PickSingleFolderAsync();
-            if (folder is null) return;
-
-            EmptyFoldersView.RootPathBox.Text = folder.Path;
+            EmptyFoldersView.RootPathBox.Text = folderPath;
 
             UpdateResultsActionState();
             SetStatus(Symbol.Folder,

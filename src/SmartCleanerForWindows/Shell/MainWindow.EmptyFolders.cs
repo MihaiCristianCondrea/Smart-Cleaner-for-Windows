@@ -317,51 +317,17 @@ public sealed partial class MainWindow
 
     private DirectoryCleanOptions CreateOptions(bool dryRun)
     {
-        var depthValue = EmptyFoldersView.DepthBox.Value;
-        int? maxDepth = null;
-        if (double.IsNaN(depthValue))
-            return new DirectoryCleanOptions
-            {
-                DryRun = dryRun,
-                SendToRecycleBin = EmptyFoldersView.RecycleChk.IsChecked == true,
-                SkipReparsePoints = true,
-                DeleteRootWhenEmpty = false,
-                MaxDepth = maxDepth,
-                ExcludedNamePatterns = ParseExclusions(EmptyFoldersView.ExcludeBox.Text),
-                ExcludedFullPaths = _inlineExcludedPaths.ToArray(),
-            };
-        var depth = (int)Math.Max(0, Math.Round(depthValue, MidpointRounding.AwayFromZero));
-        if (depth > 0)
-        {
-            maxDepth = depth;
-        }
-
-        return new DirectoryCleanOptions
-        {
-            DryRun = dryRun,
-            SendToRecycleBin = EmptyFoldersView.RecycleChk.IsChecked == true,
-            SkipReparsePoints = true,
-            DeleteRootWhenEmpty = false,
-            MaxDepth = maxDepth,
-            ExcludedNamePatterns = ParseExclusions(EmptyFoldersView.ExcludeBox.Text),
-            ExcludedFullPaths = _inlineExcludedPaths.ToArray(),
-        };
+        return _emptyFoldersWorkflow.CreateOptions(
+            dryRun,
+            EmptyFoldersView.DepthBox.Value,
+            EmptyFoldersView.RecycleChk.IsChecked == true,
+            EmptyFoldersView.ExcludeBox.Text,
+            _inlineExcludedPaths);
     }
 
     private bool TryGetRootPath(out string root)
     {
-        root = EmptyFoldersView.RootPathBox.Text.Trim();
-        return !string.IsNullOrWhiteSpace(root) && Directory.Exists(root);
-    }
-
-    private static IReadOnlyCollection<string> ParseExclusions(string? text)
-    {
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            return [];
-        }
-
-        return text.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        return _emptyFoldersWorkflow.TryGetRootPath(EmptyFoldersView.RootPathBox.Text, out root);
     }
 
     private void OnCancel(object sender, RoutedEventArgs e) => CancelActiveOperation();
@@ -819,6 +785,6 @@ public sealed partial class MainWindow
 
     private bool HasActiveFilters()
     {
-        return !string.IsNullOrWhiteSpace(_currentResultSearch) || _hideExcludedResults;
+        return _emptyFoldersWorkflow.HasActiveFilters(_currentResultSearch, _hideExcludedResults);
     }
 }
