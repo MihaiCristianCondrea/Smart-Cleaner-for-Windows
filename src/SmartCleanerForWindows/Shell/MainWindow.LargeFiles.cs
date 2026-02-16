@@ -10,8 +10,6 @@ using Microsoft.VisualBasic.FileIO;
 using SmartCleanerForWindows.Core.LargeFiles;
 using SmartCleanerForWindows.Core.Storage;
 using SmartCleanerForWindows.Modules.LargeFiles.ViewModels;
-using Windows.Storage.Pickers;
-using WinRT.Interop;
 
 namespace SmartCleanerForWindows.Shell;
 
@@ -21,12 +19,9 @@ public sealed partial class MainWindow
     {
         try
         {
-            var picker = new FolderPicker();
-            picker.FileTypeFilter.Add("*");
-            InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
-            var folder = await picker.PickSingleFolderAsync();
-            if (folder is null) return;
-            LargeFilesView.LargeFilesRootPathBox.Text = folder.Path;
+            var folderPath = await PickFolderPathAsync().ConfigureAwait(true);
+            if (folderPath is null) return;
+            LargeFilesView.LargeFilesRootPathBox.Text = folderPath;
             ClearLargeFilesResults();
             SetLargeFilesStatus(
                 Symbol.SaveLocal,
@@ -296,13 +291,12 @@ public sealed partial class MainWindow
 
     private void OnLargeFilesClearExclusions(object sender, RoutedEventArgs e)
     {
-        if (_largeFileExclusions.Count == 0)
+        if (_largeFilesWorkflow.Exclusions.Count == 0)
         {
             return;
         }
 
-        _largeFileExclusions.Clear();
-        _largeFileExclusionLookup.Clear();
+        _largeFilesWorkflow.ClearExclusions();
         PersistLargeFileExclusions();
         UpdateLargeFilesExclusionState();
         ShowLargeFilesInfo(Localize("LargeFilesInfoClearedExclusions", "Cleared all exclusions."), InfoBarSeverity.Success);
@@ -311,28 +305,16 @@ public sealed partial class MainWindow
 
     private bool TryGetLargeFilesRoot(out string root)
     {
-        root = LargeFilesView.LargeFilesRootPathBox.Text.Trim();
-        return !string.IsNullOrWhiteSpace(root) && Directory.Exists(root);
+        return _largeFilesWorkflow.TryGetRootPath(LargeFilesView.LargeFilesRootPathBox.Text, out root);
     }
 
     private LargeFileScanOptions CreateLargeFileOptions()
     {
         var includeSubfolders = LargeFilesView.LargeFilesIncludeSubfoldersCheck.IsChecked != false;
-        var maxItemsValue = LargeFilesView.LargeFilesMaxItemsBox.Value;
-        var maxItems = 100;
-        if (!double.IsNaN(maxItemsValue))
-        {
-            maxItems = (int)Math.Max(1, Math.Round(maxItemsValue, MidpointRounding.AwayFromZero));
-        }
-
-        return new LargeFileScanOptions
-        {
-            IncludeSubdirectories = includeSubfolders,
-            SkipReparsePoints = true,
-            MaxResults = maxItems,
-            ExcludedNamePatterns = ParseExclusions(LargeFilesView.LargeFilesExclusionsBox.Text),
-            ExcludedFullPaths = _largeFileExclusions.ToList(),
-        };
+        return _largeFilesWorkflow.CreateOptions(
+            includeSubfolders,
+            LargeFilesView.LargeFilesMaxItemsBox.Value,
+            LargeFilesView.LargeFilesExclusionsBox.Text);
     }
 
     private void ClearLargeFilesResults()
@@ -478,35 +460,13 @@ public sealed partial class MainWindow
 
     private void ApplyLargeFilesSettings(System.Text.Json.Nodes.JsonObject values)
     {
-        var exclusions = values.TryGetPropertyValue("excludedPaths", out var exclusionsNode)
-            ? exclusionsNode?.GetValue<string>()
-            : null;
+        _largeFilesWorkflow.LoadPreferences(
+            values,
+            LargeFilesView.LargeFilesMaxItemsBox.Value,
+            maxItems => LargeFilesView.LargeFilesMaxItemsBox.Value = maxItems);
 
-        if (!string.IsNullOrWhiteSpace(exclusions))
-        {
-            foreach (var exclusion in exclusions.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-            {
-                AddLargeFileExclusion(exclusion, save: false, showMessageOnError: false);
-            }
-
-            LargeFilesView.LargeFilesExclusionsBox.Text = exclusions;
-        }
-
-        if (values.TryGetPropertyValue("minimumSizeMb", out var minimumSizeNode))
-        {
-            var maxItems = minimumSizeNode switch
-            {
-                System.Text.Json.Nodes.JsonValue value when value.TryGetValue<double>(out var sizeValue) =>
-                    Math.Clamp((int)Math.Round(sizeValue, MidpointRounding.AwayFromZero), 1, 5000),
-                System.Text.Json.Nodes.JsonValue value when value.TryGetValue<int>(out var sizeValue) =>
-                    Math.Clamp(sizeValue, 1, 5000),
-                _ => (int)LargeFilesView.LargeFilesMaxItemsBox.Value
-            };
-
-            LargeFilesView.LargeFilesMaxItemsBox.Value = maxItems;
-        }
-
-        UpdateLargeFilesExclusionState();
+        LargeFilesView.LargeFilesExclusionsBox.Text = string.Join(";", _largeFilesWorkflow.Exclusions);
+        PersistLargeFileExclusions();
     }
 
     private void PersistLargeFileExclusions()
@@ -516,98 +476,34 @@ public sealed partial class MainWindow
             return;
         }
 
-        snapshot.Values["excludedPaths"] = string.Join(";", _largeFileExclusions);
+        snapshot.Values["excludedPaths"] = string.Join(";", _largeFilesWorkflow.Exclusions);
         _ = _toolSettingsService.UpdateAsync(LargeFilesToolId, snapshot.Values);
     }
 
     private bool AddLargeFileExclusion(string path, bool save = true, bool showMessageOnError = true)
     {
-        if (string.IsNullOrWhiteSpace(path))
+        var added = _largeFilesWorkflow.TryAddExclusion(path, showMessageOnError);
+        if (added && save)
         {
-            return false;
+            PersistLargeFileExclusions();
         }
 
-        try
-        {
-            var normalized = NormalizeLargeFilePath(path);
-            if (!_largeFileExclusionLookup.Add(normalized))
-            {
-                if (showMessageOnError)
-                {
-                    ShowLargeFilesInfo(Localize("LargeFilesInfoAlreadyExcluded", "That file is already excluded."), InfoBarSeverity.Informational);
-                }
-
-                return false;
-            }
-
-            _largeFileExclusions.Add(normalized);
-
-            if (save)
-            {
-                PersistLargeFileExclusions();
-            }
-
-            UpdateLargeFilesExclusionState();
-            return true;
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException or System.Security.SecurityException)
-        {
-            if (showMessageOnError)
-            {
-                ShowLargeFilesInfo(string.Format(CultureInfo.CurrentCulture, Localize("LargeFilesInfoExcludeFailed", "Couldn't add exclusion: {0}"), ex.Message), InfoBarSeverity.Error);
-            }
-
-            return false;
-        }
+        return added;
     }
 
     private void RemoveLargeFileExclusion(string path, bool save = true)
     {
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            return;
-        }
-
-        string normalized;
-        try
-        {
-            normalized = NormalizeLargeFilePath(path);
-        }
-        catch
-        {
-            normalized = path;
-        }
-
-        var comparer = _largeFileExclusionLookup.Comparer;
-
-        for (var i = _largeFileExclusions.Count - 1; i >= 0; i--)
-        {
-            if (!comparer.Equals(_largeFileExclusions[i], normalized)) continue;
-            _largeFileExclusions.RemoveAt(i);
-            break;
-        }
-
-        _largeFileExclusionLookup.Remove(normalized);
+        _largeFilesWorkflow.RemoveExclusion(path);
 
         if (save)
         {
             PersistLargeFileExclusions();
         }
-
-        UpdateLargeFilesExclusionState();
     }
 
     private void UpdateLargeFilesExclusionState()
     {
-        var hasExclusions = _largeFileExclusions.Count > 0;
-        LargeFilesView.LargeFilesNoExclusionsText.Visibility = hasExclusions ? Visibility.Collapsed : Visibility.Visible;
-        LargeFilesView.LargeFilesClearExclusionsBtn.IsEnabled = hasExclusions && !_isLargeFilesBusy;
-    }
-
-    private static string NormalizeLargeFilePath(string path)
-    {
-        var full = Path.GetFullPath(path);
-        return Path.TrimEndingDirectorySeparator(full);
+        SetLargeFilesExclusionState(_largeFilesWorkflow.Exclusions.Count > 0);
     }
 
     private string FormatFileCount(int count) => count == 1

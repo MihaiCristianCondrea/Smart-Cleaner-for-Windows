@@ -5,12 +5,21 @@ using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.Windows.Storage.Pickers;
 using SmartCleanerForWindows.Settings;
 
 namespace SmartCleanerForWindows.Shell;
 
 public sealed partial class MainWindow
 {
+    private async System.Threading.Tasks.Task<string?> PickFolderPathAsync()
+    {
+        var picker = new FolderPicker(AppWindow.Id);
+
+        var folder = await picker.PickSingleFolderAsync();
+        return folder?.Path;
+    }
+
     private object? FindElement(string elementName)
     {
         if (Content is FrameworkElement root)
@@ -219,10 +228,10 @@ public sealed partial class MainWindow
 
     private void ApplyEmptyFolderSettings(JsonObject values)
     {
-        _cleanerSendToRecycleBin = GetBooleanValue(values, "sendToRecycleBin", _cleanerSendToRecycleBin);
-        _cleanerDepthLimit = GetIntegerValue(values, "depthLimit", _cleanerDepthLimit, 0, 999);
-        _cleanerExclusions = GetStringValue(values, "exclusions", _cleanerExclusions);
-        _automationAutoPreview = GetBooleanValue(values, "previewAutomatically", _automationAutoPreview);
+        _cleanerSendToRecycleBin = _settingsCoordinator.GetBooleanValue(values, "sendToRecycleBin", _cleanerSendToRecycleBin);
+        _cleanerDepthLimit = _settingsCoordinator.GetIntegerValue(values, "depthLimit", _cleanerDepthLimit, 0, 999);
+        _cleanerExclusions = _settingsCoordinator.GetStringValue(values, "exclusions", _cleanerExclusions);
+        _automationAutoPreview = _settingsCoordinator.GetBooleanValue(values, "previewAutomatically", _automationAutoPreview);
 
         var emptyFoldersView = EnsureEmptyFoldersView();
         if (emptyFoldersView is not null)
@@ -240,7 +249,7 @@ public sealed partial class MainWindow
 
     private void ApplyDashboardSettings(JsonObject values)
     {
-        _automationWeeklyReminder = GetBooleanValue(values, "remindWeekly", _automationWeeklyReminder);
+        _automationWeeklyReminder = _settingsCoordinator.GetBooleanValue(values, "remindWeekly", _automationWeeklyReminder);
 
         UpdateAutomationSettingsView();
         UpdateAutomationSummary();
@@ -254,58 +263,10 @@ public sealed partial class MainWindow
             return;
         }
 
-        internetRepairView.InternetRepairDnsChk.IsChecked = GetBooleanValue(values, "flushDns", internetRepairView.InternetRepairDnsChk.IsChecked == true);
-        internetRepairView.InternetRepairWinsockChk.IsChecked = GetBooleanValue(values, "resetWinsock", internetRepairView.InternetRepairWinsockChk.IsChecked == true);
+        internetRepairView.InternetRepairDnsChk.IsChecked = _settingsCoordinator.GetBooleanValue(values, "flushDns", internetRepairView.InternetRepairDnsChk.IsChecked == true);
+        internetRepairView.InternetRepairWinsockChk.IsChecked = _settingsCoordinator.GetBooleanValue(values, "resetWinsock", internetRepairView.InternetRepairWinsockChk.IsChecked == true);
 
         UpdateInternetRepairSelectionState();
-    }
-
-    private static bool GetBooleanValue(JsonObject values, string key, bool fallback)
-    {
-        if (!values.TryGetPropertyValue(key, out var node) || node is null)
-        {
-            return fallback;
-        }
-
-        return node switch
-        {
-            JsonValue value when value.TryGetValue<bool>(out var boolean) => boolean,
-            JsonValue value when value.TryGetValue<int>(out var number) => number != 0,
-            JsonValue value when value.TryGetValue<string>(out var text) && bool.TryParse(text, out var parsed) => parsed,
-            _ => fallback
-        };
-    }
-
-    private static int GetIntegerValue(JsonObject values, string key, int fallback, int min, int max)
-    {
-        if (!values.TryGetPropertyValue(key, out var node) || node is null)
-        {
-            return fallback;
-        }
-
-        var parsed = node switch
-        {
-            JsonValue value when value.TryGetValue<int>(out var integer) => integer,
-            JsonValue value when value.TryGetValue<double>(out var number) => (int)Math.Round(number, MidpointRounding.AwayFromZero),
-            JsonValue value when value.TryGetValue<string>(out var text) && int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var integer) => integer,
-            _ => fallback
-        };
-
-        return Math.Clamp(parsed, min, max);
-    }
-
-    private static string GetStringValue(JsonObject values, string key, string fallback)
-    {
-        if (!values.TryGetPropertyValue(key, out var node) || node is null)
-        {
-            return fallback;
-        }
-
-        return node switch
-        {
-            JsonValue value when value.TryGetValue<string>(out var text) => text,
-            _ => node.ToString()
-        };
     }
 
     private void UpdateCleanerDefaultsSummary()
