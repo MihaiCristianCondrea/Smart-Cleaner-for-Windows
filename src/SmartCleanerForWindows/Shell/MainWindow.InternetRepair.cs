@@ -338,11 +338,7 @@ public sealed partial class MainWindow
                     Localize("InternetRepairLogCancelled", "Cancelled."));
                 break;
             default:
-                var exception = new ArgumentOutOfRangeException();
-                exception.HelpLink = null;
-                exception.HResult = 0;
-                exception.Source = null;
-                throw exception;
+                throw new ArgumentOutOfRangeException(nameof(update.State), update.State, "Unsupported internet repair step state.");
         }
     }
 

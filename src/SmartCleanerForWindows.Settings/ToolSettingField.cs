@@ -3,32 +3,32 @@ using System.Text.Json.Serialization;
 
 namespace SmartCleanerForWindows.Settings;
 
-public sealed class ToolSettingField // FIXME: Class 'ToolSettingField' is never instantiated
+public sealed class ToolSettingField
 {
     [JsonPropertyName("key")]
-    public required string Key { get; init; } // FIXME: Auto-property accessor 'Key.init' is never used
+    public required string Key { get; init; }
 
     [JsonPropertyName("displayName")]
-    public required string DisplayName { get; init; } // FIXME: Auto-property accessor 'DisplayName.init' is never used
+    public required string DisplayName { get; init; }
 
     [JsonPropertyName("description")]
-    public string? Description { get; init; } // FIXME: Auto-property accessor 'Description.init' is never used
+    public string? Description { get; init; }
 
     [JsonPropertyName("type")]
-    public ToolSettingFieldType FieldType { get; init; } // FIXME: Auto-property accessor 'FieldType.init' is never used
+    public ToolSettingFieldType FieldType { get; init; }
 
     [JsonPropertyName("defaultValue")]
-    public JsonNode? DefaultValue { get; init; } // FIXME: Auto-property accessor 'DefaultValue.init' is never used
+    public JsonNode? DefaultValue { get; init; }
 
     [JsonPropertyName("minimum")]
-    public double? Minimum { get; init; } // FIXME: Auto-property accessor 'Minimum.init' is never used
+    public double? Minimum { get; init; }
 
     [JsonPropertyName("maximum")]
-    public double? Maximum { get; init; } // FIXME: Auto-property accessor 'Maximum.init' is never used
+    public double? Maximum { get; init; }
 
     [JsonPropertyName("step")]
-    public double? Step { get; init; } // FIXME: Auto-property accessor 'Step.init' is never used
+    public double? Step { get; init; }
 
     [JsonPropertyName("options")]
-    public IReadOnlyList<ToolSettingOption>? Options { get; init; } // FIXME: 
+    public IReadOnlyList<ToolSettingOption>? Options { get; init; }
 }

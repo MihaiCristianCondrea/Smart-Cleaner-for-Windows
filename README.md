@@ -36,7 +36,7 @@ dotnet restore
 
 ### 3. Build the solution
 ```powershell
-dotnet build "SmartCleanerForWindows.sln" -c Release
+dotnet build "Smart Cleaner for Windows.sln" -c Release
 ```
 
 ### 4. Run from the command line
@@ -75,6 +75,23 @@ The project references stable, preview, and experimental channels. Override the 
 dotnet build "src/SmartCleanerForWindows/SmartCleanerForWindows.csproj" -p:WindowsAppSdkChannel=preview
 dotnet publish "src/SmartCleanerForWindows/SmartCleanerForWindows.csproj" -c Release -p:PublishProfile=win-x64 -p:WindowsAppSdkChannel=experimental
 ```
+
+
+### Build and package (single-project MSIX)
+This app uses the WinUI **single-project MSIX** model. To build and generate an MSIX from CLI, include `GenerateAppxPackageOnBuild=true`:
+
+```powershell
+dotnet msbuild "src/SmartCleanerForWindows/SmartCleanerForWindows.csproj" `
+  /t:Build `
+  /p:Configuration=Release `
+  /p:Platform=x64 `
+  /p:RuntimeIdentifier=win-x64 `
+  /p:GenerateAppxPackageOnBuild=true
+```
+
+Without that property, the project builds but does not emit an MSIX package. A detailed guide is available at [`docs/single-project-msix-guide.md`](docs/single-project-msix-guide.md).
+
+For packaging strategy trade-offs (packaged vs unpackaged, process model, deployment notes), see [`docs/windows-packaging-deployment-process.md`](docs/windows-packaging-deployment-process.md).
 
 ### Package as MSIX
 Smart Cleaner for Windows enables the single-project MSIX tooling. To produce an installer:

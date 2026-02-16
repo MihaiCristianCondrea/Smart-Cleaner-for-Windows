@@ -166,23 +166,25 @@ public sealed partial class MainWindow
 
     private static Brush GetStatusHeroBrush(Symbol symbol)
     {
+        var resources = Application.Current?.Resources;
         return symbol switch
         {
             Symbol.Accept => new SolidColorBrush(Colors.SeaGreen),
             Symbol.Important or Symbol.Cancel => new SolidColorBrush(Colors.IndianRed),
             Symbol.Sync => new SolidColorBrush(Colors.SteelBlue),
-            _ => Application.Current.Resources["AccentFillColorTertiaryBrush"] as Brush ?? new SolidColorBrush(Colors.DodgerBlue)
+            _ => resources?["AccentFillColorTertiaryBrush"] as Brush ?? new SolidColorBrush(Colors.DodgerBlue)
         };
     }
 
     private static Brush GetStatusGlyphBrush(Symbol symbol)
     {
+        var resources = Application.Current?.Resources;
         return symbol switch
         {
             Symbol.Accept => new SolidColorBrush(Colors.White),
             Symbol.Important or Symbol.Cancel => new SolidColorBrush(Colors.White),
             Symbol.Sync => new SolidColorBrush(Colors.White),
-            _ => Application.Current.Resources["TextOnAccentFillColorPrimaryBrush"] as Brush ?? new SolidColorBrush(Colors.White)
+            _ => resources?["TextOnAccentFillColorPrimaryBrush"] as Brush ?? new SolidColorBrush(Colors.White)
         };
     }
 

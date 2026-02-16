@@ -2,12 +2,11 @@ using System.Text.Json.Serialization;
 
 namespace SmartCleanerForWindows.Settings;
 
-public sealed class ToolSettingOption // FIXME: Class 'ToolSettingOption' is never instantiated
-    (string? value, string? displayName)
+public sealed class ToolSettingOption
 {
     [JsonPropertyName("value")]
-    public string? Value { get; init; } = value; // FIXME: Auto-property accessor 'Value.get' is never used
+    public string? Value { get; init; }
 
     [JsonPropertyName("displayName")]
-    public string? DisplayName { get; init; } = displayName; // FIXME: Auto-property accessor 'DisplayName.get' is never used
+    public string? DisplayName { get; init; }
 }
