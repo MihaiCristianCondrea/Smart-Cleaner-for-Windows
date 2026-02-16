@@ -37,7 +37,7 @@ using SmartCleanerForWindows.Settings;
 using SmartCleanerForWindows.Shell.Settings;
 using Windows.Storage;
 using AppDataPaths = SmartCleanerForWindows.Diagnostics.AppDataPaths;
-using WindowsColor = Microsoft.UI.Color;
+using WindowsColor = Windows.UI.Color;
 
 namespace SmartCleanerForWindows.Shell;
 

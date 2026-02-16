@@ -6,7 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.Windows.ApplicationModel.Resources;
 using Windows.Storage;
-using Microsoft.UI;
+using Windows.UI;
 
 namespace SmartCleanerForWindows.Shell;
 

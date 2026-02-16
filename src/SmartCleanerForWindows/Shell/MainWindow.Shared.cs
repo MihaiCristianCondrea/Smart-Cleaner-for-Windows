@@ -15,7 +15,6 @@ public sealed partial class MainWindow
     private async System.Threading.Tasks.Task<string?> PickFolderPathAsync()
     {
         var picker = new FolderPicker(AppWindow.Id);
-        picker.FileTypeFilter.Add("*");
 
         var folder = await picker.PickSingleFolderAsync();
         return folder?.Path;

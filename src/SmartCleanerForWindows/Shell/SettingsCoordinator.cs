@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 using System.Text.Json.Nodes;
-using Microsoft.UI;
+using Windows.UI;
 
 namespace SmartCleanerForWindows.Shell;
 
