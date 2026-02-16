@@ -106,10 +106,7 @@ public sealed partial class App
         var anyPri = false;
         try
         {
-            if (Directory.EnumerateFiles(baseDirectory, "*.pri", SearchOption.TopDirectoryOnly).Any())
-            {
-                anyPri = true;
-            }
+            anyPri = Directory.EnumerateFiles(baseDirectory, "*.pri", SearchOption.TopDirectoryOnly).Any();
         }
         catch (Exception ex)
         {
@@ -200,7 +197,11 @@ public sealed partial class App
 
         sb.AppendLine(exception.ToString());
 
-        if (exception is not FileNotFoundException fnf || string.IsNullOrWhiteSpace(fnf.FileName)) return sb.ToString();
+        if (exception is not FileNotFoundException fnf || string.IsNullOrWhiteSpace(fnf.FileName))
+        {
+            return sb.ToString();
+        }
+
         sb.AppendLine();
         sb.Append("FileName: ");
         sb.AppendLine(fnf.FileName);

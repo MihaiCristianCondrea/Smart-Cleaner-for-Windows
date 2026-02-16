@@ -59,8 +59,9 @@
                         x:Load="False" />
 
                     <!-- Embedded Tool Settings UI (old ToolSettingsWindow content) -->
-                    <Grid x:Load="False">
+                    <Grid x:Name="ToolSettingsHost" x:Load="False">
                         <NavigationView
+                            x:Name="ToolsNavigation"
                             IsSettingsVisible="False"
                             IsBackButtonVisible="Collapsed"
                             PaneDisplayMode="Left"
@@ -72,6 +73,7 @@
                             <NavigationView.Content>
                                 <ScrollViewer>
                                     <StackPanel
+                                        x:Name="FieldsHost"
                                         Spacing="12"
                                         Margin="24" />
                                 </ScrollViewer>

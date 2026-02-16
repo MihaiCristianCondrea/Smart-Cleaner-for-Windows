@@ -3,5 +3,6 @@ namespace SmartCleanerForWindows.Settings;
 public enum ToolSettingFieldType
 {
     Boolean,
-    Number
+    Number,
+    Text
 }

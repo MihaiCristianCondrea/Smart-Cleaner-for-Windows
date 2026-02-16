@@ -43,6 +43,10 @@ public sealed class LargeFileItemViewModel
 
     private string SizeDisplay { get; }
 
+    public LargeFileItemViewModel() : this(new LargeFileEntry(), string.Empty)
+    {
+    }
+
     public override string ToString()
     {
         return $"{Name} ({SizeDisplay}) — {TypeName} in {Directory} [{ExtensionDisplay}]";

@@ -296,6 +296,7 @@ public sealed partial class MainWindow
         if (_isInitializingSettings) return;
 
         if (sender is not TextBox textBox) return;
+
         _cleanerExclusions = textBox.Text?.Trim() ?? string.Empty;
         PersistEmptyFolderSettings();
         UpdateCleanerDefaultsSummary();

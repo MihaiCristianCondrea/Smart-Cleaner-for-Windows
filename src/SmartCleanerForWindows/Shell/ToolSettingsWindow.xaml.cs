@@ -180,6 +180,39 @@ public sealed partial class MainWindow : IEmptyFolderCleanupView
     {
     }
 
+    public MainWindow(IDirectoryCleaner directoryCleaner)
+        : this(
+            directoryCleaner,
+            DiskCleanupServiceFactory.CreateDefault(),
+            new StorageOverviewService(),
+            LargeFileExplorer.Default,
+            InternetRepairServiceFactory.CreateDefault())
+    {
+    }
+
+    public MainWindow(IDirectoryCleaner directoryCleaner, IDiskCleanupService diskCleanupService)
+        : this(
+            directoryCleaner,
+            diskCleanupService,
+            new StorageOverviewService(),
+            LargeFileExplorer.Default,
+            InternetRepairServiceFactory.CreateDefault())
+    {
+    }
+
+    public MainWindow(
+        IDirectoryCleaner directoryCleaner,
+        IDiskCleanupService diskCleanupService,
+        IStorageOverviewService storageOverviewService)
+        : this(
+            directoryCleaner,
+            diskCleanupService,
+            storageOverviewService,
+            LargeFileExplorer.Default,
+            InternetRepairServiceFactory.CreateDefault())
+    {
+    }
+
     private MainWindow(
         IDirectoryCleaner directoryCleaner,
         IDiskCleanupService diskCleanupService,
@@ -549,7 +582,7 @@ public sealed partial class MainWindow : IEmptyFolderCleanupView
             SetLargeFilesStatus(
                 Symbol.SaveLocal,
                 Localize("LargeFilesStatusReadyTitle", "Ready to explore large files"),
-                Localize("LargeFilesStatusReadyDescription", "Choose a location to find the biggest files grouped by type.")); // FIXME: Unpaired symbol: '"' seems to be missing
+                Localize("LargeFilesStatusReadyDescription", "Choose a location to find the biggest files grouped by type."));
             SetLargeFilesResultsCaption(Localize("LargeFilesResultsPlaceholder", "Scan results will appear here after you run a scan."));
             SetLargeFilesActivity(Localize("ActivityReadyToScan", "Ready to scan the selected folder."));
         });
@@ -1003,7 +1036,7 @@ public sealed partial class MainWindow : IEmptyFolderCleanupView
     {
         NameAscending,
         NameDescending,
-        DepthDescending
+        DepthDescending,
     }
 
     // NOTE: EnsureView<T>, EnsureEmptyFoldersView/EnsureLargeFilesView/etc are assumed unchanged below.
