@@ -1,3 +1,5 @@
+using Microsoft.UI;
+using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Markup;
@@ -23,14 +25,14 @@ public sealed class DiskCleanupView : UserControl
         DiskCleanupIntro = new TextBlock
         {
             Text = "Analyze Windows cleanup handlers to reclaim temporary files.",
-            Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(0xE6, 0xFF, 0xFF, 0xFF)),
+            Foreground = new SolidColorBrush(ColorHelper.FromArgb(0xE6, 0xFF, 0xFF, 0xFF)),
             TextWrapping = TextWrapping.Wrap
         };
 
         DiskCleanupStatusText = new TextBlock
         {
             Text = "Ready to analyze Windows disk cleanup handlers.",
-            Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(0xE6, 0xFF, 0xFF, 0xFF)),
+            Foreground = new SolidColorBrush(ColorHelper.FromArgb(0xE6, 0xFF, 0xFF, 0xFF)),
             TextWrapping = TextWrapping.Wrap
         };
 
@@ -78,8 +80,8 @@ public sealed class DiskCleanupView : UserControl
         heroStack.Children.Add(new TextBlock
         {
             Text = "Disk cleanup",
-            Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(0xB3, 0xFF, 0xFF, 0xFF)),
-            FontWeight = Windows.UI.Text.FontWeights.SemiBold
+            Foreground = new SolidColorBrush(ColorHelper.FromArgb(0xB3, 0xFF, 0xFF, 0xFF)),
+            FontWeight = FontWeights.SemiBold
         });
         heroStack.Children.Add(DiskCleanupIntro);
         heroStack.Children.Add(DiskCleanupStatusText);
@@ -94,7 +96,7 @@ public sealed class DiskCleanupView : UserControl
 
         var headerRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 12 };
         headerRow.Children.Add(CreateIconBadge(40, 14, "\uE74D", "AccentFillColorTertiaryBrush", "TextOnAccentFillColorPrimaryBrush", true));
-        headerRow.Children.Add(new TextBlock { Text = "Cleanup categories", FontSize = 22, FontWeight = Windows.UI.Text.FontWeights.SemiBold, VerticalAlignment = VerticalAlignment.Center });
+        headerRow.Children.Add(new TextBlock { Text = "Cleanup categories", FontSize = 22, FontWeight = FontWeights.SemiBold, VerticalAlignment = VerticalAlignment.Center });
 
         var actions = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, Spacing = 8 };
         actions.Children.Add(DiskCleanupAnalyzeBtn);
@@ -155,8 +157,8 @@ public sealed class DiskCleanupView : UserControl
         else
         {
             icon.Foreground = foregroundResource == "White"
-                ? new SolidColorBrush(Windows.UI.Colors.White)
-                : new SolidColorBrush(Windows.UI.Colors.Black);
+                ? new SolidColorBrush(Colors.White)
+                : new SolidColorBrush(Colors.Black);
         }
 
         var border = new Border
@@ -179,7 +181,7 @@ public sealed class DiskCleanupView : UserControl
             return brush;
         }
 
-        return new SolidColorBrush(Windows.UI.Colors.Transparent);
+        return new SolidColorBrush(Colors.Transparent);
     }
 
     private static Button CreateActionButton(Symbol symbol, string label, RoutedEventHandler onClick)
