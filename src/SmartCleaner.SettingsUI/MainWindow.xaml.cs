@@ -95,12 +95,13 @@ public sealed class MainWindow : Window
     {
         _fieldsHost.Children.Clear();
 
-        var header = new TextBlock
-        {
-            Text = definition.Description ?? definition.Title,
-            Style = Application.Current.Resources["SubtitleTextBlockStyle"] as Style,
-            TextWrapping = TextWrapping.Wrap
-        };
+        var header = new TextBlock()
+            .Text(definition.Description ?? definition.Title)
+            .Assign(tb =>
+            {
+                tb.Style = Application.Current.Resources["SubtitleTextBlockStyle"] as Style;
+                tb.TextWrapping = TextWrapping.Wrap;
+            });
         _fieldsHost.Children.Add(header);
 
         foreach (var field in definition.Fields)
@@ -119,12 +120,10 @@ public sealed class MainWindow : Window
     private UIElement CreateToggle(ToolSettingField field, JsonObject values)
     {
         var container = CreateFieldContainer(field);
-        var toggle = new ToggleSwitch
-        {
-            Header = field.DisplayName,
-            IsOn = values.TryGetPropertyValue(field.Key, out var node) && node?.GetValue<bool>() == true,
-            Tag = field
-        };
+        var toggle = new ToggleSwitch()
+            .Header(field.DisplayName)
+            .IsOn(values.TryGetPropertyValue(field.Key, out var node) && node?.GetValue<bool>() == true)
+            .Assign(t => t.Tag = field);
         toggle.Toggled += (_, _) => PersistBoolean(toggle);
         container.Children.Add(toggle);
         return container;
@@ -133,15 +132,16 @@ public sealed class MainWindow : Window
     private UIElement CreateNumberBox(ToolSettingField field, JsonObject values)
     {
         var container = CreateFieldContainer(field);
-        var numberBox = new NumberBox
-        {
-            Header = field.DisplayName,
-            Value = values.TryGetPropertyValue(field.Key, out var node) ? node?.GetValue<double>() ?? 0 : 0,
-            Minimum = field.Minimum ?? double.MinValue,
-            Maximum = field.Maximum ?? double.MaxValue,
-            SmallChange = field.Step ?? 1,
-            Tag = field
-        };
+        var numberBox = new NumberBox()
+            .Header(field.DisplayName)
+            .Value(values.TryGetPropertyValue(field.Key, out var node) ? node?.GetValue<double>() ?? 0 : 0)
+            .Assign(b =>
+            {
+                b.Minimum = field.Minimum ?? double.MinValue;
+                b.Maximum = field.Maximum ?? double.MaxValue;
+                b.SmallChange = field.Step ?? 1;
+                b.Tag = field;
+            });
         numberBox.ValueChanged += (_, args) => PersistNumber(numberBox, args.NewValue);
         container.Children.Add(numberBox);
         return container;
@@ -150,12 +150,10 @@ public sealed class MainWindow : Window
     private UIElement CreateTextBox(ToolSettingField field, JsonObject values)
     {
         var container = CreateFieldContainer(field);
-        var textBox = new TextBox
-        {
-            Header = field.DisplayName,
-            Text = values.TryGetPropertyValue(field.Key, out var node) ? node?.ToString() ?? string.Empty : string.Empty,
-            Tag = field
-        };
+        var textBox = new TextBox()
+            .Header(field.DisplayName)
+            .Text(values.TryGetPropertyValue(field.Key, out var node) ? node?.ToString() ?? string.Empty : string.Empty)
+            .Assign(tb => tb.Tag = field);
         textBox.TextChanged += (_, _) => PersistText(textBox);
         container.Children.Add(textBox);
         return container;
@@ -166,13 +164,14 @@ public sealed class MainWindow : Window
         var panel = new StackPanel().Spacing(4);
         if (!string.IsNullOrWhiteSpace(field.Description))
         {
-            panel.Children.Add(new TextBlock
-            {
-                Text = field.Description,
-                Opacity = 0.7,
-                TextWrapping = TextWrapping.Wrap,
-                Margin = new Thickness(0, 0, 0, 4)
-            });
+            panel.Children.Add(new TextBlock()
+                .Text(field.Description)
+                .Margin(0, 0, 0, 4)
+                .Assign(tb =>
+                {
+                    tb.Opacity = 0.7;
+                    tb.TextWrapping = TextWrapping.Wrap;
+                }));
         }
 
         return panel;
