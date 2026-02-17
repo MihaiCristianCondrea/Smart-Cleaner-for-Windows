@@ -17,10 +17,6 @@
     <ProjectReference Include="..\SmartCleanerForWindows\Settings\SmartCleanerForWindows.Settings.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml" />
-    <Page Include="ToolSettingsWindow.xaml" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="..\SettingsDefinitions\**\*.json"
              Link="SettingsDefinitions\%(RecursiveDir)%(Filename)%(Extension)"
              CopyToOutputDirectory="PreserveNewest"
