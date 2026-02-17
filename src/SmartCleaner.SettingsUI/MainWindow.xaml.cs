@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using SmartCleanerForWindows.Settings;
+using SmartCleanerForWindows.SettingsUi.Markup;
 using System.Text.Json.Nodes;
 
 namespace SmartCleanerForWindows.SettingsUi;
@@ -11,11 +12,23 @@ public sealed partial class MainWindow : Window
     private readonly ToolSettingsService _settingsService;
     private readonly Dictionary<string, JsonObject> _pendingValues = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<NavigationViewItem> _menuItems = new();
+    private readonly NavigationView _toolsNavigation;
+    private readonly StackPanel _fieldsHost;
     private ToolSettingsDefinition? _activeDefinition;
 
     public MainWindow()
     {
         InitializeComponent();
+
+        _fieldsHost = new StackPanel().Spacing(12).Margin(24);
+
+        _toolsNavigation = new NavigationView()
+            .OnLoaded(OnNavigationLoaded)
+            .OnSelectionChanged(OnNavigationSelectionChanged)
+            .WithContent(new ScrollViewer().WithContent(_fieldsHost));
+
+        Content = new Grid().Add(_toolsNavigation);
+
         _settingsService = ToolSettingsService.CreateDefault();
         _settingsService.SettingsChanged += OnSettingsChanged;
         Closed += OnWindowClosed;
@@ -41,16 +54,16 @@ public sealed partial class MainWindow : Window
             _menuItems.Add(item);
         }
 
-        ToolsNavigation.MenuItemsSource = null;
-        ToolsNavigation.MenuItems.Clear();
+        _toolsNavigation.MenuItemsSource = null;
+        _toolsNavigation.MenuItems.Clear();
         foreach (var item in _menuItems)
         {
-            ToolsNavigation.MenuItems.Add(item);
+            _toolsNavigation.MenuItems.Add(item);
         }
 
         if (_menuItems.Count > 0)
         {
-            ToolsNavigation.SelectedItem = _menuItems[0];
+            _toolsNavigation.SelectedItem = _menuItems[0];
         }
     }
 
@@ -81,7 +94,7 @@ public sealed partial class MainWindow : Window
 
     private void RenderFields(ToolSettingsDefinition definition, JsonObject values)
     {
-        FieldsHost.Children.Clear();
+        _fieldsHost.Children.Clear();
 
         var header = new TextBlock
         {
@@ -89,7 +102,7 @@ public sealed partial class MainWindow : Window
             Style = Application.Current.Resources["SubtitleTextBlockStyle"] as Style,
             TextWrapping = TextWrapping.Wrap
         };
-        FieldsHost.Children.Add(header);
+        _fieldsHost.Children.Add(header);
 
         foreach (var field in definition.Fields)
         {
@@ -100,7 +113,7 @@ public sealed partial class MainWindow : Window
                 _ => CreateTextBox(field, values)
             };
 
-            FieldsHost.Children.Add(element);
+            _fieldsHost.Children.Add(element);
         }
     }
 
@@ -151,7 +164,7 @@ public sealed partial class MainWindow : Window
 
     private static StackPanel CreateFieldContainer(ToolSettingField field)
     {
-        var panel = new StackPanel { Spacing = 4 };
+        var panel = new StackPanel().Spacing(4);
         if (!string.IsNullOrWhiteSpace(field.Description))
         {
             panel.Children.Add(new TextBlock
