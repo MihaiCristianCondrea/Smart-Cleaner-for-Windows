@@ -1,10 +1,16 @@
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 
 namespace SmartCleanerForWindows.SettingsUi;
 
-public partial class App : Application
+public sealed class App : Application
 {
     private Window? _window;
+
+    public App()
+    {
+        Resources.MergedDictionaries.Add(new XamlControlsResources());
+    }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {

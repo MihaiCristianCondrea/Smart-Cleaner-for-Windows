@@ -12,7 +12,6 @@ using Microsoft.UI;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.Windows.ApplicationModel.Resources;
 using Serilog;
@@ -280,40 +279,6 @@ public sealed partial class MainWindow : IEmptyFolderCleanupView, ILargeFilesWor
         _toolSettingsService.SettingsChanged += OnToolSettingsChanged;
         BuildToolNavigation();
         NavigateToTool(DashboardToolId);
-    }
-
-    private bool TryInitializeComponentWithDiagnostics(out Exception? failure)
-    {
-        try
-        {
-            InitializeComponent();
-            failure = null;
-            return true;
-        }
-        catch (FileNotFoundException fileEx)
-        {
-            Log.Error("XAML load failed while constructing MainWindow.\n{Details}", XamlDiagnostics.Format(fileEx));
-            failure = fileEx;
-        }
-        catch (XamlParseException xamlEx)
-        {
-            if (xamlEx.InnerException is FileNotFoundException innerFileEx)
-            {
-                Log.Error(
-                    "XAML parse failed with inner FileNotFoundException while constructing MainWindow.\n{Details}",
-                    XamlDiagnostics.Format(innerFileEx));
-            }
-
-            Log.Error("XAML parse failed while constructing MainWindow.\n{Details}", XamlDiagnostics.Format(xamlEx));
-            failure = xamlEx;
-        }
-        catch (Exception ex)
-        {
-            Log.Error("Unexpected failure during MainWindow InitializeComponent.\n{Details}", XamlDiagnostics.Format(ex));
-            failure = ex;
-        }
-
-        return false;
     }
 
     private void BuildFallbackShell(Exception? failure)

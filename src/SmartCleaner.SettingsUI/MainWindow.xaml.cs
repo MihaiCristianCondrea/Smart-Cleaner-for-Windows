@@ -1,13 +1,12 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 using SmartCleanerForWindows.Settings;
 using SmartCleanerForWindows.SettingsUi.Markup;
 using System.Text.Json.Nodes;
 
 namespace SmartCleanerForWindows.SettingsUi;
 
-public sealed partial class MainWindow : Window
+public sealed class MainWindow : Window
 {
     private readonly ToolSettingsService _settingsService;
     private readonly Dictionary<string, JsonObject> _pendingValues = new(StringComparer.OrdinalIgnoreCase);
@@ -18,7 +17,7 @@ public sealed partial class MainWindow : Window
 
     public MainWindow()
     {
-        InitializeComponent();
+        Title = "Smart Cleaner Settings";
 
         _fieldsHost = new StackPanel().Spacing(12).Margin(24);
 
