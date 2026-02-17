@@ -23,6 +23,7 @@ using SmartCleanerForWindows.Core.Networking;
 using SmartCleanerForWindows.Core.Storage;
 using SmartCleanerForWindows.Diagnostics;
 using SmartCleanerForWindows.Modules.Dashboard.ViewModels;
+using SmartCleanerForWindows.Modules.Dashboard.Views;
 using SmartCleanerForWindows.Modules.DiskCleanup.ViewModels;
 using SmartCleanerForWindows.Modules.DiskCleanup.Views;
 using SmartCleanerForWindows.Modules.EmptyFolders;
@@ -47,7 +48,18 @@ namespace SmartCleanerForWindows.Shell;
 /// </summary>
 public sealed partial class MainWindow : IEmptyFolderCleanupView, ILargeFilesWorkflowView, ISettingsWorkflowView
 {
-    // - XAML namescope resolution (RootNavigation/DashboardView/InitializeComponent) now relies on correct Page include in csproj.
+    private NavigationView RootNavigation = null!;
+    private DashboardView DashboardView = null!;
+    private EmptyFoldersView EmptyFoldersView = null!;
+    private LargeFilesView LargeFilesView = null!;
+    private InternetRepairView InternetRepairView = null!;
+    private DiskCleanupView DiskCleanupView = null!;
+    private Grid ToolSettingsHost = null!;
+    private NavigationView ToolsNavigation = null!;
+    private StackPanel FieldsHost = null!;
+    private SettingsView SettingsView = null!;
+
+    // - Main shell layout is built programmatically (C# markup style) and element references are maintained by fields.
     // - Missing snapshot/application wiring is handled via ApplySnapshot and _settingsSnapshots updates.
     // - Shared status/localization/settings summary helpers are implemented in MainWindow.Shared.cs.
     // - Tool view event subscriptions are now connected in Ensure*View initializers.
@@ -227,13 +239,18 @@ public sealed partial class MainWindow : IEmptyFolderCleanupView, ILargeFilesWor
         _diskCleanupVolume = _diskCleanupService.GetDefaultVolume();
         _largeFilesWorkflow = new LargeFilesWorkflowCoordinator(this);
 
-        // ✅ This is now valid because the class is a Window and XAML generation works.
-        if (!TryInitializeComponentWithDiagnostics(out var xamlFailure))
+        try
+        {
+            var shell = BuildMainShell();
+            Content = shell;
+            Title = "Smart Cleaner for Windows";
+        }
+        catch (Exception ex)
         {
             _toolSettingsService.Dispose();
             IsFallbackShellActive = true;
-            InitializationFailure = xamlFailure;
-            BuildFallbackShell(xamlFailure);
+            InitializationFailure = ex;
+            BuildFallbackShell(ex);
             return;
         }
 
@@ -379,6 +396,88 @@ public sealed partial class MainWindow : IEmptyFolderCleanupView, ILargeFilesWor
         {
             Log.Error(ex, "Failed to open logs directory from fallback shell.");
         }
+    }
+
+    private UIElement BuildMainShell()
+    {
+        DashboardView = new DashboardView();
+        EmptyFoldersView = new EmptyFoldersView { Visibility = Visibility.Collapsed };
+        LargeFilesView = new LargeFilesView { Visibility = Visibility.Collapsed };
+        InternetRepairView = new InternetRepairView { Visibility = Visibility.Collapsed };
+        DiskCleanupView = new DiskCleanupView { Visibility = Visibility.Collapsed };
+        SettingsView = new SettingsView { Visibility = Visibility.Collapsed };
+
+        FieldsHost = new StackPanel
+        {
+            Name = "FieldsHost",
+            Spacing = 12,
+            Margin = new Thickness(24),
+        };
+
+        ToolsNavigation = new NavigationView
+        {
+            Name = "ToolsNavigation",
+            IsSettingsVisible = false,
+            IsBackButtonVisible = NavigationViewBackButtonVisible.Collapsed,
+            PaneDisplayMode = NavigationViewPaneDisplayMode.Left,
+            CompactPaneLength = 56,
+            OpenPaneLength = 260,
+            Content = new ScrollViewer
+            {
+                Content = FieldsHost,
+            },
+        };
+        ToolsNavigation.SelectionChanged += OnToolSettingsNavigationSelectionChanged;
+        ToolsNavigation.Loaded += OnToolSettingsNavigationLoaded;
+
+        ToolSettingsHost = new Grid
+        {
+            Name = "ToolSettingsHost",
+            Visibility = Visibility.Collapsed,
+            Children = { ToolsNavigation },
+        };
+
+        var contentGrid = new Grid();
+        contentGrid.Children.Add(DashboardView);
+        contentGrid.Children.Add(EmptyFoldersView);
+        contentGrid.Children.Add(LargeFilesView);
+        contentGrid.Children.Add(InternetRepairView);
+        contentGrid.Children.Add(DiskCleanupView);
+        contentGrid.Children.Add(ToolSettingsHost);
+        contentGrid.Children.Add(SettingsView);
+
+        RootNavigation = new NavigationView
+        {
+            Name = "RootNavigation",
+            IsBackButtonVisible = NavigationViewBackButtonVisible.Collapsed,
+            IsSettingsVisible = true,
+            PaneDisplayMode = NavigationViewPaneDisplayMode.Left,
+            CompactPaneLength = 56,
+            OpenPaneLength = 260,
+            IsPaneToggleButtonVisible = true,
+            SelectionFollowsFocus = NavigationViewSelectionFollowsFocus.Disabled,
+            AlwaysShowHeader = false,
+            IsTitleBarAutoPaddingEnabled = false,
+            Content = contentGrid,
+            MenuItemContainerStyle = new Style(typeof(NavigationViewItem))
+            {
+                Setters =
+                {
+                    new Setter(FrameworkElement.MarginProperty, new Thickness(0, 0, 0, 12)),
+                },
+            },
+        };
+
+        RootNavigation.SelectionChanged += OnNavigationSelectionChanged;
+        RootNavigation.Loaded += OnNavigationLoaded;
+
+        return new Grid
+        {
+            Children =
+            {
+                RootNavigation,
+            },
+        };
     }
 
     private void OnClosed(object sender, WindowEventArgs args)
