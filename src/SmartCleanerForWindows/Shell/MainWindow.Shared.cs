@@ -22,12 +22,20 @@ public sealed partial class MainWindow
 
     private object? FindElement(string elementName)
     {
-        if (Content is FrameworkElement root)
+        return elementName switch
         {
-            return root.FindName(elementName);
-        }
-
-        return null;
+            nameof(RootNavigation) => RootNavigation,
+            nameof(DashboardView) => DashboardView,
+            nameof(EmptyFoldersView) => EmptyFoldersView,
+            nameof(LargeFilesView) => LargeFilesView,
+            nameof(InternetRepairView) => InternetRepairView,
+            nameof(DiskCleanupView) => DiskCleanupView,
+            nameof(ToolSettingsHost) => ToolSettingsHost,
+            nameof(ToolsNavigation) => ToolsNavigation,
+            nameof(FieldsHost) => FieldsHost,
+            nameof(SettingsView) => SettingsView,
+            _ => (Content as FrameworkElement)?.FindName(elementName)
+        };
     }
 
     private string Localize(string resourceKey, string fallback)
