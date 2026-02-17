@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media;
+using Serilog;
 using SmartCleanerForWindows.Diagnostics;
 
 namespace SmartCleanerForWindows.Modules.DiskCleanup.Views;
@@ -62,11 +63,26 @@ public sealed class DiskCleanupView : UserControl
         DiskCleanupList = new ListView
         {
             SelectionMode = ListViewSelectionMode.None,
-            IsItemClickEnabled = false,
-            ItemTemplate = CreateItemTemplate()
+            IsItemClickEnabled = false
         };
 
-        Content = CreateLayout();
+        DiskCleanupList.ItemTemplate = CreateItemTemplateSafely();
+
+        try
+        {
+            Content = CreateLayout();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to build DiskCleanupView layout. Falling back to minimal UI.");
+            Content = new TextBlock
+            {
+                Text = "Disk Cleanup view failed to load. Check logs for details.",
+                Margin = new Thickness(24),
+                TextWrapping = TextWrapping.Wrap
+            };
+        }
+
         UiConstructionLog.AttachFrameworkElementDiagnostics(this, "DiskCleanupView");
     }
 
@@ -193,6 +209,19 @@ public sealed class DiskCleanupView : UserControl
         content.Children.Add(new TextBlock { Text = label });
         button.Content = content;
         return button;
+    }
+
+    private static DataTemplate? CreateItemTemplateSafely()
+    {
+        try
+        {
+            return CreateItemTemplate();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to parse DiskCleanupView item template. Falling back to default list rendering.");
+            return null;
+        }
     }
 
     private static DataTemplate CreateItemTemplate()
