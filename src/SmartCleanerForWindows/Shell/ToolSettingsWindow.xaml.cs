@@ -45,7 +45,7 @@ namespace SmartCleanerForWindows.Shell;
 /// Main dashboard window for Smart Cleaner (tools + integrated settings view).
 /// ToolSettingsWindow has been merged into this class (dynamic tool settings UI lives inside SettingsView).
 /// </summary>
-public sealed partial class MainWindow : IEmptyFolderCleanupView, ILargeFilesWorkflowView, ISettingsWorkflowView
+public sealed partial class MainWindow : Window, IEmptyFolderCleanupView, ILargeFilesWorkflowView, ISettingsWorkflowView
 {
     private NavigationView RootNavigation = null!;
     private DashboardView DashboardView = null!;
