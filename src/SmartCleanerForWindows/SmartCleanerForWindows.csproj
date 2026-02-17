@@ -117,13 +117,6 @@
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
         </Page>
-
-        <None Remove="Modules\DiskCleanup\Views\DiskCleanupView.xaml" />
-        <Content Remove="Modules\DiskCleanup\Views\DiskCleanupView.xaml" />
-        <Page Include="Modules\DiskCleanup\Views\DiskCleanupView.xaml">
-            <Generator>MSBuild:Compile</Generator>
-            <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-        </Page>
     </ItemGroup>
 
     <ItemGroup>

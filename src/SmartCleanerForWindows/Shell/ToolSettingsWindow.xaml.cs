@@ -48,15 +48,15 @@ namespace SmartCleanerForWindows.Shell;
 public sealed partial class MainWindow : Window, IEmptyFolderCleanupView, ILargeFilesWorkflowView, ISettingsWorkflowView
 {
     private NavigationView RootNavigation = null!;
-    private DashboardView DashboardView = null!;
-    private EmptyFoldersView EmptyFoldersView = null!;
-    private LargeFilesView LargeFilesView = null!;
-    private InternetRepairView InternetRepairView = null!;
-    private DiskCleanupView DiskCleanupView = null!;
+    private DashboardView? DashboardView;
+    private EmptyFoldersView? EmptyFoldersView;
+    private LargeFilesView? LargeFilesView;
+    private InternetRepairView? InternetRepairView;
+    private DiskCleanupView? DiskCleanupView;
     private Grid ToolSettingsHost = null!;
     private NavigationView ToolsNavigation = null!;
     private StackPanel FieldsHost = null!;
-    private SettingsView SettingsView = null!;
+    private SettingsView? SettingsView;
 
     // - Main shell layout is built programmatically (C# markup style) and element references are maintained by fields.
     // - Missing snapshot/application wiring is handled via ApplySnapshot and _settingsSnapshots updates.
@@ -255,15 +255,21 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView, ILarge
 
         _emptyFolderController = new EmptyFolderCleanupController(cleaner, this);
 
-        DashboardView.NavigateToEmptyFoldersRequested += (_, _) => NavigateToTool(EmptyFoldersToolId);
-        DashboardView.NavigateToLargeFilesRequested += (_, _) => NavigateToTool(LargeFilesToolId);
-        DashboardView.NavigateToDiskCleanupRequested += (_, _) => NavigateToTool(DiskCleanupToolId);
-        DashboardView.NavigateToInternetRepairRequested += (_, _) => NavigateToTool(InternetRepairToolId);
+        if (DashboardView is not null)
+        {
+            DashboardView.NavigateToEmptyFoldersRequested += (_, _) => NavigateToTool(EmptyFoldersToolId);
+            DashboardView.NavigateToLargeFilesRequested += (_, _) => NavigateToTool(LargeFilesToolId);
+            DashboardView.NavigateToDiskCleanupRequested += (_, _) => NavigateToTool(DiskCleanupToolId);
+            DashboardView.NavigateToInternetRepairRequested += (_, _) => NavigateToTool(InternetRepairToolId);
+        }
 
         CaptureDefaultAccentColors();
         LoadPreferences();
 
-        DashboardView.DriveUsageListControl.ItemsSource = _driveUsage;
+        if (DashboardView is not null)
+        {
+            DashboardView.DriveUsageListControl.ItemsSource = _driveUsage;
+        }
         _ = UpdateStorageOverviewAsync();
 
         TryEnableMica();
@@ -365,12 +371,12 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView, ILarge
 
     private UIElement BuildMainShell()
     {
-        DashboardView = new DashboardView();
-        EmptyFoldersView = new EmptyFoldersView { Visibility = Visibility.Collapsed };
-        LargeFilesView = new LargeFilesView { Visibility = Visibility.Collapsed };
-        InternetRepairView = new InternetRepairView { Visibility = Visibility.Collapsed };
-        DiskCleanupView = new DiskCleanupView { Visibility = Visibility.Collapsed };
-        SettingsView = new SettingsView { Visibility = Visibility.Collapsed };
+        DashboardView = CreateViewSafely(() => new DashboardView(), nameof(DashboardView));
+        EmptyFoldersView = CreateViewSafely(() => new EmptyFoldersView { Visibility = Visibility.Collapsed }, nameof(EmptyFoldersView));
+        LargeFilesView = CreateViewSafely(() => new LargeFilesView { Visibility = Visibility.Collapsed }, nameof(LargeFilesView));
+        InternetRepairView = CreateViewSafely(() => new InternetRepairView { Visibility = Visibility.Collapsed }, nameof(InternetRepairView));
+        DiskCleanupView = CreateViewSafely(() => new DiskCleanupView { Visibility = Visibility.Collapsed }, nameof(DiskCleanupView));
+        SettingsView = CreateViewSafely(() => new SettingsView { Visibility = Visibility.Collapsed }, nameof(SettingsView));
 
         FieldsHost = new StackPanel
         {
@@ -403,13 +409,13 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView, ILarge
         };
 
         var contentGrid = new Grid();
-        contentGrid.Children.Add(DashboardView);
-        contentGrid.Children.Add(EmptyFoldersView);
-        contentGrid.Children.Add(LargeFilesView);
-        contentGrid.Children.Add(InternetRepairView);
-        contentGrid.Children.Add(DiskCleanupView);
+        AddIfPresent(contentGrid, DashboardView);
+        AddIfPresent(contentGrid, EmptyFoldersView);
+        AddIfPresent(contentGrid, LargeFilesView);
+        AddIfPresent(contentGrid, InternetRepairView);
+        AddIfPresent(contentGrid, DiskCleanupView);
         contentGrid.Children.Add(ToolSettingsHost);
-        contentGrid.Children.Add(SettingsView);
+        AddIfPresent(contentGrid, SettingsView);
 
         RootNavigation = new NavigationView
         {
@@ -443,6 +449,28 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView, ILarge
                 RootNavigation,
             },
         };
+    }
+
+    private static TView? CreateViewSafely<TView>(Func<TView> factory, string viewName)
+        where TView : UIElement
+    {
+        try
+        {
+            return factory();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to construct {ViewName}. The view will be unavailable, but the shell will continue.", viewName);
+            return null;
+        }
+    }
+
+    private static void AddIfPresent(Panel panel, UIElement? element)
+    {
+        if (element is not null)
+        {
+            panel.Children.Add(element);
+        }
     }
 
     private void OnClosed(object sender, WindowEventArgs args)
@@ -529,7 +557,10 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView, ILarge
         _viewFactoryLookup["InternetRepair"] = EnsureInternetRepairView;
 
         _allViews.Clear();
-        _allViews.Add(DashboardView);
+        if (DashboardView is not null)
+        {
+            _allViews.Add(DashboardView);
+        }
     }
 
     private void NavigateToTool(string toolId)
@@ -812,7 +843,13 @@ public sealed partial class MainWindow : Window, IEmptyFolderCleanupView, ILarge
             var folderPath = await PickFolderPathAsync().ConfigureAwait(true);
             if (folderPath is null) return;
 
-            EmptyFoldersView.RootPathBox.Text = folderPath;
+            var emptyFoldersView = EnsureEmptyFoldersView();
+            if (emptyFoldersView is null)
+            {
+                return;
+            }
+
+            emptyFoldersView.RootPathBox.Text = folderPath;
 
             UpdateResultsActionState();
             SetStatus(Symbol.Folder,
