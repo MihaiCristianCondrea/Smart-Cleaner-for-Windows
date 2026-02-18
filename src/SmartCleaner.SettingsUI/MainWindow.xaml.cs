@@ -33,24 +33,19 @@ public sealed class MainWindow : Window
         Closed += OnWindowClosed;
     }
 
-    private void OnNavigationLoaded(object sender, RoutedEventArgs e)
-    {
-        BuildMenu();
-    }
+    private void OnNavigationLoaded(object sender, RoutedEventArgs e) => BuildMenu();
 
     private void BuildMenu()
     {
         _menuItems.Clear();
+
         foreach (var definition in _settingsService.Definitions)
         {
-            var item = new NavigationViewItem
-            {
-                Content = definition.Title,
-                Tag = definition.Id,
-                ToolTip = definition.Description,
-                Icon = TryCreateIcon(definition.Icon)
-            };
-            _menuItems.Add(item);
+            _menuItems.Add(new NavigationViewItem()
+                .Title(definition.Title)
+                .Key(definition.Id)
+                .Description(definition.Description)
+                .Icon(TryCreateIcon(definition.Icon)));
         }
 
         _toolsNavigation.MenuItemsSource = null;
@@ -66,15 +61,10 @@ public sealed class MainWindow : Window
         }
     }
 
-    private static IconElement? TryCreateIcon(string? icon)
-    {
-        if (Enum.TryParse<Symbol>(icon, ignoreCase: true, out var symbol))
-        {
-            return new SymbolIcon(symbol);
-        }
-
-        return null;
-    }
+    private static IconElement? TryCreateIcon(string? icon) =>
+        Enum.TryParse<Symbol>(icon, ignoreCase: true, out var symbol)
+            ? new SymbolIcon(symbol)
+            : null;
 
     private void OnNavigationSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
@@ -95,14 +85,10 @@ public sealed class MainWindow : Window
     {
         _fieldsHost.Children.Clear();
 
-        var header = new TextBlock()
+        _fieldsHost.Add(new TextBlock()
             .Text(definition.Description ?? definition.Title)
-            .Assign(tb =>
-            {
-                tb.Style = Application.Current.Resources["SubtitleTextBlockStyle"] as Style;
-                tb.TextWrapping = TextWrapping.Wrap;
-            });
-        _fieldsHost.Children.Add(header);
+            .Wrap()
+            .Assign(tb => tb.Style = Application.Current.Resources["SubtitleTextBlockStyle"] as Style));
 
         foreach (var field in definition.Fields)
         {
@@ -113,7 +99,7 @@ public sealed class MainWindow : Window
                 _ => CreateTextBox(field, values)
             };
 
-            _fieldsHost.Children.Add(element);
+            _fieldsHost.Add(element);
         }
     }
 
@@ -124,8 +110,9 @@ public sealed class MainWindow : Window
             .Header(field.DisplayName)
             .IsOn(values.TryGetPropertyValue(field.Key, out var node) && node?.GetValue<bool>() == true)
             .Assign(t => t.Tag = field);
+
         toggle.Toggled += (_, _) => PersistBoolean(toggle);
-        container.Children.Add(toggle);
+        container.Add(toggle);
         return container;
     }
 
@@ -135,15 +122,12 @@ public sealed class MainWindow : Window
         var numberBox = new NumberBox()
             .Header(field.DisplayName)
             .Value(values.TryGetPropertyValue(field.Key, out var node) ? node?.GetValue<double>() ?? 0 : 0)
-            .Assign(b =>
-            {
-                b.Minimum = field.Minimum ?? double.MinValue;
-                b.Maximum = field.Maximum ?? double.MaxValue;
-                b.SmallChange = field.Step ?? 1;
-                b.Tag = field;
-            });
+            .Range(field.Minimum ?? double.MinValue, field.Maximum ?? double.MaxValue)
+            .Step(field.Step ?? 1)
+            .Assign(b => b.Tag = field);
+
         numberBox.ValueChanged += (_, args) => PersistNumber(numberBox, args.NewValue);
-        container.Children.Add(numberBox);
+        container.Add(numberBox);
         return container;
     }
 
@@ -154,8 +138,9 @@ public sealed class MainWindow : Window
             .Header(field.DisplayName)
             .Text(values.TryGetPropertyValue(field.Key, out var node) ? node?.ToString() ?? string.Empty : string.Empty)
             .Assign(tb => tb.Tag = field);
+
         textBox.TextChanged += (_, _) => PersistText(textBox);
-        container.Children.Add(textBox);
+        container.Add(textBox);
         return container;
     }
 
@@ -164,14 +149,11 @@ public sealed class MainWindow : Window
         var panel = new StackPanel().Spacing(4);
         if (!string.IsNullOrWhiteSpace(field.Description))
         {
-            panel.Children.Add(new TextBlock()
+            panel.Add(new TextBlock()
                 .Text(field.Description)
                 .Margin(0, 0, 0, 4)
-                .Assign(tb =>
-                {
-                    tb.Opacity = 0.7;
-                    tb.TextWrapping = TextWrapping.Wrap;
-                }));
+                .Wrap()
+                .Assign(tb => tb.Opacity = 0.7));
         }
 
         return panel;

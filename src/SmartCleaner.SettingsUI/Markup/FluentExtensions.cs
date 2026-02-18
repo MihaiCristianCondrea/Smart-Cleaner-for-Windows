@@ -28,35 +28,60 @@ internal static class CSharpMarkupExtensions
         panel.Assign(static (p, s) => p.Spacing = s, spacing);
 
     public static TextBlock Text(this TextBlock textBlock, string value) =>
-        textBlock.Assign((tb, v) => tb.Text = v, value);
+        textBlock.Assign(static (tb, v) => tb.Text = v, value);
+
+    public static TextBlock Wrap(this TextBlock textBlock, TextWrapping wrapping = TextWrapping.Wrap) =>
+        textBlock.Assign(static (tb, value) => tb.TextWrapping = value, wrapping);
 
     public static TextBox Header(this TextBox textBox, string value) =>
-        textBox.Assign((tb, v) => tb.Header = v, value);
+        textBox.Assign(static (tb, v) => tb.Header = v, value);
 
     public static NumberBox Header(this NumberBox box, string value) =>
-        box.Assign((b, v) => b.Header = v, value);
+        box.Assign(static (b, v) => b.Header = v, value);
 
     public static ToggleSwitch Header(this ToggleSwitch toggle, string value) =>
-        toggle.Assign((t, v) => t.Header = v, value);
+        toggle.Assign(static (t, v) => t.Header = v, value);
 
     public static TextBox Text(this TextBox textBox, string value) =>
-        textBox.Assign((tb, v) => tb.Text = v, value);
+        textBox.Assign(static (tb, v) => tb.Text = v, value);
 
     public static ToggleSwitch IsOn(this ToggleSwitch toggle, bool value) =>
-        toggle.Assign((t, v) => t.IsOn = v, value);
+        toggle.Assign(static (t, v) => t.IsOn = v, value);
 
     public static NumberBox Value(this NumberBox box, double value) =>
-        box.Assign((b, v) => b.Value = v, value);
+        box.Assign(static (b, v) => b.Value = v, value);
+
+    public static NumberBox Range(this NumberBox box, double minimum, double maximum) =>
+        box.Assign(static (b, values) =>
+        {
+            b.Minimum = values.minimum;
+            b.Maximum = values.maximum;
+        }, (minimum, maximum));
+
+    public static NumberBox Step(this NumberBox box, double step) =>
+        box.Assign(static (b, value) => b.SmallChange = value, step);
 
     public static NavigationView OnLoaded(this NavigationView view, RoutedEventHandler handler) =>
-        view.Assign((v, h) => v.Loaded += h, handler);
+        view.Assign(static (v, h) => v.Loaded += h, handler);
 
     public static NavigationView OnSelectionChanged(this NavigationView view, TypedEventHandler<NavigationView, NavigationViewSelectionChangedEventArgs> handler) =>
-        view.Assign((v, h) => v.SelectionChanged += h, handler);
+        view.Assign(static (v, h) => v.SelectionChanged += h, handler);
+
+    public static NavigationViewItem Title(this NavigationViewItem item, string value) =>
+        item.Assign(static (i, v) => i.Content = v, value);
+
+    public static NavigationViewItem Description(this NavigationViewItem item, string? value) =>
+        item.Assign(static (i, v) => i.ToolTip = v, value);
+
+    public static NavigationViewItem Key(this NavigationViewItem item, string value) =>
+        item.Assign(static (i, v) => i.Tag = v, value);
+
+    public static NavigationViewItem Icon(this NavigationViewItem item, IconElement? value) =>
+        item.Assign(static (i, v) => i.Icon = v, value);
 
     public static T WithContent<T>(this T control, object content) where T : ContentControl =>
-        control.Assign((c, value) => c.Content = value, content);
+        control.Assign(static (c, value) => c.Content = value, content);
 
     public static Panel Add(this Panel panel, UIElement child) =>
-        panel.Assign((p, c) => p.Children.Add(c), child);
+        panel.Assign(static (p, c) => p.Children.Add(c), child);
 }
